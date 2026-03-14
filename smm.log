@@ -4486,3 +4486,19 @@ with app.app_context(). See the documentation for more information.
 2026-03-14 12:39:42,148 [INFO] 127.0.0.1 - - [14/Mar/2026 12:39:42] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
 2026-03-14 12:39:42,175 [INFO] 127.0.0.1 - - [14/Mar/2026 12:39:42] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
 2026-03-14 12:39:42,182 [INFO] 127.0.0.1 - - [14/Mar/2026 12:39:42] "GET /api/price?service_id=0&quantity=0 HTTP/1.1" 200 -
+2026-03-14 14:04:09,883 [INFO] Auto-sync ishga tushdi (har 5 daqiqa)
+2026-03-14 14:04:09,895 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8000
+ * Running on http://172.20.10.4:8000
+2026-03-14 14:04:09,895 [INFO] [33mPress CTRL+C to quit[0m
+2026-03-14 14:09:09,885 [ERROR] Auto-sync xato: Working outside of application context.
+
+This typically means that you attempted to use functionality that needed
+the current application. To solve this, set up an application context
+with app.app_context(). See the documentation for more information.
+2026-03-14 14:14:09,909 [ERROR] Auto-sync xato: Working outside of application context.
+
+This typically means that you attempted to use functionality that needed
+the current application. To solve this, set up an application context
+with app.app_context(). See the documentation for more information.
