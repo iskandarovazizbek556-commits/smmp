@@ -1,0 +1,527 @@
+{% extends "base.html" %}
+{% block title %}Admin Foydalanuvchilar{% endblock %}
+
+{% block content %}
+<style>
+  .au-wrap *, .au-wrap *::before, .au-wrap *::after { box-sizing: border-box; }
+
+  .au-wrap {
+    --p1: #6366f1;
+    --p1l: #eef2ff;
+    --p1h: #4f46e5;
+    --green: #10b981;
+    --greenl: #d1fae5;
+    --red: #ef4444;
+    --redl: #fef2f2;
+    --yellow: #f59e0b;
+    --yellowl: #fef3c7;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #111827;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+  }
+
+  /* HEADER */
+  .au-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .au-header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--p1l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p1);
+    font-size: 18px;
+  }
+
+  .au-header h1 { font-size: 20px; font-weight: 700; margin: 0; }
+  .au-header-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+  /* CARD */
+  .au-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  /* TOOLBAR */
+  .au-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .au-total {
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--p1l);
+    color: var(--p1);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* SEARCH */
+  .au-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .au-search-input {
+    padding: 7px 12px;
+    font-size: 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--text);
+    outline: none;
+    width: 220px;
+    font-family: inherit;
+    transition: border-color 0.15s;
+  }
+
+  .au-search-input:focus { border-color: var(--p1); }
+
+  .au-search-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+
+  .au-search-btn:hover { border-color: var(--p1); color: var(--p1); }
+
+  /* TABLE */
+  .au-table-wrap { overflow-x: auto; }
+
+  .au-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .au-table thead tr { background: var(--bg); }
+
+  .au-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .au-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .au-table tbody tr:last-child td { border-bottom: none; }
+  .au-table tbody tr:hover { background: #fafafa; }
+
+  .au-id { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+  /* USER CELL */
+  .au-user-cell { display: flex; align-items: center; gap: 9px; }
+
+  .au-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--p1l);
+    color: var(--p1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  .au-username { font-weight: 700; color: var(--text); font-size: 13px; }
+  .au-email    { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  .au-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 5px;
+  }
+
+  .au-badge.admin  { background: var(--yellowl); color: #92400e; }
+  .au-badge.banned { background: var(--redl);    color: #991b1b; }
+
+  .au-balance { font-weight: 800; color: var(--green); font-size: 13px; }
+  .au-balance span { font-size: 10px; font-weight: 500; color: var(--muted); margin-left: 1px; }
+
+  .au-num    { font-weight: 600; color: var(--text); }
+  .au-spent  { font-weight: 600; color: var(--p1); }
+  .au-date   { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  /* ACTION BUTTONS */
+  .au-actions { display: flex; gap: 6px; align-items: center; }
+
+  .au-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-family: inherit;
+  }
+
+  .au-btn-add {
+    background: var(--greenl);
+    color: #065f46;
+    border: 1px solid rgba(16,185,129,0.25);
+  }
+
+  .au-btn-add:hover { background: #a7f3d0; }
+
+  .au-btn-ban {
+    background: var(--redl);
+    color: #991b1b;
+    border: 1px solid rgba(239,68,68,0.25);
+  }
+
+  .au-btn-ban:hover { background: #fecaca; }
+
+  .au-btn-unban {
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .au-btn-unban:hover { background: var(--greenl); color: #065f46; border-color: rgba(16,185,129,0.3); }
+
+  /* EMPTY */
+  .au-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+  }
+
+  .au-empty-icon { font-size: 36px; margin-bottom: 10px; }
+  .au-empty p { font-size: 14px; margin: 0; }
+
+  /* MODAL */
+  .au-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .au-modal-overlay.open { display: flex; }
+
+  .au-modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 360px;
+    position: relative;
+  }
+
+  .au-modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .au-modal-input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s;
+    margin-bottom: 14px;
+  }
+
+  .au-modal-input:focus { border-color: var(--p1); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+
+  .au-modal-hint { font-size: 12px; color: var(--muted); margin-top: -10px; margin-bottom: 14px; }
+
+  .au-modal-actions { display: flex; gap: 8px; }
+
+  .au-modal-submit {
+    flex: 1;
+    padding: 10px;
+    border-radius: 9px;
+    background: var(--p1);
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .au-modal-submit:hover { background: var(--p1h); }
+
+  .au-modal-cancel {
+    flex: 1;
+    padding: 10px;
+    border-radius: 9px;
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .au-modal-cancel:hover { background: var(--border); }
+
+  /* TOAST */
+  .au-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #111827;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  .au-toast.show { opacity: 1; }
+
+  @media (max-width: 768px) {
+    .au-search { margin-left: 0; width: 100%; }
+    .au-search-input { flex: 1; }
+  }
+</style>
+
+<div class="au-wrap">
+
+  <div class="au-header">
+    <div class="au-header-icon"><i class="fas fa-users"></i></div>
+    <div>
+      <h1>Foydalanuvchilar</h1>
+      <div class="au-header-sub">Barcha ro'yxatdan o'tganlar</div>
+    </div>
+  </div>
+
+  <div class="au-card">
+    <div class="au-toolbar">
+      <span class="au-total">{{ users|length }} ta foydalanuvchi</span>
+      <form action="/admin/users" method="get" class="au-search">
+        <input name="q" value="{{ q }}" class="au-search-input"
+               placeholder="Username yoki email...">
+        <button type="submit" class="au-search-btn">
+          <i class="fas fa-search"></i> Qidirish
+        </button>
+      </form>
+    </div>
+
+    <div class="au-table-wrap">
+      <table class="au-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Foydalanuvchi</th>
+            <th>Balans</th>
+            <th>Orderlar</th>
+            <th>Sarflagan</th>
+            <th>Sana</th>
+            <th>Amal</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for u in users %}
+        <tr id="user-row-{{ u.id }}">
+          <td><span class="au-id">#{{ u.id }}</span></td>
+          <td>
+            <div class="au-user-cell">
+              <div class="au-avatar">{{ u.username[0] }}</div>
+              <div>
+                <div>
+                  <span class="au-username">{{ u.username }}</span>
+                  {% if u.role == 'admin' %}
+                  <span class="au-badge admin">Admin</span>
+                  {% endif %}
+                  {% if not u.is_active %}
+                  <span class="au-badge banned">Bloklangan</span>
+                  {% endif %}
+                </div>
+                <div class="au-email">{{ u.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="au-balance">
+              {{ "{:,.0f}".format(u.balance) }}<span>so'm</span>
+            </span>
+          </td>
+          <td><span class="au-num">{{ u.order_count }}</span></td>
+          <td><span class="au-spent">{{ "{:,.0f}".format(u.total_spent) }}</span></td>
+          <td><span class="au-date">{{ u.created_at[:10] }}</span></td>
+          <td>
+            <div class="au-actions">
+              <button class="au-btn au-btn-add" title="Balans qo'shish"
+                      onclick="openAddBal({{ u.id }}, '{{ u.username }}')">
+                <i class="fas fa-plus"></i>
+              </button>
+              {% if u.is_active %}
+              <button class="au-btn au-btn-ban" title="Bloklash"
+                      onclick="toggleUser({{ u.id }}, this)">
+                <i class="fas fa-ban"></i>
+              </button>
+              {% else %}
+              <button class="au-btn au-btn-unban" title="Blokdan chiqarish"
+                      onclick="toggleUser({{ u.id }}, this)">
+                <i class="fas fa-check"></i>
+              </button>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7">
+            <div class="au-empty">
+              <div class="au-empty-icon">🔍</div>
+              <p>Hech qanday foydalanuvchi topilmadi</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- BALANCE MODAL -->
+<div class="au-modal-overlay" id="au-modal" onclick="if(event.target===this)closeModal()">
+  <div class="au-modal">
+    <div class="au-modal-title" id="au-modal-title">Balans qo'shish</div>
+    <input type="number" class="au-modal-input" id="au-modal-amount"
+           placeholder="Miqdor (so'm)">
+    <div class="au-modal-hint">Manfiy qiymat — balansdan yechish</div>
+    <div class="au-modal-actions">
+      <button class="au-modal-submit" onclick="submitAddBal()">
+        <i class="fas fa-check"></i> Tasdiqlash
+      </button>
+      <button class="au-modal-cancel" onclick="closeModal()">Bekor</button>
+    </div>
+  </div>
+</div>
+
+<div class="au-toast" id="au-toast"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let activeUid = null;
+
+function showToast(msg) {
+  const t = document.getElementById('au-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function openAddBal(uid, username) {
+  activeUid = uid;
+  document.getElementById('au-modal-title').textContent = username + ' — balans o\'zgartirish';
+  document.getElementById('au-modal-amount').value = '';
+  document.getElementById('au-modal').classList.add('open');
+  setTimeout(() => document.getElementById('au-modal-amount').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('au-modal').classList.remove('open');
+  activeUid = null;
+}
+
+async function submitAddBal() {
+  const amt = document.getElementById('au-modal-amount').value;
+  if (!amt) return;
+  const r = await fetch(`/admin/users/${activeUid}/balance`, {
+    method: 'POST',
+    body: new URLSearchParams({ amount: amt }),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  }).then(r => r.json());
+
+  closeModal();
+  if (r.ok) {
+    showToast('✓ Balans yangilandi');
+    setTimeout(() => location.reload(), 800);
+  } else {
+    showToast('❌ Xatolik: ' + (r.message || ''));
+  }
+}
+
+async function toggleUser(uid, btn) {
+  const r = await fetch(`/admin/users/${uid}/toggle`, { method: 'POST' }).then(r => r.json());
+  if (r.ok) {
+    showToast('✓ Holat yangilandi');
+    setTimeout(() => location.reload(), 800);
+  }
+}
+
+/* Enter tugmasi modal da */
+document.getElementById('au-modal-amount').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitAddBal();
+});
+</script>
+{% endblock %}

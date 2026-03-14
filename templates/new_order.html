@@ -1,0 +1,497 @@
+{% extends "base.html" %}
+{% block title %}Yangi Order — UzSMM.uz{% endblock %}
+
+{% block content %}
+<style>
+  .no-order-wrap *,
+  .no-order-wrap *::before,
+  .no-order-wrap *::after { box-sizing: border-box; }
+
+  .no-order-wrap {
+    --g1: #0ea472;
+    --g1h: #0b8a5f;
+    --g1l: #e6f7f1;
+    --g2: #d97706;
+    --g2l: #fef3c7;
+    --red: #ef4444;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #111827;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+  }
+
+  .no-page-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .no-page-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .no-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--g1l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--g1);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .no-layout {
+    display: grid;
+    grid-template-columns: 1fr 290px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .no-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+  }
+
+  .no-card + .no-card { margin-top: 14px; }
+
+  .no-card-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 14px 0;
+  }
+
+  .no-form-group { margin-bottom: 16px; }
+
+  .no-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .no-label .req { color: var(--red); margin-left: 2px; }
+
+  .no-input {
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  select.no-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 32px;
+    cursor: pointer;
+  }
+
+  .no-input:focus {
+    border-color: var(--g1);
+    box-shadow: 0 0 0 3px rgba(14,164,114,0.13);
+  }
+
+  .no-svc-info {
+    display: none;
+    margin-top: 10px;
+    padding: 13px;
+    background: var(--g1l);
+    border: 1px solid rgba(14,164,114,0.25);
+    border-radius: 9px;
+  }
+
+  .no-svc-info.show { display: block; }
+
+  .no-svc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .no-svc-stat .lbl { font-size: 11px; color: #0b8a5f; margin-bottom: 2px; }
+  .no-svc-stat .val { font-size: 13px; font-weight: 700; color: #065f46; }
+
+  .no-svc-desc {
+    margin-top: 9px;
+    padding-top: 9px;
+    border-top: 1px solid rgba(14,164,114,0.2);
+    font-size: 12px;
+    color: #0b8a5f;
+    line-height: 1.5;
+  }
+
+  .no-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+
+  .no-price-box {
+    display: none;
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  .no-price-head {
+    padding: 9px 14px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .no-price-body { padding: 13px 14px; }
+
+  .no-price-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 3px 0;
+  }
+
+  .no-price-row .lbl { color: var(--muted); }
+  .no-price-row .fee { color: var(--g2); font-weight: 600; }
+
+  .no-price-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 10px 0;
+  }
+
+  .no-price-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .no-price-total .lbl { font-size: 15px; font-weight: 700; color: var(--text); }
+  .no-price-total .total { font-size: 22px; font-weight: 800; color: var(--g1); }
+
+  .no-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+
+  .no-btn-primary {
+    background: var(--g1);
+    color: #fff;
+    width: 100%;
+    margin-top: 18px;
+    font-size: 15px;
+    padding: 13px;
+  }
+
+  .no-btn-primary:hover:not(:disabled) {
+    background: var(--g1h);
+    box-shadow: 0 4px 12px rgba(14,164,114,0.28);
+    transform: translateY(-1px);
+  }
+
+  .no-btn-primary:active:not(:disabled) { transform: translateY(0); }
+
+  .no-btn-primary:disabled {
+    background: #d1d5db;
+    color: #9ca3af;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .no-btn-green {
+    background: var(--g1l);
+    color: var(--g1h);
+    border: 1px solid rgba(14,164,114,0.3);
+    font-size: 13px;
+    padding: 8px 14px;
+    margin-top: 12px;
+  }
+
+  .no-btn-green:hover { background: #d1fae5; }
+
+  .no-balance-num {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--g1);
+    line-height: 1.1;
+  }
+
+  .no-balance-cur {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 3px;
+  }
+
+  .no-steps { list-style: none; counter-reset: s; padding: 0; margin: 0; }
+
+  .no-steps li {
+    counter-increment: s;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    padding: 5px 0;
+    line-height: 1.5;
+  }
+
+  .no-steps li::before {
+    content: counter(s);
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--g1l);
+    color: var(--g1h);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .no-warn-card {
+    background: var(--g2l);
+    border-color: rgba(217,119,6,0.25) !important;
+  }
+
+  .no-warn-card .no-card-title { color: var(--g2); }
+  .no-warn-card p { font-size: 13px; color: #78350f; line-height: 1.7; margin: 0; }
+
+  @media (max-width: 768px) {
+    .no-layout { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="no-order-wrap">
+  <div class="no-page-header">
+    <div class="no-icon-wrap"><i class="fas fa-plus-circle"></i></div>
+    <h1>Yangi Order</h1>
+  </div>
+
+  <div class="no-layout">
+    <div class="no-card">
+      <form method="POST" action="/new-order" id="order-form">
+
+        <div class="no-form-group">
+          <label class="no-label">Kategoriya</label>
+          <select class="no-input" id="cat-select" onchange="filterServices()">
+            <option value="">— Barchasi —</option>
+            {% for c in categories %}
+            <option value="{{ c.id }}">{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="no-form-group">
+          <label class="no-label">Xizmat <span class="req">*</span></label>
+          <select class="no-input" name="service_id" id="service-select" required onchange="onServiceChange(this)">
+            <option value="">— Xizmatni tanlang —</option>
+            {% for s in services %}
+            <option value="{{ s.id }}"
+              data-cat="{{ s.category_id }}"
+              data-min="{{ s.min_order }}"
+              data-max="{{ s.max_order }}"
+              data-price="{{ s.price_per_1000 }}"
+              data-desc="{{ s.description or '' }}"
+              data-type="{{ s.type }}">
+              {{ s.cat_name }} — {{ s.name }}
+            </option>
+            {% endfor %}
+          </select>
+
+          <div class="no-svc-info" id="svc-info">
+            <div class="no-svc-grid">
+              <div class="no-svc-stat">
+                <div class="lbl">Min miqdor</div>
+                <div class="val" id="svc-min">—</div>
+              </div>
+              <div class="no-svc-stat">
+                <div class="lbl">Max miqdor</div>
+                <div class="val" id="svc-max">—</div>
+              </div>
+              <div class="no-svc-stat">
+                <div class="lbl">Tur</div>
+                <div class="val" id="svc-type">—</div>
+              </div>
+            </div>
+            <div class="no-svc-desc" id="svc-desc"></div>
+          </div>
+        </div>
+
+        <div class="no-form-group">
+          <label class="no-label">Link <span class="req">*</span></label>
+          <input type="url" name="link" class="no-input" placeholder="https://instagram.com/..." required>
+        </div>
+
+        <div class="no-form-group">
+          <label class="no-label">Miqdor <span class="req">*</span></label>
+          <input type="number" name="quantity" id="qty-input" class="no-input"
+                 placeholder="100" min="1" required oninput="updatePrice()">
+          <div class="no-hint" id="qty-hint"></div>
+        </div>
+
+        <div class="no-price-box" id="price-box">
+          <div class="no-price-head">Hisob-kitob</div>
+          <div class="no-price-body">
+            <div class="no-price-row">
+              <span class="lbl">Asosiy narx</span>
+              <span id="price-base">—</span>
+            </div>
+            <div class="no-price-row">
+              <span class="lbl">Xizmat to'lovi (1%)</span>
+              <span class="fee" id="price-fee">—</span>
+            </div>
+            <div class="no-price-divider"></div>
+            <div class="no-price-total">
+              <span class="lbl">Jami:</span>
+              <span class="total" id="price-val">—</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="no-btn no-btn-primary" id="submit-btn" disabled>
+          <i class="fas fa-paper-plane"></i> Orderni Joylash
+        </button>
+      </form>
+    </div>
+
+    <div>
+      <div class="no-card">
+        <div class="no-card-title">Balansingiz</div>
+        <div>
+          <span class="no-balance-num">{{ "{:,.0f}".format(user.balance) }}</span>
+          <span class="no-balance-cur">so'm</span>
+        </div>
+        <a href="/add-funds" class="no-btn no-btn-green">
+          <i class="fas fa-plus"></i> To'ldirish
+        </a>
+      </div>
+
+      <div class="no-card">
+        <div class="no-card-title">Qo'llanma</div>
+        <ol class="no-steps">
+          <li>Xizmat kategoriyasini tanlang</li>
+          <li>Post yoki sahifa linkini kiriting</li>
+          <li>Kerakli miqdorni belgilang</li>
+          <li>Orderni joylang va kuting</li>
+        </ol>
+      </div>
+
+      <div class="no-card no-warn-card">
+        <div class="no-card-title">To'lov haqida</div>
+        <p>Har bir buyurtmaga <strong>1% xizmat to'lovi</strong> qo'shiladi. Narx miqdor kiritilganda avtomatik hisoblanadi.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const MARGIN = 1;
+const svcs = document.querySelectorAll('#service-select option[data-min]');
+
+function filterServices() {
+  const cat = document.getElementById('cat-select').value;
+  svcs.forEach(o => {
+    o.style.display = (!cat || o.dataset.cat == cat) ? '' : 'none';
+  });
+  document.getElementById('service-select').value = '';
+  onServiceChange(document.getElementById('service-select'));
+}
+
+function onServiceChange(sel) {
+  const opt  = sel.options[sel.selectedIndex];
+  const info = document.getElementById('svc-info');
+  const qty  = document.getElementById('qty-input');
+
+  if (!opt.dataset.min) {
+    info.classList.remove('show');
+    document.getElementById('price-box').style.display = 'none';
+    document.getElementById('submit-btn').disabled = true;
+    return;
+  }
+
+  document.getElementById('svc-min').textContent  = parseInt(opt.dataset.min).toLocaleString('uz-UZ');
+  document.getElementById('svc-max').textContent  = parseInt(opt.dataset.max).toLocaleString('uz-UZ');
+  document.getElementById('svc-type').textContent = opt.dataset.type;
+  document.getElementById('svc-desc').textContent = opt.dataset.desc;
+  document.getElementById('qty-hint').textContent =
+    'Min: ' + parseInt(opt.dataset.min).toLocaleString('uz-UZ') +
+    ' / Max: ' + parseInt(opt.dataset.max).toLocaleString('uz-UZ');
+
+  qty.min = opt.dataset.min;
+  qty.max = opt.dataset.max;
+  info.classList.add('show');
+  updatePrice();
+}
+
+function updatePrice() {
+  const sel = document.getElementById('service-select');
+  const opt = sel.options[sel.selectedIndex];
+  const qty = parseInt(document.getElementById('qty-input').value || 0);
+
+  if (!opt.dataset.price || !qty) {
+    document.getElementById('price-box').style.display = 'none';
+    document.getElementById('submit-btn').disabled = true;
+    return;
+  }
+
+  const basePrice = Math.round((parseFloat(opt.dataset.price) / 1000) * qty);
+  const fee       = Math.round(basePrice * MARGIN / 100);
+  const total     = basePrice + fee;
+
+  document.getElementById('price-base').textContent = basePrice.toLocaleString('uz-UZ') + ' so\'m';
+  document.getElementById('price-fee').textContent  = fee.toLocaleString('uz-UZ') + ' so\'m';
+  document.getElementById('price-val').textContent  = total.toLocaleString('uz-UZ') + ' so\'m';
+
+  document.getElementById('price-box').style.display = 'block';
+
+  const min = parseInt(opt.dataset.min);
+  const max = parseInt(opt.dataset.max);
+  document.getElementById('submit-btn').disabled = (qty < min || qty > max);
+}
+</script>
+{% endblock %}

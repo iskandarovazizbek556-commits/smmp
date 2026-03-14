@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+{% block auth_content %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ro'yxatdan O'tish — SMMZone.uz</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #050a14;
+    --card:    #0d1628;
+    --card2:   #111d35;
+    --border:  rgba(99,179,237,0.12);
+    --accent:  #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --text:    #e2eaf8;
+    --muted:   #7a8fad;
+    --white:   #ffffff;
+    --grad:    linear-gradient(135deg, #38bdf8, #818cf8);
+    --err:     #f87171;
+    --ok:      #34d399;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+  }
+
+  /* BACKGROUND */
+  .bg-scene {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden;
+  }
+  .blob {
+    position: absolute; border-radius: 50%;
+    filter: blur(100px);
+    animation: drift 12s ease-in-out infinite alternate;
+  }
+  .blob-1 { width: 500px; height: 500px; background: rgba(56,189,248,0.08); top: -150px; left: -150px; }
+  .blob-2 { width: 400px; height: 400px; background: rgba(129,140,248,0.08); bottom: -100px; right: -100px; animation-delay: -5s; }
+  .blob-3 { width: 250px; height: 250px; background: rgba(52,211,153,0.05); top: 40%; left: 55%; animation-delay: -9s; }
+  @keyframes drift {
+    from { transform: translate(0,0) scale(1); }
+    to   { transform: translate(25px,18px) scale(1.04); }
+  }
+  .bg-scene::after {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* WRAPPER */
+  .auth-wrapper {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 520px;
+    animation: slideUp 0.6s ease both;
+  }
+  @keyframes slideUp {
+    from { opacity:0; transform:translateY(28px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* CARD */
+  .auth-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 44px 40px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  }
+  .auth-card::before {
+    content: ''; position: absolute; top:0; left:0; right:0;
+    height: 2px; background: var(--grad);
+  }
+  .auth-card::after {
+    content: ''; position: absolute; top:-80px; right:-80px;
+    width:200px; height:200px;
+    background: radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* LOGO */
+  .auth-logo {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 28px; text-decoration: none;
+  }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: var(--grad);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; color: #fff; flex-shrink: 0;
+  }
+  .logo-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px; font-weight: 800;
+    color: var(--white); letter-spacing: -0.3px;
+  }
+  .logo-name span { color: var(--accent); }
+
+  /* HEADING */
+  .auth-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px; font-weight: 800;
+    color: var(--white); letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .auth-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+  /* ALERT */
+  .alert {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 12px;
+    font-size: 13px; font-weight: 500;
+    margin-bottom: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+  .alert-danger, .alert-error {
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.25);
+    color: var(--err);
+  }
+  .alert-success {
+    background: rgba(52,211,153,0.1);
+    border: 1px solid rgba(52,211,153,0.25);
+    color: var(--ok);
+  }
+  .alert-info {
+    background: rgba(56,189,248,0.1);
+    border: 1px solid rgba(56,189,248,0.25);
+    color: var(--accent);
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* FORM GRID */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-label {
+    display: block;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--muted); margin-bottom: 7px;
+  }
+
+  .input-wrap { position: relative; }
+  .input-icon {
+    position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); font-size: 13px;
+    pointer-events: none; transition: color 0.2s;
+  }
+  .input-wrap:focus-within .input-icon { color: var(--accent); }
+
+  .form-control {
+    width: 100%;
+    padding: 12px 14px 12px 38px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+  }
+  .form-control::placeholder { color: #3a4a62; }
+  .form-control:focus {
+    border-color: rgba(56,189,248,0.5);
+    box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
+    background: #0f1c33;
+  }
+  .form-control.valid   { border-color: rgba(52,211,153,0.5); }
+  .form-control.invalid { border-color: rgba(248,113,113,0.5); }
+
+  /* PASSWORD TOGGLE */
+  .pw-toggle {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 13px;
+    transition: color 0.2s; padding: 4px;
+  }
+  .pw-toggle:hover { color: var(--accent); }
+
+  /* PASSWORD STRENGTH */
+  .pw-strength { margin-top: 7px; display: none; }
+  .pw-strength.show { display: block; }
+  .strength-bar {
+    height: 3px; border-radius: 2px;
+    background: var(--card2);
+    overflow: hidden; margin-bottom: 5px;
+  }
+  .strength-fill {
+    height: 100%; border-radius: 2px;
+    width: 0%; transition: width 0.4s ease, background 0.4s ease;
+  }
+  .strength-text { font-size: 11px; color: var(--muted); }
+
+  /* REF BADGE */
+  .ref-hint {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--muted);
+    margin-top: 6px;
+  }
+  .ref-hint i { color: var(--accent3); }
+
+  /* SUBMIT */
+  .btn-submit {
+    width: 100%; padding: 14px;
+    background: var(--grad);
+    border: none; border-radius: 12px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 0 24px rgba(56,189,248,0.25);
+    transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    margin-top: 8px;
+  }
+  .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 32px rgba(56,189,248,0.4); }
+  .btn-submit:active { transform: translateY(0); }
+
+  /* TERMS */
+  .terms-note {
+    font-size: 12px; color: var(--muted);
+    text-align: center; margin-top: 14px; line-height: 1.6;
+  }
+  .terms-note a { color: var(--accent); text-decoration: none; }
+  .terms-note a:hover { text-decoration: underline; }
+
+  /* DIVIDER */
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 22px 0;
+  }
+  .divider::before, .divider::after {
+    content:''; flex:1; height:1px; background: var(--border);
+  }
+  .divider span { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+  /* FOOTER */
+  .auth-footer {
+    text-align: center;
+    font-size: 14px; color: var(--muted);
+    margin-top: 20px;
+  }
+  .auth-footer a {
+    color: var(--accent); text-decoration: none; font-weight: 600;
+    transition: opacity 0.2s;
+  }
+  .auth-footer a:hover { opacity: 0.8; text-decoration: underline; }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--muted);
+    text-decoration: none; margin-bottom: 20px;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--accent); }
+
+  @media (max-width: 520px) {
+    .auth-card { padding: 32px 22px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-scene">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+
+<div class="auth-wrapper">
+  <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Bosh sahifaga qaytish</a>
+
+  <div class="auth-card">
+    <a href="/" class="auth-logo">
+      <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+      <div class="logo-name">SMM<span>Zone</span>.uz</div>
+    </a>
+
+    <h2 class="auth-title">Akkaunt yarating 🚀</h2>
+    <p class="auth-subtitle">Bepul ro'yxatdan o'ting va boshlang</p>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in msgs %}
+        <div class="alert alert-{{ cat }}">
+          <i class="fas fa-{{ 'check-circle' if cat == 'success' else 'exclamation-circle' }}"></i>
+          {{ msg }}
+        </div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="/register" autocomplete="off" id="reg-form">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <div class="input-wrap">
+            <input type="text" name="username" id="f-username" class="form-control"
+                   placeholder="aziz99" required autocomplete="username">
+            <i class="fas fa-at input-icon"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <div class="input-wrap">
+            <input type="email" name="email" id="f-email" class="form-control"
+                   placeholder="email@example.com" required autocomplete="email">
+            <i class="fas fa-envelope input-icon"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Parol</label>
+          <div class="input-wrap">
+            <input type="password" name="password" id="f-pw" class="form-control"
+                   placeholder="Kamida 8 belgi" required minlength="8" autocomplete="new-password">
+            <i class="fas fa-lock input-icon"></i>
+            <button type="button" class="pw-toggle" id="pw-toggle1"><i class="fas fa-eye" id="pw-eye1"></i></button>
+          </div>
+          <div class="pw-strength" id="pw-strength">
+            <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+            <div class="strength-text" id="strength-text">Parol kuchini tekshiring</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Parolni tasdiqlang</label>
+          <div class="input-wrap">
+            <input type="password" name="password2" id="f-pw2" class="form-control"
+                   placeholder="••••••••" required autocomplete="new-password">
+            <i class="fas fa-shield-alt input-icon"></i>
+            <button type="button" class="pw-toggle" id="pw-toggle2"><i class="fas fa-eye" id="pw-eye2"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Referal kod <span style="color:#3a4a62;font-size:10px;text-transform:none;letter-spacing:0">(ixtiyoriy)</span></label>
+        <div class="input-wrap">
+          <input type="text" name="ref" id="f-ref" class="form-control"
+                 placeholder="ABCD1234" maxlength="12"
+                 style="text-transform:uppercase;letter-spacing:2px">
+          <i class="fas fa-gift input-icon"></i>
+        </div>
+        <div class="ref-hint"><i class="fas fa-sparkles"></i> Referal kod bilan bonus balans olasiz</div>
+      </div>
+
+      <button type="submit" class="btn-submit">
+        <i class="fas fa-user-plus"></i> Ro'yxatdan O'tish
+      </button>
+    </form>
+
+    <p class="terms-note">
+      Ro'yxatdan o'tish orqali siz bizning
+      <a href="/terms">Foydalanish shartlari</a> va
+      <a href="/privacy">Maxfiylik siyosati</a>ga rozilik bildirasiz.
+    </p>
+
+    <div class="divider"><span>yoki</span></div>
+
+    <div class="auth-footer">
+      Akkaunt bormi? <a href="/login">Kiring →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Password toggle #1
+  const t1 = document.getElementById('pw-toggle1');
+  const f1 = document.getElementById('f-pw');
+  const e1 = document.getElementById('pw-eye1');
+  t1.addEventListener('click', () => {
+    const v = f1.type === 'text';
+    f1.type = v ? 'password' : 'text';
+    e1.className = v ? 'fas fa-eye' : 'fas fa-eye-slash';
+  });
+
+  // Password toggle #2
+  const t2 = document.getElementById('pw-toggle2');
+  const f2 = document.getElementById('f-pw2');
+  const e2 = document.getElementById('pw-eye2');
+  t2.addEventListener('click', () => {
+    const v = f2.type === 'text';
+    f2.type = v ? 'password' : 'text';
+    e2.className = v ? 'fas fa-eye' : 'fas fa-eye-slash';
+  });
+
+  // Password strength meter
+  const pwField   = document.getElementById('f-pw');
+  const strWrap   = document.getElementById('pw-strength');
+  const strFill   = document.getElementById('strength-fill');
+  const strText   = document.getElementById('strength-text');
+
+  pwField.addEventListener('input', () => {
+    const val = pwField.value;
+    if (!val) { strWrap.classList.remove('show'); return; }
+    strWrap.classList.add('show');
+
+    let score = 0;
+    if (val.length >= 8)  score++;
+    if (val.length >= 12) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^a-zA-Z0-9]/.test(val)) score++;
+
+    const levels = [
+      { w:'20%',  bg:'#f87171', label:'Juda zaif' },
+      { w:'40%',  bg:'#fb923c', label:'Zaif' },
+      { w:'60%',  bg:'#facc15', label:"O'rtacha" },
+      { w:'80%',  bg:'#a3e635', label:'Kuchli' },
+      { w:'100%', bg:'#34d399', label:'Juda kuchli 💪' },
+    ];
+    const lvl = levels[Math.min(score - 1, 4)] || levels[0];
+    strFill.style.width      = lvl.w;
+    strFill.style.background = lvl.bg;
+    strText.textContent      = lvl.label;
+    strText.style.color      = lvl.bg;
+  });
+
+  // Confirm password live check
+  const pw2 = document.getElementById('f-pw2');
+  pw2.addEventListener('input', () => {
+    if (!pw2.value) { pw2.classList.remove('valid','invalid'); return; }
+    if (pw2.value === pwField.value) {
+      pw2.classList.add('valid'); pw2.classList.remove('invalid');
+    } else {
+      pw2.classList.add('invalid'); pw2.classList.remove('valid');
+    }
+  });
+
+  // Ref code uppercase
+  const ref = document.getElementById('f-ref');
+  ref.addEventListener('input', () => { ref.value = ref.value.toUpperCase(); });
+</script>
+</body>
+</html>
+{% endblock %}

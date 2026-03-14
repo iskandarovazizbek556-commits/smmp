@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SMMZone.uz — O'zbekistondagi #1 SMM Panel</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050a14;
+    --bg2: #090f1e;
+    --card: #0d1628;
+    --card2: #111d35;
+    --border: rgba(99,179,237,0.12);
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --text: #e2eaf8;
+    --muted: #7a8fad;
+    --white: #ffffff;
+    --grad: linear-gradient(135deg, #38bdf8, #818cf8);
+    --grad2: linear-gradient(135deg, #0d1628 0%, #050a14 100%);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+  .blob-1 { width: 600px; height: 600px; background: rgba(56,189,248,0.07); top: -200px; left: -200px; }
+  .blob-2 { width: 500px; height: 500px; background: rgba(129,140,248,0.07); bottom: -100px; right: -100px; }
+  .blob-3 { width: 300px; height: 300px; background: rgba(52,211,153,0.05); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 14px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(5,10,20,0.8);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    display: flex; align-items: center; gap: 9px;
+    text-decoration: none;
+    color: var(--white);
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--grad);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+  .logo span { color: var(--accent); }
+
+  .nav-links { display: flex; gap: 8px; align-items: center; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 20px;
+    border-radius: 9px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s ease;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--white); border-color: rgba(99,179,237,0.35); background: var(--card); }
+  .btn-primary {
+    background: var(--grad);
+    color: var(--white);
+    box-shadow: 0 0 24px rgba(56,189,248,0.25);
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 32px rgba(56,189,248,0.4); }
+  .btn-outline {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid rgba(56,189,248,0.4);
+  }
+  .btn-outline:hover { background: rgba(56,189,248,0.08); }
+  .btn-lg { padding: 12px 28px; font-size: 14px; border-radius: 11px; }
+
+  /* HERO */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 110px 24px 72px;
+  }
+
+  .hero-inner { max-width: 760px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 7px 16px;
+    background: rgba(56,189,248,0.08);
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 28px;
+    animation: fadeDown 0.8s ease forwards;
+  }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); box-shadow: 0 0 8px var(--accent3); animation: pulse 2s infinite; }
+
+  @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.6; transform:scale(0.85); } }
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 6vw, 62px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -2px;
+    color: var(--white);
+    margin-bottom: 20px;
+    animation: fadeUp 0.9s 0.2s ease both;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto 36px;
+    animation: fadeUp 0.9s 0.35s ease both;
+  }
+
+  .hero-btns {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+    animation: fadeUp 0.9s 0.5s ease both;
+  }
+
+  .stats-row {
+    display: flex; gap: 36px; justify-content: center; flex-wrap: wrap;
+    margin-top: 56px;
+    animation: fadeUp 0.9s 0.65s ease both;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px; font-weight: 800;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
+
+  /* SECTION */
+  section { position: relative; z-index: 1; padding: 80px 24px; }
+  .section-header { text-align: center; margin-bottom: 52px; }
+  .section-tag {
+    display: inline-block;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(22px, 3.5vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    color: var(--white);
+    line-height: 1.15;
+  }
+  .section-sub { font-size: 14px; color: var(--muted); margin-top: 10px; max-width: 480px; margin-left: auto; margin-right: auto; }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    max-width: 1100px; margin: 0 auto;
+  }
+
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 26px 22px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--grad);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .feature-card:hover { transform: translateY(-4px); border-color: rgba(56,189,248,0.25); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-icon {
+    width: 44px; height: 44px;
+    background: rgba(56,189,248,0.08);
+    border: 1px solid rgba(56,189,248,0.15);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px;
+    margin-bottom: 16px;
+  }
+  .feature-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* PLATFORMS */
+  .platforms-section { background: var(--bg2); }
+  .platforms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .platform-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .platform-card:hover { border-color: rgba(56,189,248,0.3); transform: translateY(-3px); background: var(--card2); }
+  .platform-card .p-icon { font-size: 30px; margin-bottom: 10px; display: block; }
+  .platform-card h4 { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+  .platform-card .p-count { font-size: 11px; color: var(--muted); }
+
+  /* PRICING */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    max-width: 960px; margin: 0 auto 40px;
+  }
+  .price-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .price-card.featured {
+    border-color: rgba(56,189,248,0.4);
+    background: linear-gradient(145deg, #0e1a2e, #0d1628);
+    box-shadow: 0 0 40px rgba(56,189,248,0.1);
+  }
+  .price-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(0,0,0,0.35); }
+  .price-card .emoji { font-size: 30px; margin-bottom: 12px; display: block; }
+  .price-card h4 { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 16px; }
+  .price-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px; font-weight: 800;
+    background: var(--grad);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    line-height: 1;
+  }
+  .price-unit { font-size: 12px; color: var(--muted); margin-top: 5px; }
+  .featured-badge {
+    position: absolute; top: 12px; right: 12px;
+    background: var(--grad);
+    color: #fff;
+    font-size: 9px; font-weight: 700;
+    padding: 3px 8px; border-radius: 100px;
+    letter-spacing: 0.5px;
+  }
+
+  /* PAYMENTS */
+  .payments-row {
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+    max-width: 660px; margin: 0 auto;
+  }
+  .pay-chip {
+    display: flex; align-items: center; gap: 7px;
+    padding: 10px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 13px; font-weight: 600;
+    color: var(--text);
+    transition: all 0.2s ease;
+  }
+  .pay-chip:hover { border-color: rgba(56,189,248,0.3); color: var(--white); }
+  .pay-chip i { color: var(--accent); font-size: 14px; }
+
+  /* CTA */
+  .cta-section { background: var(--bg2); text-align: center; }
+  .cta-box {
+    background: linear-gradient(135deg, rgba(56,189,248,0.08) 0%, rgba(129,140,248,0.08) 100%);
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 24px;
+    padding: 60px 40px;
+    max-width: 680px; margin: 0 auto;
+    position: relative; overflow: hidden;
+  }
+  .cta-box::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(56,189,248,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-box h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(22px, 3.5vw, 34px);
+    font-weight: 800; letter-spacing: -0.8px;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+  .cta-box p { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+
+  /* FAQ */
+  .faq-section { background: var(--bg); }
+  .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+  .faq-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .faq-item.open { border-color: rgba(56,189,248,0.3); }
+  .faq-q {
+    padding: 18px 22px;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--white);
+    user-select: none;
+  }
+  .faq-q i { color: var(--accent); font-size: 12px; transition: transform 0.3s ease; flex-shrink: 0; }
+  .faq-item.open .faq-q i { transform: rotate(180deg); }
+  .faq-a {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+    font-size: 13px; line-height: 1.7; color: var(--muted);
+    padding: 0 22px;
+  }
+  .faq-item.open .faq-a { max-height: 300px; padding: 0 22px 18px; }
+
+  /* FOOTER */
+  footer {
+    position: relative; z-index: 1;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 40px 24px;
+    text-align: center;
+  }
+  .footer-logo { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; color: var(--white); margin-bottom: 14px; }
+  .footer-logo span { color: var(--accent); }
+  .footer-links { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+  .footer-links a {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 7px;
+    font-size: 12px; color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-copy { font-size: 11px; color: #3a4a62; }
+
+  @media (max-width: 768px) {
+    nav { padding: 12px 18px; }
+    .hero { padding: 95px 18px 56px; }
+    .stats-row { gap: 20px; }
+    section { padding: 60px 18px; }
+    .cta-box { padding: 40px 20px; }
+  }
+  @media (max-width: 480px) {
+    .nav-links .btn-ghost { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<nav>
+  <a href="/" class="logo">
+    <div class="logo-icon"><i class="fas fa-bolt" style="color:#fff"></i></div>
+    SMM<span>Zone</span>.uz
+  </a>
+  <div class="nav-links">
+    <a href="/login" class="btn btn-ghost">Kirish</a>
+    <a href="/register" class="btn btn-primary"><i class="fas fa-rocket"></i> Boshlash</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="badge">
+      <div class="badge-dot"></div>
+      O'zbekistondagi #1 SMM Panel
+    </div>
+    <h1>Ijtimoiy Tarmoqlarni<br><em>Kuchaytiring</em></h1>
+    <p>Instagram, YouTube, TikTok, Telegram va boshqa platformalar uchun sifatli xizmatlar. Avtomatik yetkazish, 24/7 ishlaydi.</p>
+    <div class="hero-btns">
+      <a href="/register" class="btn btn-primary btn-lg"><i class="fas fa-rocket"></i> Bepul Boshlash</a>
+      <a href="#narxlar" class="btn btn-outline btn-lg"><i class="fas fa-tag"></i> Narxlar</a>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num">50K+</div><div class="stat-label">Faol Foydalanuvchilar</div></div>
+      <div class="stat"><div class="stat-num">2M+</div><div class="stat-label">Bajarilgan Buyurtmalar</div></div>
+      <div class="stat"><div class="stat-num">99.9%</div><div class="stat-label">Uptime</div></div>
+      <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Texnik Yordam</div></div>
+    </div>
+  </div>
+</section>
+
+<section style="background: var(--bg2); position:relative; z-index:1;">
+  <div class="section-header">
+    <div class="section-tag">Imkoniyatlar</div>
+    <h2 class="section-title">Nega SMMZone.uz?</h2>
+    <p class="section-sub">Biz raqobatchilardan bir necha qadam oldinda. Mana sabablari.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon">⚡</div><h3>Tez Yetkazish</h3><p>Buyurtmangiz 1–5 daqiqada ishga tushadi. Avtomatik tizim to'xtamasdan ishlaydi.</p></div>
+    <div class="feature-card"><div class="feature-icon">💎</div><h3>Premium Sifat</h3><p>Real va faol profillarga asoslangan xizmatlar. Account bloklash xavfi yo'q.</p></div>
+    <div class="feature-card"><div class="feature-icon">💰</div><h3>Eng Arzon Narxlar</h3><p>Bozordagi eng past narxlarda eng yaxshi sifat. Katta hajmda chegirmalar.</p></div>
+    <div class="feature-card"><div class="feature-icon">🔒</div><h3>Xavfsiz To'lov</h3><p>Payme, Click, Uzcard, Humo va USDT qabul qilinadi. 100% xavfsiz.</p></div>
+    <div class="feature-card"><div class="feature-icon">🔗</div><h3>API Integratsiya</h3><p>Reseller uchun to'liq REST API. O'z panelingizni qurishingiz mumkin.</p></div>
+    <div class="feature-card"><div class="feature-icon">📊</div><h3>Real Vaqt Monitoring</h3><p>Har bir buyurtmani real vaqtda kuzating. Batafsil statistika va hisobotlar.</p></div>
+  </div>
+</section>
+
+<section class="platforms-section">
+  <div class="section-header">
+    <div class="section-tag">Platformalar</div>
+    <h2 class="section-title">Barcha Platformalar Uchun</h2>
+    <p class="section-sub">20+ platforma uchun 500+ xizmat turlarini taklif qilamiz.</p>
+  </div>
+  <div class="platforms-grid">
+    <a href="/register" class="platform-card"><span class="p-icon">📸</span><h4>Instagram</h4><div class="p-count">85+ xizmat</div></a>
+    <a href="/register" class="platform-card"><span class="p-icon">▶️</span><h4>YouTube</h4><div class="p-count">60+ xizmat</div></a>
+    <a href="/register" class="platform-card"><span class="p-icon">🎵</span><h4>TikTok</h4><div class="p-count">70+ xizmat</div></a>
+    <a href="/register" class="platform-card"><span class="p-icon">✈️</span><h4>Telegram</h4><div class="p-count">40+ xizmat</div></a>
+    <a href="/register" class="platform-card"><span class="p-icon">🐦</span><h4>Twitter / X</h4><div class="p-count">35+ xizmat</div></a>
+    <a href="/register" class="platform-card"><span class="p-icon">👍</span><h4>Facebook</h4><div class="p-count">50+ xizmat</div></a>
+  </div>
+</section>
+
+<section id="narxlar" style="background:var(--bg); position:relative; z-index:1;">
+  <div class="section-header">
+    <div class="section-tag">Narxlar</div>
+    <h2 class="section-title">Mashhur Xizmatlar</h2>
+    <p class="section-sub">O'zbekistondagi eng arzon narxlar. 1000 ta uchun so'mda.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card"><span class="emoji">📸</span><h4>Instagram Followers</h4><div class="price-amount">500</div><div class="price-unit">so'm / 1000 ta</div></div>
+    <div class="price-card featured"><div class="featured-badge">🔥 MASHHUR</div><span class="emoji">▶️</span><h4>YouTube Views</h4><div class="price-amount">800</div><div class="price-unit">so'm / 1000 ta</div></div>
+    <div class="price-card"><span class="emoji">🎵</span><h4>TikTok Likes</h4><div class="price-amount">300</div><div class="price-unit">so'm / 1000 ta</div></div>
+    <div class="price-card"><span class="emoji">✈️</span><h4>Telegram Members</h4><div class="price-amount">1200</div><div class="price-unit">so'm / 1000 ta</div></div>
+  </div>
+  <div style="text-align:center">
+    <a href="/register" class="btn btn-primary btn-lg"><i class="fas fa-list"></i> Barcha narxlarni ko'rish</a>
+  </div>
+</section>
+
+<section style="background:var(--bg2); position:relative; z-index:1; padding: 64px 24px;">
+  <div class="section-header" style="margin-bottom:36px">
+    <div class="section-tag">To'lov Usullari</div>
+    <h2 class="section-title">Qulay To'lov</h2>
+  </div>
+  <div class="payments-row">
+    <div class="pay-chip"><i class="fas fa-credit-card"></i> Payme</div>
+    <div class="pay-chip"><i class="fas fa-mobile-alt"></i> Click</div>
+    <div class="pay-chip"><i class="fas fa-id-card"></i> Uzcard</div>
+    <div class="pay-chip"><i class="fas fa-wallet"></i> Humo</div>
+    <div class="pay-chip"><i class="fab fa-bitcoin"></i> USDT / Crypto</div>
+  </div>
+</section>
+
+<section class="faq-section">
+  <div class="section-header">
+    <div class="section-tag">Savol-Javob</div>
+    <h2 class="section-title">Ko'p So'raladigan Savollar</h2>
+    <p class="section-sub">Savolaringizga javob topa olmadingizmi? Telegram orqali murojaat qiling.</p>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item"><div class="faq-q">SMMZone.uz xavfsizmi? Accountim bloklanadimi?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Bizning barcha xizmatlarimiz Instagram, YouTube va boshqa platformalarning qoidalariga mos ravishda ishlaydi. Biz faqat real va faol profillarga asoslangan xizmatlar taqdim etamiz. Shunga qaramay, bir kunda juda ko'p miqdorda buyurtma berishdan saqlaning — bu har qanday SMM panelida xavf tug'dirishi mumkin.</div></div>
+    <div class="faq-item"><div class="faq-q">Buyurtma bergandan keyin qancha vaqtda boshlanadi?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Odatda buyurtmangiz 1–5 daqiqa ichida avtomatik ravishda boshlanadi. Yuklanish vaqtida ba'zida kechikish bo'lishi mumkin, lekin 15 daqiqadan oshmasligi kerak. Agar 15 daqiqadan ortiq kutgan bo'lsangiz, support bilan bog'laning.</div></div>
+    <div class="faq-item"><div class="faq-q">Balansni qanday to'ldirish mumkin?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Payme, Click, Uzcard, Humo yoki USDT orqali balans to'ldirishingiz mumkin. To'lov darhol qayta ishlanadi va balans 1–2 daqiqa ichida yoziladi. Minimal to'ldirish miqdori 5 000 so'm.</div></div>
+    <div class="faq-item"><div class="faq-q">API bor va u qanday ishlaydi?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Ha, biz to'liq REST API taqdim etamiz. Reseller bo'lsangiz, API orqali o'z panelingizni qurishingiz mumkin. API kaliti shaxsiy kabinetingizda API bo'limida mavjud. Texnik hujjatlar ham o'sha yerda joylashgan.</div></div>
+    <div class="faq-item"><div class="faq-q">Buyurtma to'liq bajarilmasa qaytarim bo'ladimi?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Agar buyurtma texnik sabablarga ko'ra to'liq bajarilmasa, bajarilmagan qism uchun balans avtomatik qaytariladi. Buni "Buyurtmalarim" bo'limidan kuzatishingiz mumkin.</div></div>
+    <div class="faq-item"><div class="faq-q">Qanday qilib reseller bo'lish mumkin?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Ro'yxatdan o'tib, API kalitingizni oling. Bizning narxlarimizga ustama qo'shib o'z mijozlaringizga xizmat ko'rsatishingiz mumkin. Katta hajmli buyurtmalar uchun maxsus chegirmalar mavjud — Telegram orqali bog'laning.</div></div>
+    <div class="faq-item"><div class="faq-q">Yordam kerak bo'lsa qayerga murojaat qilaman?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Telegram orqali @smmzone_uz manziliga yozing. Biz 24/7 ishlaymiz va har qanday muammoingizni hal qilishga tayyormiz. Javob vaqti odatda 5–15 daqiqa.</div></div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-box">
+    <h2>Hoziroq Boshlang 🚀</h2>
+    <p>Minglab foydalanuvchilar allaqachon SMMZone.uz orqali o'sish yo'lida. Siz ham qo'shiling — bepul!</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="/register" class="btn btn-primary btn-lg"><i class="fas fa-user-plus"></i> Bepul Ro'yxatdan O'tish</a>
+      <a href="https://t.me/smmzone_uz" class="btn btn-outline btn-lg"><i class="fab fa-telegram"></i> Telegram</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">SMM<span>Zone</span>.uz</div>
+  <div class="footer-links">
+    <a href="/"><i class="fas fa-home"></i> Bosh Sahifa</a>
+    <a href="/register"><i class="fas fa-rocket"></i> Boshlash</a>
+    <a href="https://t.me/smmzone_uz"><i class="fab fa-telegram"></i> Telegram</a>
+    <a href="mailto:info@smmzone.uz"><i class="fas fa-envelope"></i> Email</a>
+    <a href="/api"><i class="fas fa-code"></i> API</a>
+  </div>
+  <div class="footer-copy">© 2025 SMMZone.uz — Barcha huquqlar himoyalangan</div>
+</footer>
+
+<script>
+  document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => {
+      const item = q.parentElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }, i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.feature-card, .platform-card, .price-card, .faq-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease, border-color 0.3s, box-shadow 0.3s';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

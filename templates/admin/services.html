@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+{% block title %}Admin Xizmatlar{% endblock %}
+
+{% block content %}
+<style>
+  .as-wrap *, .as-wrap *::before, .as-wrap *::after { box-sizing: border-box; }
+
+  .as-wrap {
+    --p1: #6366f1;
+    --p1l: #eef2ff;
+    --p1h: #4f46e5;
+    --green: #10b981;
+    --greenl: #d1fae5;
+    --red: #ef4444;
+    --redl: #fef2f2;
+    --yellow: #f59e0b;
+    --yellowl: #fef3c7;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #111827;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+  }
+
+  /* HEADER */
+  .as-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .as-header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--p1l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p1);
+    font-size: 18px;
+  }
+
+  .as-header h1 { font-size: 20px; font-weight: 700; margin: 0; color: var(--text); }
+  .as-header-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+  /* LAYOUT */
+  .as-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* CARD */
+  .as-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .as-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .as-card-title { font-size: 13px; font-weight: 700; color: var(--text); }
+
+  .as-count {
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--p1l);
+    color: var(--p1);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* IMPORT BUTTON */
+  .as-import-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    background: var(--p1);
+    color: #fff;
+    border: none;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .as-import-btn:hover {
+    background: var(--p1h);
+    box-shadow: 0 3px 10px rgba(99,102,241,0.3);
+  }
+
+  /* TABLE */
+  .as-table-wrap { overflow-x: auto; }
+
+  .as-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .as-table thead tr { background: var(--bg); }
+
+  .as-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .as-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .as-table tbody tr:last-child td { border-bottom: none; }
+  .as-table tbody tr:hover { background: #fafafa; }
+
+  .as-id { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .as-name {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--text);
+    display: block;
+  }
+
+  .as-cat {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--p1l);
+    color: var(--p1);
+  }
+
+  .as-price { font-weight: 700; color: var(--green); }
+  .as-minmax { font-size: 12px; color: var(--muted); }
+
+  .as-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .as-badge.active   { background: var(--greenl); color: #065f46; }
+  .as-badge.inactive { background: var(--redl);   color: #991b1b; }
+
+  /* FORM CARD */
+  .as-form-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .as-form-head {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .as-form-head-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: var(--p1l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p1);
+    font-size: 12px;
+  }
+
+  .as-form-body { padding: 18px; }
+
+  .as-form-group { margin-bottom: 14px; }
+
+  .as-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 5px;
+  }
+
+  .as-input {
+    width: 100%;
+    padding: 8px 11px;
+    font-size: 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  select.as-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+    padding-right: 28px;
+    cursor: pointer;
+  }
+
+  textarea.as-input { resize: vertical; min-height: 64px; }
+
+  .as-input:focus {
+    border-color: var(--p1);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+  }
+
+  .as-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .as-submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 100%;
+    padding: 11px;
+    border-radius: 9px;
+    background: var(--p1);
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 4px;
+  }
+
+  .as-submit-btn:hover {
+    background: var(--p1h);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+    transform: translateY(-1px);
+  }
+
+  .as-submit-btn:active { transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    .as-layout { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="as-wrap">
+
+  <div class="as-header">
+    <div class="as-header-icon"><i class="fas fa-list"></i></div>
+    <div>
+      <h1>Xizmatlar</h1>
+      <div class="as-header-sub">Barcha mavjud xizmatlar</div>
+    </div>
+  </div>
+
+  <div class="as-layout">
+
+    <!-- TABLE -->
+    <div class="as-card">
+      <div class="as-card-head">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="as-card-title">Barcha Xizmatlar</span>
+          <span class="as-count">{{ services|length }} ta</span>
+        </div>
+        <form method="POST" action="/admin/services/import">
+          <button class="as-import-btn">
+            <i class="fas fa-download"></i> 1xPanel Import
+          </button>
+        </form>
+      </div>
+
+      <div class="as-table-wrap">
+        <table class="as-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nomi</th>
+              <th>Kategoriya</th>
+              <th>1000 narxi</th>
+              <th>Min / Max</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for s in services %}
+          <tr>
+            <td><span class="as-id">{{ s.id }}</span></td>
+            <td><span class="as-name" title="{{ s.name }}">{{ s.name }}</span></td>
+            <td><span class="as-cat">{{ s.cat_name }}</span></td>
+            <td><span class="as-price">{{ "{:,.0f}".format(s.price_per_1000) }}</span></td>
+            <td><span class="as-minmax">{{ s.min_order }} — {{ s.max_order }}</span></td>
+            <td>
+              {% if s.is_active %}
+              <span class="as-badge active"><i class="fas fa-circle" style="font-size:6px"></i> Faol</span>
+              {% else %}
+              <span class="as-badge inactive"><i class="fas fa-circle" style="font-size:6px"></i> Nofaol</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADD FORM -->
+    <div class="as-form-card">
+      <div class="as-form-head">
+        <div class="as-form-head-icon"><i class="fas fa-plus"></i></div>
+        Yangi Xizmat Qo'shish
+      </div>
+      <div class="as-form-body">
+        <form method="POST" action="/admin/services/add">
+
+          <div class="as-form-group">
+            <label class="as-label">Kategoriya</label>
+            <select name="category_id" class="as-input" required>
+              {% for c in categories %}
+              <option value="{{ c.id }}">{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="as-form-group">
+            <label class="as-label">Xizmat nomi</label>
+            <input name="name" class="as-input" placeholder="Instagram Followers HQ" required>
+          </div>
+
+          <div class="as-form-group">
+            <label class="as-label">Provider ID (1xPanel)</label>
+            <input name="provider_id" class="as-input" type="number" placeholder="1234">
+          </div>
+
+          <div class="as-row">
+            <div class="as-form-group">
+              <label class="as-label">Narx (1000 ta)</label>
+              <input name="price_per_1000" class="as-input" type="number" step="0.01" placeholder="500" required>
+            </div>
+            <div class="as-form-group">
+              <label class="as-label">Tur</label>
+              <select name="type" class="as-input">
+                <option>Default</option>
+                <option>Drip-feed</option>
+                <option>Custom Comments</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="as-row">
+            <div class="as-form-group">
+              <label class="as-label">Min</label>
+              <input name="min_order" class="as-input" type="number" value="10" required>
+            </div>
+            <div class="as-form-group">
+              <label class="as-label">Max</label>
+              <input name="max_order" class="as-input" type="number" value="100000" required>
+            </div>
+          </div>
+
+          <div class="as-form-group">
+            <label class="as-label">Tavsif</label>
+            <textarea name="description" class="as-input" placeholder="Qo'shimcha ma'lumot..."></textarea>
+          </div>
+
+          <button type="submit" class="as-submit-btn">
+            <i class="fas fa-plus"></i> Xizmat Qo'shish
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

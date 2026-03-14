@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+{% block title %}API Docs — SMMZone.uz{% endblock %}
+{% block content %}
+
+<style>
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px; font-weight: 800;
+    color: var(--white); letter-spacing: -0.5px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .page-title-icon {
+    width: 40px; height: 40px;
+    background: var(--grad);
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: #fff;
+  }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+  /* LAYOUT */
+  .api-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    align-items: start;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  /* CARD */
+  .api-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .api-card:last-child { margin-bottom: 0; }
+
+  .api-card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--white); letter-spacing: -0.2px;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 18px;
+  }
+  .api-card-title i { color: var(--accent); font-size: 14px; }
+
+  /* API KEY BOX */
+  .key-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px; color: #34d399;
+    word-break: break-all; letter-spacing: 0.5px;
+    line-height: 1.5; margin-bottom: 14px;
+    user-select: all; cursor: text;
+  }
+
+  .key-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .btn-copy {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 16px; border-radius: 10px;
+    background: var(--card2); color: var(--text);
+    border: 1px solid var(--border);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-copy:hover { border-color: rgba(56,189,248,0.3); color: var(--white); }
+  .btn-copy.copied { color: #34d399; border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.08); }
+
+  .btn-regen {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 16px; border-radius: 10px;
+    background: rgba(248,113,113,0.08); color: #f87171;
+    border: 1px solid rgba(248,113,113,0.2);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-regen:hover { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.4); }
+
+  /* ENDPOINT BADGE */
+  .endpoint-url {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+  }
+  .method-badge {
+    display: inline-flex; align-items: center;
+    padding: 4px 10px; border-radius: 7px;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .method-post { background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.2); }
+  .endpoint-url code {
+    font-family: 'Courier New', monospace;
+    font-size: 13px; color: var(--accent3);
+    word-break: break-all;
+  }
+
+  /* API SECTIONS */
+  .api-section {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .api-section:last-child { margin-bottom: 0; }
+  .api-section:hover { border-color: rgba(56,189,248,0.2); }
+
+  .api-section-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px;
+    background: rgba(56,189,248,0.03);
+    cursor: pointer; user-select: none;
+  }
+  .api-section-header b {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700; color: var(--white);
+  }
+  .api-section-header span {
+    font-size: 13px; color: var(--muted); margin-left: 2px;
+  }
+  .api-section-header .toggle-icon {
+    margin-left: auto; color: var(--muted); font-size: 12px;
+    transition: transform 0.3s;
+  }
+  .api-section.open .toggle-icon { transform: rotate(180deg); }
+
+  .api-section-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s ease;
+    padding: 0 18px;
+  }
+  .api-section.open .api-section-body { max-height: 400px; padding: 0 18px 18px; }
+
+  .params-list { margin-bottom: 12px; }
+  .param-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(99,179,237,0.06);
+    font-size: 13px;
+  }
+  .param-row:last-child { border-bottom: none; }
+  .param-name {
+    font-family: 'Courier New', monospace;
+    background: var(--bg);
+    padding: 3px 8px; border-radius: 6px;
+    font-size: 12px; color: var(--accent2);
+    border: 1px solid rgba(129,140,248,0.15);
+    flex-shrink: 0;
+  }
+  .param-desc { color: var(--muted); }
+
+  .code-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px; color: #34d399;
+    white-space: pre; overflow-x: auto;
+    line-height: 1.6;
+  }
+
+  /* SIDEBAR CARD */
+  .sidebar-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    position: sticky; top: 80px;
+  }
+
+  /* FORM */
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--muted); margin-bottom: 7px;
+  }
+  .form-control {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px; outline: none;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .form-control:focus {
+    border-color: rgba(56,189,248,0.5);
+    box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
+  }
+  .form-control option { background: var(--card2); }
+
+  .btn-run {
+    width: 100%; padding: 13px;
+    background: var(--grad); border: none; border-radius: 12px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 0 20px rgba(56,189,248,0.2);
+    transition: opacity 0.2s, transform 0.2s;
+    margin-bottom: 16px;
+  }
+  .btn-run:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  .test-result-wrap {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px; color: #34d399;
+    white-space: pre; overflow-x: auto;
+    line-height: 1.6;
+    min-height: 80px;
+    display: none;
+  }
+  .test-result-wrap.show { display: block; }
+  .test-loading { color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; }
+  .test-error   { color: #f87171; font-family: 'DM Sans', sans-serif; font-size: 13px; }
+
+  @media (max-width: 900px) {
+    .api-grid { grid-template-columns: 1fr; }
+    .sidebar-card { position: static; }
+  }
+</style>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1 class="page-title">
+    <div class="page-title-icon"><i class="fas fa-code"></i></div>
+    API Hujjatlari
+  </h1>
+</div>
+
+<div class="api-grid">
+  <div>
+
+    <!-- API KEY -->
+    <div class="api-card">
+      <div class="api-card-title"><i class="fas fa-key"></i> API Kalit</div>
+      <div class="key-box" id="api-key-val">{{ user.api_key }}</div>
+      <div class="key-actions">
+        <button class="btn-copy" id="copy-key-btn" onclick="copyApiKey()">
+          <i class="fas fa-copy"></i> Nusxalash
+        </button>
+        <form method="POST" action="/profile/regen-key"
+              onsubmit="return confirm('Diqqat! Eski key ishlamay qoladi. Davom etasizmi?')">
+          <button type="submit" class="btn-regen">
+            <i class="fas fa-sync"></i> Yangilash
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ENDPOINT + ACTIONS -->
+    <div class="api-card">
+      <div class="api-card-title"><i class="fas fa-terminal"></i> Endpoint</div>
+
+      <div class="endpoint-url">
+        <span class="method-badge method-post">POST</span>
+        <code>{{ site_url }}/api/v2</code>
+      </div>
+
+      {% for action, desc, params, example in [
+        ('services', 'Barcha xizmatlar ro\'yxati',
+         [('key','API kalit'),('action','services')],
+         '{\n  "services": [\n    {\n      "service": 1,\n      "name": "Instagram Followers",\n      "rate": 500,\n      "min": 100,\n      "max": 50000\n    }\n  ]\n}'),
+        ('balance', 'Balansni ko\'rish',
+         [('key','API kalit'),('action','balance')],
+         '{\n  "balance": "15000",\n  "currency": "UZS"\n}'),
+        ('add', 'Yangi order yaratish',
+         [('key','API kalit'),('action','add'),('service','Service ID'),('link','Havola'),('quantity','Miqdor')],
+         '{\n  "order": 12345\n}'),
+        ('status', 'Order statusini tekshirish',
+         [('key','API kalit'),('action','status'),('order','Order ID')],
+         '{\n  "status": "Processing",\n  "start_count": "0",\n  "remains": "950",\n  "charge": "500"\n}'),
+      ] %}
+      <div class="api-section" id="sec-{{ action }}">
+        <div class="api-section-header" onclick="toggleSection('{{ action }}')">
+          <span class="method-badge method-post">POST</span>
+          <b>{{ action }}</b>
+          <span>— {{ desc }}</span>
+          <i class="fas fa-chevron-down toggle-icon"></i>
+        </div>
+        <div class="api-section-body">
+          <div class="params-list">
+            {% for p, d in params %}
+            <div class="param-row">
+              <span class="param-name">{{ p }}</span>
+              <span class="param-desc">{{ d }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.7px;font-weight:700;margin-bottom:8px">Javob namunasi</div>
+          <div class="code-block">{{ example }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR: TEST -->
+  <div class="sidebar-card">
+    <div class="api-card-title" style="margin-bottom:20px"><i class="fas fa-flask"></i> Tezkor Test</div>
+
+    <div class="form-group">
+      <label class="form-label">Action</label>
+      <select class="form-control" id="test-action">
+        <option value="services">services</option>
+        <option value="balance">balance</option>
+        <option value="status">status</option>
+      </select>
+    </div>
+
+    <div class="form-group" id="order-field" style="display:none">
+      <label class="form-label">Order ID</label>
+      <input type="number" class="form-control" id="test-order" placeholder="12345">
+    </div>
+
+    <button class="btn-run" onclick="testApi()">
+      <i class="fas fa-play"></i> Sinab Ko'rish
+    </button>
+
+    <div class="test-result-wrap" id="test-result"></div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+  // Copy API key
+  function copyApiKey() {
+    const key = document.getElementById('api-key-val').textContent.trim();
+    navigator.clipboard.writeText(key).then(() => {
+      const btn = document.getElementById('copy-key-btn');
+      btn.classList.add('copied');
+      btn.innerHTML = '<i class="fas fa-check"></i> Nusxalandi!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<i class="fas fa-copy"></i> Nusxalash';
+      }, 2200);
+    });
+  }
+
+  // Toggle sections
+  function toggleSection(action) {
+    const sec = document.getElementById('sec-' + action);
+    const isOpen = sec.classList.contains('open');
+    document.querySelectorAll('.api-section').forEach(s => s.classList.remove('open'));
+    if (!isOpen) sec.classList.add('open');
+  }
+
+  // Show/hide order field
+  document.getElementById('test-action').addEventListener('change', function() {
+    document.getElementById('order-field').style.display =
+      this.value === 'status' ? 'block' : 'none';
+  });
+
+  // Test API
+  async function testApi() {
+    const action = document.getElementById('test-action').value;
+    const body   = new FormData();
+    body.append('key', '{{ user.api_key }}');
+    body.append('action', action);
+    if (action === 'status') {
+      body.append('order', document.getElementById('test-order').value);
+    }
+
+    const res = document.getElementById('test-result');
+    res.classList.add('show');
+    res.innerHTML = '<span class="test-loading"><i class="fas fa-spinner fa-spin"></i> Yuborilmoqda...</span>';
+
+    try {
+      const r = await fetch('/api/v2', { method: 'POST', body });
+      const data = await r.json();
+      res.style.color = '#34d399';
+      res.textContent = JSON.stringify(data, null, 2);
+    } catch(e) {
+      res.innerHTML = '<span class="test-error"><i class="fas fa-exclamation-circle"></i> Xatolik: ' + e + '</span>';
+    }
+  }
+</script>
+{% endblock %}

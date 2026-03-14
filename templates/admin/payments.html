@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+{% block title %}Admin To'lovlar{% endblock %}
+
+{% block content %}
+<style>
+  .ap-wrap *, .ap-wrap *::before, .ap-wrap *::after { box-sizing: border-box; }
+
+  .ap-wrap {
+    --p1: #6366f1;
+    --p1l: #eef2ff;
+    --p1h: #4f46e5;
+    --green: #10b981;
+    --greenl: #d1fae5;
+    --yellow: #f59e0b;
+    --yellowl: #fef3c7;
+    --red: #ef4444;
+    --redl: #fef2f2;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #111827;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+  }
+
+  /* HEADER */
+  .ap-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .ap-header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--greenl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green);
+    font-size: 18px;
+  }
+
+  .ap-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .ap-header-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+  /* CARD */
+  .ap-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .ap-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .ap-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .ap-pending-count {
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--yellowl);
+    color: #92400e;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* TABLE */
+  .ap-table-wrap { overflow-x: auto; }
+
+  .ap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .ap-table thead tr { background: var(--bg); }
+
+  .ap-table th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ap-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .ap-table tbody tr:last-child td { border-bottom: none; }
+  .ap-table tbody tr:hover { background: #fafafa; }
+
+  .ap-id { font-weight: 700; color: var(--p1); font-size: 12px; }
+  .ap-user { font-weight: 600; }
+  .ap-amount { font-weight: 800; color: var(--green); font-size: 14px; }
+  .ap-amount span { font-size: 11px; font-weight: 500; color: var(--muted); margin-left: 2px; }
+
+  /* METHOD BADGE */
+  .ap-method {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  /* STATUS BADGE */
+  .ap-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .ap-badge.confirmed {
+    background: var(--greenl);
+    color: #065f46;
+  }
+
+  .ap-badge.pending {
+    background: var(--yellowl);
+    color: #92400e;
+  }
+
+  .ap-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  /* CONFIRM BUTTON */
+  .ap-confirm-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: var(--greenl);
+    color: #065f46;
+    border: 1px solid rgba(16,185,129,0.3);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .ap-confirm-btn:hover {
+    background: #a7f3d0;
+    box-shadow: 0 2px 8px rgba(16,185,129,0.2);
+  }
+
+  .ap-confirm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* EMPTY */
+  .ap-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+  }
+
+  .ap-empty-icon { font-size: 36px; margin-bottom: 10px; }
+  .ap-empty p { font-size: 14px; margin: 0; }
+
+  /* TOAST */
+  .ap-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  .ap-toast.success { background: #111827; color: #fff; }
+  .ap-toast.error   { background: var(--red); color: #fff; }
+  .ap-toast.show    { opacity: 1; }
+</style>
+
+<div class="ap-wrap">
+
+  <div class="ap-header">
+    <div class="ap-header-icon"><i class="fas fa-wallet"></i></div>
+    <div>
+      <h1>To'lovlar</h1>
+      <div class="ap-header-sub">Barcha depozit so'rovlari</div>
+    </div>
+  </div>
+
+  <div class="ap-card">
+    <div class="ap-card-head">
+      <div class="ap-card-title">To'lovlar tarixi</div>
+      {% set pending_count = payments | selectattr('status', 'equalto', 'pending') | list | length %}
+      {% if pending_count > 0 %}
+      <span class="ap-pending-count">⏳ {{ pending_count }} ta kutilmoqda</span>
+      {% endif %}
+    </div>
+
+    <div class="ap-table-wrap">
+      <table class="ap-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Foydalanuvchi</th>
+            <th>Miqdor</th>
+            <th>Usul</th>
+            <th>Status</th>
+            <th>Sana</th>
+            <th>Amal</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for p in payments %}
+        <tr id="pay-row-{{ p.id }}">
+          <td><span class="ap-id">#{{ p.id }}</span></td>
+          <td><span class="ap-user">{{ p.username }}</span></td>
+          <td>
+            <span class="ap-amount">
+              {{ "{:,.0f}".format(p.amount) }}<span>so'm</span>
+            </span>
+          </td>
+          <td>
+            <span class="ap-method">
+              {% if p.method == 'Payme' %}<i class="fas fa-mobile-alt" style="color:#00B2FF"></i>
+              {% elif p.method == 'Click' %}<i class="fas fa-bolt" style="color:#FF6B1A"></i>
+              {% elif p.method == 'USDT' %}<i class="fab fa-bitcoin" style="color:#26A17B"></i>
+              {% elif p.method == 'TonKeeper' %}💎
+              {% else %}<i class="fas fa-money-bill"></i>
+              {% endif %}
+              {{ p.method }}
+            </span>
+          </td>
+          <td id="pay-status-{{ p.id }}">
+            {% if p.status == 'completed' %}
+            <span class="ap-badge confirmed"><i class="fas fa-check-circle"></i> Tasdiqlandi</span>
+            {% else %}
+            <span class="ap-badge pending"><i class="fas fa-clock"></i> Kutilmoqda</span>
+            {% endif %}
+          </td>
+          <td><span class="ap-time">{{ p.created_at[:16] }}</span></td>
+          <td>
+            {% if p.status == 'pending' %}
+            <button class="ap-confirm-btn" id="pay-btn-{{ p.id }}"
+                    onclick="confirmDep({{ p.id }}, this)">
+              <i class="fas fa-check"></i> Tasdiqlash
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7">
+            <div class="ap-empty">
+              <div class="ap-empty-icon">💳</div>
+              <p>Hech qanday to'lov topilmadi</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="ap-toast" id="ap-toast"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('ap-toast');
+  t.textContent = msg;
+  t.className = 'ap-toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+async function confirmDep(id, btn) {
+  if (!confirm("To'lovni tasdiqlansinmi?")) return;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Tekshirilmoqda...';
+
+  try {
+    const r = await fetch(`/admin/payments/${id}/confirm`, { method: "POST" }).then(r => r.json());
+    if (r.ok) {
+      document.getElementById('pay-status-' + id).innerHTML =
+        '<span class="ap-badge confirmed"><i class="fas fa-check-circle"></i> Tasdiqlandi</span>';
+      btn.remove();
+      showToast('✓ To\'lov tasdiqlandi!', 'success');
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check"></i> Tasdiqlash';
+      showToast('❌ ' + (r.message || 'Xatolik yuz berdi'), 'error');
+    }
+  } catch {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check"></i> Tasdiqlash';
+    showToast('❌ Server bilan bog\'lanib bo\'lmadi', 'error');
+  }
+}
+</script>
+{% endblock %}

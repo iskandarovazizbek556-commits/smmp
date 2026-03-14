@@ -1,0 +1,431 @@
+{% extends "base.html" %}
+{% block title %}Balans To'ldirish — UzSMM.uz{% endblock %}
+
+{% block content %}
+<style>
+  .af-wrap *,
+  .af-wrap *::before,
+  .af-wrap *::after { box-sizing: border-box; }
+
+  .af-wrap {
+    --g1: #0ea472;
+    --g1h: #0b8a5f;
+    --g1l: #e6f7f1;
+    --tg: #229ED9;
+    --tgl: #e8f5fd;
+    --tgh: #1a7fb0;
+    --red: #ef4444;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #111827;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+  }
+
+  .af-page-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .af-page-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .af-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--tgl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tg);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .af-layout {
+    display: grid;
+    grid-template-columns: 1fr 290px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .af-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+  }
+
+  .af-card + .af-card { margin-top: 14px; }
+
+  .af-card-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 16px 0;
+  }
+
+  /* amount input */
+  .af-form-group { margin-bottom: 18px; }
+
+  .af-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .af-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 15px;
+    font-weight: 600;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+  }
+
+  .af-input:focus {
+    border-color: var(--tg);
+    box-shadow: 0 0 0 3px rgba(34,158,217,0.13);
+  }
+
+  .af-input.error {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+  }
+
+  .af-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+
+  /* payment method cards */
+  .af-methods {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .af-pay-card {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: #fff;
+    user-select: none;
+  }
+
+  .af-pay-card:hover {
+    border-color: var(--tg);
+    background: var(--tgl);
+  }
+
+  .af-pay-card.selected {
+    border-color: var(--tg);
+    background: var(--tgl);
+    box-shadow: 0 0 0 3px rgba(34,158,217,0.12);
+  }
+
+  .af-pay-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-size: 20px;
+  }
+
+  .af-pay-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 2px 0;
+  }
+
+  .af-pay-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* telegram CTA button */
+  .af-btn-tg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    background: var(--tg);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    margin-top: 20px;
+  }
+
+  .af-btn-tg:hover {
+    background: var(--tgh);
+    box-shadow: 0 4px 14px rgba(34,158,217,0.35);
+    transform: translateY(-1px);
+  }
+
+  .af-btn-tg:active { transform: translateY(0); }
+
+  .af-btn-tg svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  /* telegram info box */
+  .af-tg-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+    background: var(--tgl);
+    border: 1px solid rgba(34,158,217,0.25);
+    border-radius: 10px;
+    margin-top: 14px;
+  }
+
+  .af-tg-info-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--tg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .af-tg-info-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .af-tg-info p {
+    font-size: 13px;
+    color: #1a5f7a;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .af-tg-info strong { color: var(--tgh); }
+
+  /* history */
+  .af-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .af-history-item:last-child { border-bottom: none; }
+
+  .af-history-method { font-weight: 600; color: var(--text); }
+  .af-history-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .af-history-amount {
+    font-weight: 700;
+    color: var(--g1);
+    text-align: right;
+  }
+
+  .af-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 3px;
+  }
+
+  .af-badge-green { background: #d1fae5; color: #065f46; }
+  .af-badge-yellow { background: #fef3c7; color: #92400e; }
+
+  .af-empty {
+    text-align: center;
+    padding: 28px 0;
+    color: var(--muted);
+  }
+
+  .af-empty-icon { font-size: 32px; margin-bottom: 8px; }
+  .af-empty p { font-size: 13px; margin: 0; }
+
+  @media (max-width: 768px) {
+    .af-layout { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="af-wrap">
+  <div class="af-page-header">
+    <div class="af-icon-wrap"><i class="fas fa-wallet"></i></div>
+    <h1>Balans To'ldirish</h1>
+  </div>
+
+  <div class="af-layout">
+    <!-- LEFT: FORM -->
+    <div class="af-card">
+      <div class="af-card-title">To'lov Usulini Tanlang</div>
+
+      <div class="af-form-group">
+        <label class="af-label">Summa (so'm)</label>
+        <input type="number" id="af-amount" class="af-input"
+               placeholder="10 000" min="5000">
+        <div class="af-hint">Minimal: 5,000 so'm</div>
+      </div>
+
+      <div class="af-form-group">
+        <label class="af-label">To'lov usuli</label>
+        <div class="af-methods">
+
+          <div class="af-pay-card selected" onclick="afSelect(this,'Payme')">
+            <div class="af-pay-icon" style="background:#e6f7ff">
+              <i class="fas fa-mobile-alt" style="color:#00B2FF"></i>
+            </div>
+            <p class="af-pay-name">Payme</p>
+            <div class="af-pay-sub">Karta orqali</div>
+          </div>
+
+          <div class="af-pay-card" onclick="afSelect(this,'Click')">
+            <div class="af-pay-icon" style="background:#fff3eb">
+              <i class="fas fa-bolt" style="color:#FF6B1A"></i>
+            </div>
+            <p class="af-pay-name">Click</p>
+            <div class="af-pay-sub">Karta orqali</div>
+          </div>
+
+          <div class="af-pay-card" onclick="afSelect(this,'TonKeeper')">
+            <div class="af-pay-icon" style="background:#e8f5fd">
+              <span>💎</span>
+            </div>
+            <p class="af-pay-name">TonKeeper</p>
+            <div class="af-pay-sub">TON / USDT</div>
+          </div>
+
+          <div class="af-pay-card" onclick="afSelect(this,'USDT')">
+            <div class="af-pay-icon" style="background:#e6f7f1">
+              <i class="fab fa-bitcoin" style="color:#26A17B"></i>
+            </div>
+            <p class="af-pay-name">USDT TRC-20</p>
+            <div class="af-pay-sub">Kripto</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Telegram CTA -->
+      <a id="af-tg-btn" href="https://t.me/hguefg" target="_blank" class="af-btn-tg" onclick="return afGo()">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21.9 4.5L18.6 19.2C18.4 20 17.9 20.2 17.2 19.8L12.5 16.4L10.2 18.6C10 18.8 9.7 18.9 9.4 18.9L9.7 14.1L18.1 6.6C18.5 6.3 18 6.1 17.4 6.4L6.9 13L2.3 11.6C1.4 11.3 1.4 10.7 2.5 10.3L20.6 3.1C21.4 2.8 22.1 3.3 21.9 4.5Z" fill="white"/>
+        </svg>
+        Telegram orqali to'lash
+      </a>
+
+      <div class="af-tg-info">
+        <div class="af-tg-info-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21.9 4.5L18.6 19.2C18.4 20 17.9 20.2 17.2 19.8L12.5 16.4L10.2 18.6C10 18.8 9.7 18.9 9.4 18.9L9.7 14.1L18.1 6.6C18.5 6.3 18 6.1 17.4 6.4L6.9 13L2.3 11.6C1.4 11.3 1.4 10.7 2.5 10.3L20.6 3.1C21.4 2.8 22.1 3.3 21.9 4.5Z" fill="white"/>
+          </svg>
+        </div>
+        <p>
+          Tugmani bosing — <strong>@hguefg</strong> botiga o'tasiz.
+          U yerda to'lov yo'riqnomasi va barcha kerakli ma'lumotlar beriladi.
+        </p>
+      </div>
+    </div>
+
+    <!-- RIGHT: HISTORY -->
+    <div>
+      <div class="af-card">
+        <div class="af-card-title">Balans Tarixi</div>
+        {% if history %}
+          {% for h in history %}
+          <div class="af-history-item">
+            <div>
+              <div class="af-history-method">{{ h.method }}</div>
+              <div class="af-history-date">{{ h.created_at[:16] }}</div>
+            </div>
+            <div>
+              <div class="af-history-amount">+{{ "{:,.0f}".format(h.amount) }} so'm</div>
+              {% if h.status == 'completed' %}
+                <span class="af-badge af-badge-green">✓ Tasdiqlandi</span>
+              {% else %}
+                <span class="af-badge af-badge-yellow">⏳ Kutilmoqda</span>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="af-empty">
+            <div class="af-empty-icon">💳</div>
+            <p>Hali to'lovlar yo'q</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let afMethod = 'Payme';
+
+function afSelect(el, val) {
+  document.querySelectorAll('.af-pay-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  afMethod = val;
+}
+
+function afGo() {
+  const amountEl = document.getElementById('af-amount');
+  const amount   = parseInt(amountEl.value || 0);
+
+  if (!amount || amount < 5000) {
+    amountEl.classList.add('error');
+    amountEl.focus();
+    setTimeout(() => amountEl.classList.remove('error'), 2000);
+    return false; /* link ochilmasin */
+  }
+
+  /* Amount va usulni Telegram botga parametr sifatida yuborish (ixtiyoriy) */
+  const btn = document.getElementById('af-tg-btn');
+  btn.href = 'https://t.me/smmzone_uzbot?start=pay_' + amount + '_' + afMethod;
+  return true; /* linkni ochamiz */
+}
+</script>
+{% endblock %}

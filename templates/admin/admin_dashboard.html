@@ -1,0 +1,519 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<style>
+  .ad-wrap *, .ad-wrap *::before, .ad-wrap *::after { box-sizing: border-box; }
+
+  .ad-wrap {
+    --p1: #6366f1;
+    --p1l: #eef2ff;
+    --teal: #0ea472;
+    --teall: #e6f7f1;
+    --yellow: #f59e0b;
+    --yellowl: #fef3c7;
+    --red: #ef4444;
+    --redl: #fef2f2;
+    --green: #10b981;
+    --greenl: #d1fae5;
+    --blue: #3b82f6;
+    --bluel: #eff6ff;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #111827;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+  }
+
+  /* PAGE HEADER */
+  .ad-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .ad-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ad-header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--p1l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p1);
+    font-size: 18px;
+  }
+
+  .ad-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .ad-header-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .ad-sync-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 18px;
+    border-radius: 9px;
+    background: var(--p1);
+    color: #fff;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+
+  .ad-sync-btn:hover {
+    background: #4f46e5;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+    transform: translateY(-1px);
+  }
+
+  /* STATS GRID */
+  .ad-stats {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .ad-stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+
+  .ad-stat:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    transform: translateY(-2px);
+  }
+
+  .ad-stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .ad-stat-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .ad-stat-icon.purple  { background: var(--p1l);     color: var(--p1); }
+  .ad-stat-icon.teal    { background: var(--teall);   color: var(--teal); }
+  .ad-stat-icon.yellow  { background: var(--yellowl); color: var(--yellow); }
+  .ad-stat-icon.green   { background: var(--greenl);  color: var(--green); }
+  .ad-stat-icon.blue    { background: var(--bluel);   color: var(--blue); }
+  .ad-stat-icon.red     { background: var(--redl);    color: var(--red); }
+
+  .ad-stat-val {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .ad-stat-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* LAYOUT */
+  .ad-layout {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .ad-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .ad-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ad-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .ad-card-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--p1l);
+    color: var(--p1);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* TABLE */
+  .ad-table-wrap { overflow-x: auto; }
+
+  .ad-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .ad-table thead tr {
+    background: var(--bg);
+  }
+
+  .ad-table th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ad-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  .ad-table tbody tr:last-child td { border-bottom: none; }
+
+  .ad-table tbody tr:hover { background: #fafafa; }
+
+  .ad-order-id {
+    font-weight: 700;
+    color: var(--p1);
+    font-size: 12px;
+  }
+
+  .ad-username {
+    font-weight: 600;
+  }
+
+  .ad-svc-name {
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--muted);
+  }
+
+  .ad-price { font-weight: 600; color: var(--green); }
+
+  .ad-status-select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    padding: 5px 8px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .ad-status-select:focus { border-color: var(--p1); }
+
+  .ad-time {
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* SIDEBAR */
+  .ad-sidebar { display: flex; flex-direction: column; gap: 14px; }
+
+  .ad-quick-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .ad-quick-head {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .ad-quick-links {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 4px;
+  }
+
+  .ad-quick-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    transition: background 0.12s;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    width: 100%;
+    text-align: left;
+  }
+
+  .ad-quick-link:hover { background: var(--bg); }
+
+  .ad-quick-link i {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .ad-quick-link.purple i  { background: var(--p1l);     color: var(--p1); }
+  .ad-quick-link.teal i    { background: var(--teall);   color: var(--teal); }
+  .ad-quick-link.blue i    { background: var(--bluel);   color: var(--blue); }
+  .ad-quick-link.yellow i  { background: var(--yellowl); color: var(--yellow); }
+  .ad-quick-link.red i     { background: var(--redl);    color: var(--red); }
+  .ad-quick-link.green i   { background: var(--greenl);  color: var(--green); }
+
+  /* update flash */
+  .ad-saved {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #111827;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  .ad-saved.show { opacity: 1; }
+
+  @media (max-width: 1100px) {
+    .ad-stats { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .ad-stats  { grid-template-columns: repeat(2, 1fr); }
+    .ad-layout { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="ad-wrap">
+
+  <!-- HEADER -->
+  <div class="ad-header">
+    <div class="ad-header-left">
+      <div class="ad-header-icon"><i class="fas fa-chart-pie"></i></div>
+      <div>
+        <h1>Admin Dashboard</h1>
+        <div class="ad-header-sub">Boshqaruv paneli</div>
+      </div>
+    </div>
+    <form method="POST" action="/admin/orders/sync">
+      <button class="ad-sync-btn">
+        <i class="fas fa-sync"></i> Yangilash
+      </button>
+    </form>
+  </div>
+
+  <!-- STATS -->
+  <div class="ad-stats">
+    <div class="ad-stat">
+      <div class="ad-stat-top">
+        <div class="ad-stat-icon purple"><i class="fas fa-users"></i></div>
+      </div>
+      <div class="ad-stat-val">{{ stats.total_users }}</div>
+      <div class="ad-stat-lbl">Foydalanuvchilar</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat-top">
+        <div class="ad-stat-icon teal"><i class="fas fa-shopping-cart"></i></div>
+      </div>
+      <div class="ad-stat-val">{{ stats.total_orders }}</div>
+      <div class="ad-stat-lbl">Jami Orderlar</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat-top">
+        <div class="ad-stat-icon yellow"><i class="fas fa-clock"></i></div>
+      </div>
+      <div class="ad-stat-val">{{ stats.today_orders }}</div>
+      <div class="ad-stat-lbl">Bugungi Orderlar</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat-top">
+        <div class="ad-stat-icon green"><i class="fas fa-money-bill"></i></div>
+      </div>
+      <div class="ad-stat-val">{{ "{:,.0f}".format(stats.today_revenue) }}</div>
+      <div class="ad-stat-lbl">Bugungi Daromad</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat-top">
+        <div class="ad-stat-icon blue"><i class="fas fa-chart-bar"></i></div>
+      </div>
+      <div class="ad-stat-val">{{ "{:,.0f}".format(stats.total_revenue) }}</div>
+      <div class="ad-stat-lbl">Jami Daromad</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat-top">
+        <div class="ad-stat-icon red"><i class="fas fa-exclamation-circle"></i></div>
+      </div>
+      <div class="ad-stat-val">{{ stats.pending_orders }}</div>
+      <div class="ad-stat-lbl">Kutilayotgan</div>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="ad-layout">
+
+    <!-- ORDERS TABLE -->
+    <div class="ad-card">
+      <div class="ad-card-head">
+        <div class="ad-card-title">So'nggi Orderlar</div>
+        <span class="ad-card-badge">{{ recent|length }} ta</span>
+      </div>
+      <div class="ad-table-wrap">
+        <table class="ad-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Foydalanuvchi</th>
+              <th>Xizmat</th>
+              <th>Miqdor</th>
+              <th>Narx</th>
+              <th>Status</th>
+              <th>Vaqt</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for o in recent %}
+          <tr>
+            <td><span class="ad-order-id">#{{ o.id }}</span></td>
+            <td><span class="ad-username">{{ o.username }}</span></td>
+            <td><span class="ad-svc-name" title="{{ o.svc_name }}">{{ o.svc_name }}</span></td>
+            <td>{{ "{:,}".format(o.quantity) }}</td>
+            <td><span class="ad-price">{{ "{:,.0f}".format(o.price) }}</span></td>
+            <td>
+              <select class="ad-status-select" onchange="updStatus({{ o.id }}, this.value, this)">
+                {% for s in ["Pending","Processing","Completed","Failed","Cancelled"] %}
+                <option {% if o.status == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+              </select>
+            </td>
+            <td><span class="ad-time">{{ o.created_at[:16] }}</span></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="ad-sidebar">
+      <div class="ad-quick-card">
+        <div class="ad-quick-head">Tezkor havolalar</div>
+        <div class="ad-quick-links">
+          <a href="/admin/services" class="ad-quick-link purple">
+            <i class="fas fa-list"></i> Xizmatlar
+          </a>
+          <a href="/admin/users" class="ad-quick-link teal">
+            <i class="fas fa-users"></i> Foydalanuvchilar
+          </a>
+          <a href="/admin/orders" class="ad-quick-link blue">
+            <i class="fas fa-shopping-cart"></i> Orderlar
+          </a>
+          <a href="/admin/payments" class="ad-quick-link yellow">
+            <i class="fas fa-wallet"></i> To'lovlar
+          </a>
+          <a href="/admin/settings" class="ad-quick-link red">
+            <i class="fas fa-cog"></i> Sozlamalar
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Save toast -->
+<div class="ad-saved" id="ad-saved">✓ Saqlandi</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function updStatus(id, status, sel) {
+  sel.disabled = true;
+  await fetch(`/admin/orders/${id}/status`, {
+    method: "POST",
+    body: new URLSearchParams({ status }),
+    headers: { "Content-Type": "application/x-www-form-urlencoded" }
+  });
+  sel.disabled = false;
+  const toast = document.getElementById('ad-saved');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+</script>
+{% endblock %}

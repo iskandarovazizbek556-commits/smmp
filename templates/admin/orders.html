@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+{% block title %}Admin Orderlar{% endblock %}
+
+{% block content %}
+<style>
+  .ao-wrap *, .ao-wrap *::before, .ao-wrap *::after { box-sizing: border-box; }
+
+  .ao-wrap {
+    --p1: #6366f1;
+    --p1l: #eef2ff;
+    --p1h: #4f46e5;
+    --green: #10b981;
+    --greenl: #d1fae5;
+    --yellow: #f59e0b;
+    --yellowl: #fef3c7;
+    --red: #ef4444;
+    --redl: #fef2f2;
+    --blue: #3b82f6;
+    --bluel: #eff6ff;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #111827;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+  }
+
+  /* HEADER */
+  .ao-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .ao-header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--p1l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p1);
+    font-size: 18px;
+  }
+
+  .ao-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
+  }
+
+  /* CARD */
+  .ao-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  /* TOOLBAR */
+  .ao-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  /* STATUS FILTERS */
+  .ao-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 13px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    background: var(--card);
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+
+  .ao-filter:hover { border-color: var(--p1); color: var(--p1); }
+
+  .ao-filter.active {
+    background: var(--p1);
+    border-color: var(--p1);
+    color: #fff;
+  }
+
+  .ao-filter .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.7;
+  }
+
+  /* SEARCH */
+  .ao-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .ao-search-input {
+    padding: 7px 12px;
+    font-size: 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--text);
+    outline: none;
+    width: 200px;
+    font-family: inherit;
+    transition: border-color 0.15s;
+  }
+
+  .ao-search-input:focus { border-color: var(--p1); }
+
+  .ao-search-btn {
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.12s;
+  }
+
+  .ao-search-btn:hover { border-color: var(--p1); color: var(--p1); }
+
+  /* TABLE */
+  .ao-table-wrap { overflow-x: auto; }
+
+  .ao-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .ao-table thead tr { background: var(--bg); }
+
+  .ao-table th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ao-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .ao-table tbody tr:last-child td { border-bottom: none; }
+  .ao-table tbody tr:hover { background: #fafafa; }
+
+  .ao-id { font-weight: 700; color: var(--p1); font-size: 12px; }
+  .ao-user { font-weight: 600; color: var(--text); }
+
+  .ao-svc {
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .ao-link {
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    color: var(--blue);
+    text-decoration: none;
+    font-size: 12px;
+  }
+
+  .ao-link:hover { text-decoration: underline; }
+
+  .ao-qty { font-weight: 600; }
+  .ao-price { font-weight: 700; color: var(--green); }
+
+  /* STATUS SELECT */
+  .ao-status-wrap { position: relative; }
+
+  .ao-status-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 5px 26px 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: opacity 0.15s;
+  }
+
+  .ao-status-select:disabled { opacity: 0.5; }
+
+  .ao-status-select.s-pending    { background: var(--yellowl); color: #92400e; }
+  .ao-status-select.s-processing { background: var(--bluel);   color: #1e40af; }
+  .ao-status-select.s-completed  { background: var(--greenl);  color: #065f46; }
+  .ao-status-select.s-failed     { background: var(--redl);    color: #991b1b; }
+  .ao-status-select.s-cancelled  { background: var(--bg);      color: var(--muted); }
+
+  .ao-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  /* EMPTY */
+  .ao-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+  }
+
+  .ao-empty-icon { font-size: 36px; margin-bottom: 10px; }
+  .ao-empty p { font-size: 14px; margin: 0; }
+
+  /* TOAST */
+  .ao-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #111827;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  .ao-toast.show { opacity: 1; }
+
+  @media (max-width: 768px) {
+    .ao-search { margin-left: 0; width: 100%; }
+    .ao-search-input { flex: 1; }
+  }
+</style>
+
+<div class="ao-wrap">
+
+  <div class="ao-header">
+    <div class="ao-header-icon"><i class="fas fa-shopping-cart"></i></div>
+    <h1>Barcha Orderlar</h1>
+  </div>
+
+  <div class="ao-card">
+    <!-- TOOLBAR -->
+    <div class="ao-toolbar">
+      {% for st, lb in [("","Barchasi"),("Pending","Kutilmoqda"),("Processing","Jarayonda"),("Completed","Bajarildi"),("Failed","Xatolik")] %}
+      <a href="/admin/orders?status={{ st }}{% if q %}&q={{ q }}{% endif %}"
+         class="ao-filter {% if status == st %}active{% endif %}">
+        {% if st %}<span class="dot"></span>{% endif %}
+        {{ lb }}
+      </a>
+      {% endfor %}
+
+      <form action="/admin/orders" method="get" class="ao-search">
+        <input name="q" value="{{ q }}" class="ao-search-input"
+               placeholder="ID, foydalanuvchi, link...">
+        {% if status %}
+        <input type="hidden" name="status" value="{{ status }}">
+        {% endif %}
+        <button type="submit" class="ao-search-btn"><i class="fas fa-search"></i></button>
+      </form>
+    </div>
+
+    <!-- TABLE -->
+    <div class="ao-table-wrap">
+      <table class="ao-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Foydalanuvchi</th>
+            <th>Xizmat</th>
+            <th>Link</th>
+            <th>Miqdor</th>
+            <th>Narx</th>
+            <th>Status</th>
+            <th>Sana</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for o in orders %}
+        <tr>
+          <td><span class="ao-id">#{{ o.id }}</span></td>
+          <td><span class="ao-user">{{ o.username }}</span></td>
+          <td><span class="ao-svc" title="{{ o.svc_name }}">{{ o.svc_name }}</span></td>
+          <td><a href="{{ o.link }}" target="_blank" class="ao-link" title="{{ o.link }}">{{ o.link }}</a></td>
+          <td><span class="ao-qty">{{ "{:,}".format(o.quantity) }}</span></td>
+          <td><span class="ao-price">{{ "{:,.0f}".format(o.price) }}</span></td>
+          <td>
+            <select class="ao-status-select s-{{ o.status|lower }}"
+                    onchange="updStatus({{ o.id }}, this.value, this)">
+              {% for s in ["Pending","Processing","Completed","Failed","Cancelled"] %}
+              <option {% if o.status == s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td><span class="ao-time">{{ o.created_at[:16] }}</span></td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8">
+            <div class="ao-empty">
+              <div class="ao-empty-icon">🔍</div>
+              <p>Hech qanday order topilmadi</p>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="ao-toast" id="ao-toast">✓ Status yangilandi</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const statusClass = {
+  Pending: 's-pending', Processing: 's-processing',
+  Completed: 's-completed', Failed: 's-failed', Cancelled: 's-cancelled'
+};
+
+async function updStatus(id, status, sel) {
+  sel.disabled = true;
+  await fetch(`/admin/orders/${id}/status`, {
+    method: "POST",
+    body: new URLSearchParams({ status }),
+    headers: { "Content-Type": "application/x-www-form-urlencoded" }
+  });
+  sel.disabled = false;
+  sel.className = 'ao-status-select ' + (statusClass[status] || '');
+  const toast = document.getElementById('ao-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+</script>
+{% endblock %}

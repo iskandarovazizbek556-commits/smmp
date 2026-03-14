@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+{% block title %}Admin Sozlamalar{% endblock %}
+
+{% block content %}
+<style>
+  .ast-wrap *, .ast-wrap *::before, .ast-wrap *::after { box-sizing: border-box; }
+
+  .ast-wrap {
+    --p1: #6366f1;
+    --p1l: #eef2ff;
+    --p1h: #4f46e5;
+    --green: #10b981;
+    --greenl: #d1fae5;
+    --red: #ef4444;
+    --redl: #fef2f2;
+    --yellow: #f59e0b;
+    --yellowl: #fef3c7;
+    --blue: #3b82f6;
+    --bluel: #eff6ff;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #111827;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+  }
+
+  /* HEADER */
+  .ast-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .ast-header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--p1l);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--p1);
+    font-size: 18px;
+  }
+
+  .ast-header h1 { font-size: 20px; font-weight: 700; margin: 0; }
+  .ast-header-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+  /* LAYOUT */
+  .ast-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* CARD */
+  .ast-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .ast-card-head {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ast-card-head-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  .ast-card-title { font-size: 13px; font-weight: 700; color: var(--text); }
+
+  .ast-form-body { padding: 20px; }
+
+  /* SECTION */
+  .ast-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ast-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .ast-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .ast-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .ast-form-group { margin-bottom: 12px; }
+  .ast-form-group:last-child { margin-bottom: 0; }
+
+  .ast-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 5px;
+  }
+
+  .ast-input {
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  select.ast-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+    padding-right: 28px;
+    cursor: pointer;
+  }
+
+  .ast-input:focus {
+    border-color: var(--p1);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+  }
+
+  /* MAINTENANCE SELECT special */
+  .ast-input.maintenance-open   { border-color: rgba(16,185,129,0.4); background: var(--greenl); color: #065f46; }
+  .ast-input.maintenance-closed { border-color: rgba(239,68,68,0.4);  background: var(--redl);   color: #991b1b; }
+
+  /* SAVE BUTTON */
+  .ast-save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 22px;
+    border-radius: 9px;
+    background: var(--p1);
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 20px;
+  }
+
+  .ast-save-btn:hover {
+    background: var(--p1h);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+    transform: translateY(-1px);
+  }
+
+  .ast-save-btn:active { transform: translateY(0); }
+
+  /* SIDEBAR CARDS */
+  .ast-sidebar { display: flex; flex-direction: column; gap: 14px; }
+
+  /* PROVIDER CARD */
+  .ast-provider-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .ast-provider-head {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .ast-provider-body { padding: 16px; }
+
+  .ast-provider-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+
+  .ast-provider-val {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--green);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .ast-provider-cur { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 4px; }
+
+  .ast-provider-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--greenl);
+    color: #065f46;
+    margin-top: 10px;
+  }
+
+  .ast-provider-status .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  /* INFO CARD */
+  .ast-info-card {
+    background: var(--bluel);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+
+  .ast-info-card-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--blue);
+    margin-bottom: 10px;
+  }
+
+  .ast-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: #1e40af;
+    padding: 4px 0;
+    line-height: 1.5;
+  }
+
+  .ast-info-item i { margin-top: 2px; flex-shrink: 0; color: var(--blue); }
+
+  /* TOAST */
+  .ast-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #111827;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  .ast-toast.show { opacity: 1; }
+
+  @media (max-width: 768px) {
+    .ast-layout { grid-template-columns: 1fr; }
+    .ast-row    { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="ast-wrap">
+
+  <div class="ast-header">
+    <div class="ast-header-icon"><i class="fas fa-cog"></i></div>
+    <div>
+      <h1>Sozlamalar</h1>
+      <div class="ast-header-sub">Tizim konfiguratsiyasi</div>
+    </div>
+  </div>
+
+  <div class="ast-layout">
+
+    <!-- MAIN FORM -->
+    <div class="ast-card">
+      <div class="ast-card-head">
+        <div class="ast-card-head-icon" style="background:var(--p1l);color:var(--p1)">
+          <i class="fas fa-sliders-h"></i>
+        </div>
+        <span class="ast-card-title">Asosiy sozlamalar</span>
+      </div>
+
+      <div class="ast-form-body">
+        <form method="POST">
+
+          <!-- Sayt -->
+          <div class="ast-section">
+            <div class="ast-section-title">Sayt ma'lumotlari</div>
+            <div class="ast-row">
+              <div class="ast-form-group">
+                <label class="ast-label">Sayt nomi</label>
+                <input name="site_name" class="ast-input"
+                       value="{{ cfg.get('site_name', 'SMMPanel.uz') }}">
+              </div>
+              <div class="ast-form-group">
+                <label class="ast-label">Minimal depozit (so'm)</label>
+                <input name="min_deposit" class="ast-input" type="number"
+                       value="{{ cfg.get('min_deposit', '5000') }}">
+              </div>
+            </div>
+            <div class="ast-form-group">
+              <label class="ast-label">Sayt tavsifi</label>
+              <input name="site_desc" class="ast-input"
+                     value="{{ cfg.get('site_desc', '') }}"
+                     placeholder="Qisqa tavsif...">
+            </div>
+          </div>
+
+          <!-- Bonus & Texnik -->
+          <div class="ast-section">
+            <div class="ast-section-title">Foydalanuvchilar va holat</div>
+            <div class="ast-row">
+              <div class="ast-form-group">
+                <label class="ast-label">Ro'yxat bonusi (so'm)</label>
+                <input name="reg_bonus" class="ast-input" type="number"
+                       value="{{ cfg.get('reg_bonus', '0') }}"
+                       placeholder="0">
+              </div>
+              <div class="ast-form-group">
+                <label class="ast-label">Texnik ishlar</label>
+                <select name="maintenance" class="ast-input" id="maintenance-sel"
+                        onchange="updateMaintenanceStyle(this)">
+                  <option value="0" {% if cfg.get('maintenance') != '1' %}selected{% endif %}>
+                    ✅ Sayt ochiq
+                  </option>
+                  <option value="1" {% if cfg.get('maintenance') == '1' %}selected{% endif %}>
+                    🔧 Texnik ishlar (yopiq)
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="ast-save-btn">
+            <i class="fas fa-save"></i> Saqlash
+          </button>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="ast-sidebar">
+
+      <!-- Provider -->
+      <div class="ast-provider-card">
+        <div class="ast-provider-head">Provider holati</div>
+        <div class="ast-provider-body">
+          <div class="ast-provider-label">1xPanel balans</div>
+          <div>
+            <span class="ast-provider-val">{{ provider_balance }}</span>
+            <span class="ast-provider-cur">USD</span>
+          </div>
+          <div class="ast-provider-status">
+            <span class="dot"></span> Ulangan
+          </div>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="ast-info-card">
+        <div class="ast-info-card-title">Eslatmalar</div>
+        <div class="ast-info-item">
+          <i class="fas fa-info-circle"></i>
+          <span>Minimal depozit yangilansa, foydalanuvchilarga darhol ta'sir qiladi.</span>
+        </div>
+        <div class="ast-info-item">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>Texnik ishlar rejimida faqat adminlar kirishi mumkin.</span>
+        </div>
+        <div class="ast-info-item">
+          <i class="fas fa-gift"></i>
+          <span>Ro'yxat bonusi 0 bo'lsa, bonus berilmaydi.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="ast-toast" id="ast-toast">✓ Sozlamalar saqlandi</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateMaintenanceStyle(sel) {
+  sel.className = 'ast-input ' +
+    (sel.value === '1' ? 'maintenance-closed' : 'maintenance-open');
+}
+
+/* Init on load */
+const mSel = document.getElementById('maintenance-sel');
+if (mSel) updateMaintenanceStyle(mSel);
+</script>
+{% endblock %}

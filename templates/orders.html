@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% block title %}Orderlarim — SMMZone.uz{% endblock %}
+{% block content %}
+
+<style>
+  /* PAGE HEADER */
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px; font-weight: 800;
+    color: var(--white); letter-spacing: -0.5px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .page-title-icon {
+    width: 40px; height: 40px;
+    background: var(--grad);
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: #fff;
+  }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+  /* CARD */
+  .orders-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex; align-items: center;
+    gap: 8px; flex-wrap: wrap;
+    margin-bottom: 22px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .filter-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 100px;
+    font-size: 13px; font-weight: 600;
+    text-decoration: none; cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--card2); color: var(--muted);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: rgba(56,189,248,0.3); color: var(--white); }
+  .filter-btn.active {
+    background: rgba(56,189,248,0.12);
+    border-color: rgba(56,189,248,0.4);
+    color: var(--accent);
+  }
+  .filter-btn .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .dot-all      { background: var(--muted); }
+  .dot-pending  { background: #fbbf24; }
+  .dot-process  { background: #818cf8; }
+  .dot-complete { background: #34d399; }
+  .dot-failed   { background: #f87171; }
+
+  .sync-btn {
+    margin-left: auto;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 7px 16px; border-radius: 100px;
+    font-size: 13px; font-weight: 600;
+    background: var(--card2); color: var(--muted);
+    border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .sync-btn:hover { color: var(--white); border-color: rgba(56,189,248,0.3); }
+  .sync-btn i { font-size: 12px; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 0 -4px; }
+  .orders-table { width: 100%; border-collapse: collapse; min-width: 760px; }
+
+  .orders-table thead th {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.7px;
+    color: var(--muted); padding: 0 14px 14px;
+    text-align: left; border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .orders-table tbody tr {
+    border-bottom: 1px solid rgba(99,179,237,0.06);
+    transition: background 0.15s;
+  }
+  .orders-table tbody tr:last-child { border-bottom: none; }
+  .orders-table tbody tr:hover { background: rgba(56,189,248,0.03); }
+  .orders-table tbody td {
+    padding: 13px 14px;
+    font-size: 13px; color: var(--text);
+    vertical-align: middle;
+  }
+
+  .td-id    { color: var(--muted); font-size: 12px; font-weight: 700; }
+  .td-svc   { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  .td-link  { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .td-link a { color: var(--accent); text-decoration: none; font-size: 12px; }
+  .td-link a:hover { text-decoration: underline; }
+  .td-num   { font-weight: 600; color: var(--white); }
+  .td-price { font-weight: 700; color: #34d399; }
+  .td-date  { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .td-stat  { color: var(--muted); font-size: 13px; }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 100px;
+    font-size: 11px; font-weight: 700; white-space: nowrap;
+  }
+  .badge-green  { background: rgba(52,211,153,0.12);  color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
+  .badge-blue   { background: rgba(129,140,248,0.12); color: #818cf8; border: 1px solid rgba(129,140,248,0.2); }
+  .badge-yellow { background: rgba(251,191,36,0.12);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+  .badge-red    { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+  .badge-gray   { background: rgba(122,143,173,0.12); color: var(--muted); border: 1px solid rgba(122,143,173,0.2); }
+
+  /* EMPTY */
+  .empty-state {
+    text-align: center; padding: 56px 20px; color: var(--muted);
+  }
+  .empty-state i { font-size: 42px; margin-bottom: 14px; display: block; opacity: 0.3; }
+  .empty-state p { font-size: 15px; margin-bottom: 6px; color: var(--text); font-weight: 500; }
+  .empty-state small { font-size: 13px; }
+
+  /* PAGINATION */
+  .pagination {
+    display: flex; align-items: center; gap: 6px;
+    justify-content: center; flex-wrap: wrap;
+    margin-top: 24px; padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .page-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 10px;
+    font-size: 13px; font-weight: 600;
+    text-decoration: none; color: var(--muted);
+    background: var(--card2); border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  .page-btn:hover { color: var(--white); border-color: rgba(56,189,248,0.3); }
+  .page-btn.active {
+    background: rgba(56,189,248,0.12);
+    border-color: rgba(56,189,248,0.4);
+    color: var(--accent);
+  }
+</style>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1 class="page-title">
+    <div class="page-title-icon"><i class="fas fa-list"></i></div>
+    Orderlarim
+  </h1>
+</div>
+
+<!-- ORDERS CARD -->
+<div class="orders-card">
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    {% for st, label, dot in [
+      ('',           'Barchasi',   'dot-all'),
+      ('Pending',    'Kutilmoqda', 'dot-pending'),
+      ('Processing', 'Jarayonda',  'dot-process'),
+      ('Completed',  'Bajarildi',  'dot-complete'),
+      ('Failed',     'Xatolik',    'dot-failed')
+    ] %}
+    <a href="/orders?status={{ st }}"
+       class="filter-btn {% if status == st %}active{% endif %}">
+      <span class="dot {{ dot }}"></span>
+      {{ label }}
+    </a>
+    {% endfor %}
+
+    <form method="POST" action="/api/sync-orders" style="margin-left:auto">
+      <button type="submit" class="sync-btn">
+        <i class="fas fa-sync"></i> Yangilash
+      </button>
+    </form>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Xizmat</th>
+          <th>Link</th>
+          <th>Miqdor</th>
+          <th>Boshlanish</th>
+          <th>Qoldi</th>
+          <th>Narx</th>
+          <th>Status</th>
+          <th>Sana</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in orders %}
+        <tr>
+          <td class="td-id">#{{ o.id }}</td>
+          <td class="td-svc" title="{{ o.svc_name }}">{{ o.svc_name }}</td>
+          <td class="td-link">
+            <a href="{{ o.link }}" target="_blank" rel="noopener">{{ o.link }}</a>
+          </td>
+          <td class="td-num">{{ "{:,}".format(o.quantity) }}</td>
+          <td class="td-stat">{{ o.start_count }}</td>
+          <td class="td-stat">{{ o.remains }}</td>
+          <td class="td-price">{{ "{:,.0f}".format(o.price) }} so'm</td>
+          <td>
+            {% if o.status == 'Completed' %}
+              <span class="badge badge-green"><i class="fas fa-check"></i> Bajarildi</span>
+            {% elif o.status == 'Processing' %}
+              <span class="badge badge-blue"><i class="fas fa-spinner fa-spin"></i> Jarayonda</span>
+            {% elif o.status == 'Pending' %}
+              <span class="badge badge-yellow"><i class="fas fa-clock"></i> Kutilmoqda</span>
+            {% elif o.status == 'Failed' %}
+              <span class="badge badge-red"><i class="fas fa-times"></i> Xatolik</span>
+            {% else %}
+              <span class="badge badge-gray">{{ o.status }}</span>
+            {% endif %}
+          </td>
+          <td class="td-date">{{ o.created_at[:16] }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9">
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <p>Orderlar topilmadi</p>
+              <small>Hali birorta order berilmagan yoki filtr bo'yicha natija yo'q</small>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PAGINATION -->
+  {% if total > limit %}
+  <div class="pagination">
+    {% if page > 1 %}
+    <a href="/orders?page={{ page-1 }}&status={{ status }}" class="page-btn">
+      <i class="fas fa-chevron-left"></i>
+    </a>
+    {% endif %}
+
+    {% for p in range(1, (total // limit) + 2) %}
+    <a href="/orders?page={{ p }}&status={{ status }}"
+       class="page-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+    {% endfor %}
+
+    {% if page < (total // limit) + 1 %}
+    <a href="/orders?page={{ page+1 }}&status={{ status }}" class="page-btn">
+      <i class="fas fa-chevron-right"></i>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}
