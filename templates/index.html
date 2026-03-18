@@ -3,595 +3,451 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SMMZone.uz — O'zbekistondagi #1 SMM Panel</title>
+<title>SMMZONE — Digital Marketing Agency</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #050a14;
-    --bg2: #090f1e;
-    --card: #0d1628;
-    --card2: #111d35;
-    --border: rgba(99,179,237,0.12);
-    --accent: #38bdf8;
-    --accent2: #818cf8;
-    --accent3: #34d399;
-    --text: #e2eaf8;
-    --muted: #7a8fad;
-    --white: #ffffff;
-    --grad: linear-gradient(135deg, #38bdf8, #818cf8);
-    --grad2: linear-gradient(135deg, #0d1628 0%, #050a14 100%);
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.5;
-  }
-
-  .blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
-  .blob-1 { width: 600px; height: 600px; background: rgba(56,189,248,0.07); top: -200px; left: -200px; }
-  .blob-2 { width: 500px; height: 500px; background: rgba(129,140,248,0.07); bottom: -100px; right: -100px; }
-  .blob-3 { width: 300px; height: 300px; background: rgba(52,211,153,0.05); top: 50%; left: 50%; transform: translate(-50%,-50%); }
-
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 14px 48px;
-    display: flex; align-items: center; justify-content: space-between;
-    background: rgba(5,10,20,0.8);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-size: 19px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    display: flex; align-items: center; gap: 9px;
-    text-decoration: none;
-    color: var(--white);
-  }
-  .logo-icon {
-    width: 32px; height: 32px;
-    background: var(--grad);
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-  }
-  .logo span { color: var(--accent); }
-
-  .nav-links { display: flex; gap: 8px; align-items: center; }
-
-  .btn {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 9px 20px;
-    border-radius: 9px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    border: none;
-    transition: all 0.25s ease;
-  }
-  .btn-ghost {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-  }
-  .btn-ghost:hover { color: var(--white); border-color: rgba(99,179,237,0.35); background: var(--card); }
-  .btn-primary {
-    background: var(--grad);
-    color: var(--white);
-    box-shadow: 0 0 24px rgba(56,189,248,0.25);
-  }
-  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 32px rgba(56,189,248,0.4); }
-  .btn-outline {
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid rgba(56,189,248,0.4);
-  }
-  .btn-outline:hover { background: rgba(56,189,248,0.08); }
-  .btn-lg { padding: 12px 28px; font-size: 14px; border-radius: 11px; }
-
-  /* HERO */
-  .hero {
-    position: relative; z-index: 1;
-    min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    text-align: center;
-    padding: 110px 24px 72px;
-  }
-
-  .hero-inner { max-width: 760px; }
-
-  .badge {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 7px 16px;
-    background: rgba(56,189,248,0.08);
-    border: 1px solid rgba(56,189,248,0.2);
-    border-radius: 100px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--accent);
-    margin-bottom: 28px;
-    animation: fadeDown 0.8s ease forwards;
-  }
-  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); box-shadow: 0 0 8px var(--accent3); animation: pulse 2s infinite; }
-
-  @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.6; transform:scale(0.85); } }
-  @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-
-  .hero h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(32px, 6vw, 62px);
-    font-weight: 800;
-    line-height: 1.08;
-    letter-spacing: -2px;
-    color: var(--white);
-    margin-bottom: 20px;
-    animation: fadeUp 0.9s 0.2s ease both;
-  }
-  .hero h1 em {
-    font-style: normal;
-    background: var(--grad);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .hero p {
-    font-size: 15px;
-    line-height: 1.7;
-    color: var(--muted);
-    max-width: 520px;
-    margin: 0 auto 36px;
-    animation: fadeUp 0.9s 0.35s ease both;
-  }
-
-  .hero-btns {
-    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-    animation: fadeUp 0.9s 0.5s ease both;
-  }
-
-  .stats-row {
-    display: flex; gap: 36px; justify-content: center; flex-wrap: wrap;
-    margin-top: 56px;
-    animation: fadeUp 0.9s 0.65s ease both;
-  }
-  .stat { text-align: center; }
-  .stat-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 24px; font-weight: 800;
-    background: var(--grad);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
-
-  /* SECTION */
-  section { position: relative; z-index: 1; padding: 80px 24px; }
-  .section-header { text-align: center; margin-bottom: 52px; }
-  .section-tag {
-    display: inline-block;
-    font-size: 10px; font-weight: 700; letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 12px;
-  }
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(22px, 3.5vw, 36px);
-    font-weight: 800;
-    letter-spacing: -0.8px;
-    color: var(--white);
-    line-height: 1.15;
-  }
-  .section-sub { font-size: 14px; color: var(--muted); margin-top: 10px; max-width: 480px; margin-left: auto; margin-right: auto; }
-
-  /* FEATURES */
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
-    max-width: 1100px; margin: 0 auto;
-  }
-
-  .feature-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 26px 22px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .feature-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--grad);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .feature-card:hover { transform: translateY(-4px); border-color: rgba(56,189,248,0.25); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
-  .feature-card:hover::before { opacity: 1; }
-
-  .feature-icon {
-    width: 44px; height: 44px;
-    background: rgba(56,189,248,0.08);
-    border: 1px solid rgba(56,189,248,0.15);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 19px;
-    margin-bottom: 16px;
-  }
-  .feature-card h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 15px; font-weight: 700;
-    color: var(--white);
-    margin-bottom: 8px;
-  }
-  .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
-
-  /* PLATFORMS */
-  .platforms-section { background: var(--bg2); }
-  .platforms-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 14px;
-    max-width: 1100px; margin: 0 auto;
-  }
-  .platform-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 22px 16px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    color: var(--text);
-  }
-  .platform-card:hover { border-color: rgba(56,189,248,0.3); transform: translateY(-3px); background: var(--card2); }
-  .platform-card .p-icon { font-size: 30px; margin-bottom: 10px; display: block; }
-  .platform-card h4 { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
-  .platform-card .p-count { font-size: 11px; color: var(--muted); }
-
-  /* PRICING */
-  .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    max-width: 960px; margin: 0 auto 40px;
-  }
-  .price-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 26px 20px;
-    text-align: center;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .price-card.featured {
-    border-color: rgba(56,189,248,0.4);
-    background: linear-gradient(145deg, #0e1a2e, #0d1628);
-    box-shadow: 0 0 40px rgba(56,189,248,0.1);
-  }
-  .price-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(0,0,0,0.35); }
-  .price-card .emoji { font-size: 30px; margin-bottom: 12px; display: block; }
-  .price-card h4 { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 16px; }
-  .price-amount {
-    font-family: 'Syne', sans-serif;
-    font-size: 32px; font-weight: 800;
-    background: var(--grad);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    line-height: 1;
-  }
-  .price-unit { font-size: 12px; color: var(--muted); margin-top: 5px; }
-  .featured-badge {
-    position: absolute; top: 12px; right: 12px;
-    background: var(--grad);
-    color: #fff;
-    font-size: 9px; font-weight: 700;
-    padding: 3px 8px; border-radius: 100px;
-    letter-spacing: 0.5px;
-  }
-
-  /* PAYMENTS */
-  .payments-row {
-    display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
-    max-width: 660px; margin: 0 auto;
-  }
-  .pay-chip {
-    display: flex; align-items: center; gap: 7px;
-    padding: 10px 18px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 100px;
-    font-size: 13px; font-weight: 600;
-    color: var(--text);
-    transition: all 0.2s ease;
-  }
-  .pay-chip:hover { border-color: rgba(56,189,248,0.3); color: var(--white); }
-  .pay-chip i { color: var(--accent); font-size: 14px; }
-
-  /* CTA */
-  .cta-section { background: var(--bg2); text-align: center; }
-  .cta-box {
-    background: linear-gradient(135deg, rgba(56,189,248,0.08) 0%, rgba(129,140,248,0.08) 100%);
-    border: 1px solid rgba(56,189,248,0.2);
-    border-radius: 24px;
-    padding: 60px 40px;
-    max-width: 680px; margin: 0 auto;
-    position: relative; overflow: hidden;
-  }
-  .cta-box::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(56,189,248,0.1) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .cta-box h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(22px, 3.5vw, 34px);
-    font-weight: 800; letter-spacing: -0.8px;
-    color: var(--white);
-    margin-bottom: 12px;
-  }
-  .cta-box p { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
-
-  /* FAQ */
-  .faq-section { background: var(--bg); }
-  .faq-list { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
-  .faq-item {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-    transition: border-color 0.3s;
-  }
-  .faq-item.open { border-color: rgba(56,189,248,0.3); }
-  .faq-q {
-    padding: 18px 22px;
-    display: flex; align-items: center; justify-content: space-between; gap: 14px;
-    cursor: pointer;
-    font-family: 'Syne', sans-serif;
-    font-size: 13px; font-weight: 700;
-    color: var(--white);
-    user-select: none;
-  }
-  .faq-q i { color: var(--accent); font-size: 12px; transition: transform 0.3s ease; flex-shrink: 0; }
-  .faq-item.open .faq-q i { transform: rotate(180deg); }
-  .faq-a {
-    max-height: 0; overflow: hidden;
-    transition: max-height 0.4s ease, padding 0.3s ease;
-    font-size: 13px; line-height: 1.7; color: var(--muted);
-    padding: 0 22px;
-  }
-  .faq-item.open .faq-a { max-height: 300px; padding: 0 22px 18px; }
-
-  /* FOOTER */
-  footer {
-    position: relative; z-index: 1;
-    background: var(--bg2);
-    border-top: 1px solid var(--border);
-    padding: 40px 24px;
-    text-align: center;
-  }
-  .footer-logo { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; color: var(--white); margin-bottom: 14px; }
-  .footer-logo span { color: var(--accent); }
-  .footer-links { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
-  .footer-links a {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 6px 12px; border-radius: 7px;
-    font-size: 12px; color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .footer-links a:hover { color: var(--accent); }
-  .footer-copy { font-size: 11px; color: #3a4a62; }
-
-  @media (max-width: 768px) {
-    nav { padding: 12px 18px; }
-    .hero { padding: 95px 18px 56px; }
-    .stats-row { gap: 20px; }
-    section { padding: 60px 18px; }
-    .cta-box { padding: 40px 20px; }
-  }
-  @media (max-width: 480px) {
-    .nav-links .btn-ghost { display: none; }
-  }
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--black:#080808;--white:#f5f5f0;--accent:#c8f04d;--gray:#141414;--gray2:#1c1c1c;--muted:#666;--border:#2a2a2a;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--white);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 48px;height:60px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(8,8,8,0.95);backdrop-filter:blur(12px);transition:border-color .3s;}
+nav.scrolled{border-color:rgba(200,240,77,0.15);}
+.nav-logo{font-size:17px;font-weight:600;display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--white);}
+.logo-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:pulse-dot 2s infinite;}
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 rgba(200,240,77,.4)}50%{box-shadow:0 0 0 6px rgba(200,240,77,0)}}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color .2s;}
+.nav-links a:hover{color:var(--white);}
+.nav-cta{display:flex;gap:10px;}
+.btn{padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;border-radius:6px;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;}
+.btn-out{background:transparent;border:1px solid var(--border);color:var(--white);}
+.btn-out:hover{border-color:#555;}
+.btn-acc{background:var(--accent);border:1px solid var(--accent);color:#000;font-weight:600;}
+.btn-acc:hover{background:#d6f55e;}
+.hero{min-height:100vh;padding:120px 48px 80px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1280px;margin:0 auto;}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:5px 14px 5px 8px;border:1px solid var(--border);border-radius:100px;margin-bottom:28px;font-size:12px;color:var(--muted);}
+.live-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-size:clamp(42px,5.2vw,70px);font-weight:600;line-height:1.04;letter-spacing:-2.5px;margin-bottom:22px;}
+.accent-text{color:var(--accent);font-style:italic;}
+.dim-text{color:var(--muted);}
+.hero-desc{font-size:15px;color:var(--muted);line-height:1.7;max-width:440px;margin-bottom:36px;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-main{padding:13px 30px;background:var(--accent);color:#000;font-size:14px;font-weight:600;cursor:pointer;border:none;border-radius:7px;transition:all .2s;font-family:'Inter',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.btn-main:hover{background:#d6f55e;transform:translateY(-2px);box-shadow:0 8px 24px rgba(200,240,77,.2);}
+.btn-ghost{padding:13px 30px;background:transparent;color:var(--white);font-size:14px;font-weight:500;cursor:pointer;border:1px solid var(--border);border-radius:7px;transition:all .2s;font-family:'Inter',sans-serif;text-decoration:none;display:inline-flex;align-items:center;}
+.btn-ghost:hover{border-color:#555;}
+.hero-stats{display:flex;gap:36px;margin-top:52px;padding-top:36px;border-top:1px solid var(--border);}
+.stat-num{font-size:30px;font-weight:600;letter-spacing:-1px;}
+.stat-num em{color:var(--accent);font-style:normal;}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:2px;}
+.hero-right{position:relative;height:520px;}
+.hero-img-main{position:absolute;top:0;left:0;right:0;height:320px;border-radius:14px;overflow:hidden;border:1px solid var(--border);}
+.hero-img-main img{width:100%;height:100%;object-fit:cover;filter:brightness(.65) saturate(.85);}
+.img-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,.85) 0%,transparent 55%);padding:22px;display:flex;flex-direction:column;justify-content:flex-end;}
+.img-tag{font-size:10px;letter-spacing:2px;color:var(--accent);margin-bottom:6px;}
+.img-title{font-size:19px;font-weight:600;}
+.mini-row{position:absolute;bottom:0;left:0;right:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mini{background:var(--gray);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;}
+.mini-icon{font-size:20px;margin-bottom:10px;}
+.mini-val{font-size:22px;font-weight:600;letter-spacing:-.8px;}
+.mini-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+.badge-g{position:absolute;top:12px;right:12px;font-size:10px;padding:3px 8px;border-radius:100px;background:rgba(34,197,94,.12);color:#22c55e;}
+.badge-b{position:absolute;top:12px;right:12px;font-size:10px;padding:3px 8px;border-radius:100px;background:rgba(99,102,241,.12);color:#818cf8;}
+.marquee-wrap{border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:14px 0;background:var(--gray);}
+.marquee-inner{display:flex;gap:48px;width:max-content;animation:slide 22s linear infinite;}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.m-item{font-size:12px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:48px;}
+.m-dot{color:var(--accent);font-size:7px;}
+.wrap{max-width:1280px;margin:0 auto;}
+.sec{padding:90px 48px;}
+.sec-label{font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.sec-label::before{content:'';width:20px;height:1px;background:var(--muted);}
+.sec-title{font-size:clamp(34px,3.8vw,52px);font-weight:600;letter-spacing:-2px;line-height:1.05;margin-bottom:56px;}
+.sec-title .m{color:var(--muted);}
+.svc-list{display:flex;flex-direction:column;}
+.svc-row{display:grid;grid-template-columns:52px 1fr 180px 56px;align-items:center;gap:28px;padding:26px 0;border-bottom:1px solid var(--border);cursor:default;transition:padding-left .3s;}
+.svc-row:hover{padding-left:14px;}
+.svc-row:hover .svc-n{color:var(--accent);}
+.svc-row:hover .svc-arr{color:var(--accent);transform:rotate(-45deg);}
+.svc-n{font-size:12px;color:var(--border);font-weight:500;transition:color .3s;}
+.svc-name{font-size:19px;font-weight:500;letter-spacing:-.5px;margin-bottom:3px;}
+.svc-desc{font-size:13px;color:var(--muted);}
+.tag-row{display:flex;gap:7px;flex-wrap:wrap;}
+.chip{padding:3px 10px;border:1px solid var(--border);border-radius:100px;font-size:11px;color:var(--muted);}
+.svc-arr{font-size:16px;color:var(--border);transition:all .3s;text-align:right;}
+.plat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:70px;}
+.plat-cell{background:var(--black);padding:44px 36px;transition:background .3s;}
+.plat-cell:hover{background:var(--gray);}
+.plat-icon{font-size:30px;margin-bottom:18px;}
+.plat-name{font-size:20px;font-weight:600;letter-spacing:-.5px;margin-bottom:7px;}
+.plat-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px;}
+.plat-stat{font-size:26px;font-weight:600;letter-spacing:-1px;}
+.plat-stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+.counter-section{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:60px 48px;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);}
+.counter-cell{background:var(--black);padding:32px 40px;text-align:center;transition:background .3s;}
+.counter-cell:hover{background:var(--gray);}
+.counter-num{font-size:48px;font-weight:600;letter-spacing:-2px;color:var(--white);line-height:1;margin-bottom:8px;}
+.counter-num em{color:var(--accent);font-style:normal;}
+.counter-lbl{font-size:13px;color:var(--muted);}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
+.about-img{aspect-ratio:3/4;border-radius:16px;overflow:hidden;border:1px solid var(--border);position:relative;background:var(--gray);}
+.about-img img{width:100%;height:100%;object-fit:cover;filter:grayscale(15%);display:block;}
+.about-img-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,.75) 0%,transparent 55%);}
+.img-badge{position:absolute;bottom:22px;left:22px;background:rgba(8,8,8,.8);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:10px;padding:12px 16px;}
+.ib-name{font-size:14px;font-weight:600;}
+.ib-role{font-size:11px;color:var(--muted);margin-top:2px;}
+.about-tag{display:inline-block;padding:5px 14px;background:rgba(200,240,77,.08);border:1px solid rgba(200,240,77,.2);border-radius:100px;font-size:11px;color:var(--accent);margin-bottom:22px;}
+.about-title{font-size:clamp(32px,3.2vw,46px);font-weight:600;letter-spacing:-1.5px;line-height:1.1;margin-bottom:22px;}
+.about-bio{font-size:15px;color:var(--muted);line-height:1.85;margin-bottom:36px;}
+.skills{display:flex;flex-direction:column;gap:14px;}
+.skill-top{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:7px;}
+.skill-track{height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
+.skill-bar{height:100%;background:var(--accent);border-radius:2px;width:0;transition:width 1.5s ease;}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.testi{background:var(--gray);border:1px solid var(--border);border-radius:14px;padding:26px;transition:border-color .3s,transform .3s;}
+.testi:hover{border-color:#3a3a3a;transform:translateY(-4px);}
+.stars{color:var(--accent);font-size:11px;margin-bottom:12px;}
+.testi-text{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px;}
+.testi-aut{display:flex;align-items:center;gap:10px;}
+.av{width:34px;height:34px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--accent);}
+.av-name{font-size:13px;font-weight:500;}
+.av-role{font-size:11px;color:var(--muted);}
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.pricing-card{background:var(--gray);border:1px solid var(--border);border-radius:18px;padding:32px 28px;position:relative;overflow:hidden;transition:all .3s;}
+.pricing-card:hover{transform:translateY(-4px);border-color:#3a3a3a;}
+.pricing-card.featured{border-color:rgba(200,240,77,.4);background:linear-gradient(135deg,#141414,#101408);}
+.pricing-card.featured::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top,rgba(200,240,77,.06),transparent 60%);pointer-events:none;}
+.pricing-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;background:var(--accent);color:#000;border-radius:100px;font-size:10px;font-weight:700;margin-bottom:20px;}
+.pricing-badge-ph{height:26px;margin-bottom:20px;}
+.pricing-name{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+.pricing-price{font-size:42px;font-weight:600;letter-spacing:-2px;margin-bottom:4px;color:var(--white);}
+.pricing-price span{font-size:16px;font-weight:400;color:var(--muted);}
+.pricing-period{font-size:12px;color:var(--muted);margin-bottom:28px;}
+.pricing-features{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
+.pf{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);}
+.pf i{color:var(--accent);font-size:11px;flex-shrink:0;}
+.pf.off i{color:#3a3a3a;}
+.pf.off{opacity:.5;}
+.btn-pricing{width:100%;padding:13px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;text-align:center;text-decoration:none;display:block;}
+.btn-po{background:transparent;border:1px solid var(--border);color:var(--white);}
+.btn-po:hover{border-color:#555;}
+.btn-ps{background:var(--accent);border:none;color:#000;}
+.btn-ps:hover{background:#d6f55e;transform:translateY(-1px);}
+/* FAQ */
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;}
+.faq-item{background:var(--gray);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s;margin-bottom:8px;}
+.faq-item:hover{border-color:#3a3a3a;}
+.faq-item.open{border-color:rgba(200,240,77,.25);}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;cursor:pointer;user-select:none;font-size:15px;font-weight:500;gap:16px;}
+.faq-q-text{flex:1;}
+.faq-icon{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);transition:all .3s;}
+.faq-item.open .faq-icon{background:var(--accent);color:#000;transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;font-size:14px;color:var(--muted);line-height:1.7;padding:0 24px;}
+.faq-item.open .faq-a{max-height:200px;padding:0 24px 20px;}
+/* FLOATING */
+.float-tg{position:fixed;bottom:32px;right:32px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:12px;}
+.float-menu{display:flex;flex-direction:column;gap:8px;opacity:0;transform:translateY(10px) scale(.96);pointer-events:none;transition:all .25s ease;}
+.float-menu.show{opacity:1;transform:translateY(0) scale(1);pointer-events:all;}
+.float-link{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:100px;background:var(--gray2);border:1px solid var(--border);color:var(--white);text-decoration:none;font-size:13px;font-weight:500;white-space:nowrap;transition:all .2s;box-shadow:0 4px 20px rgba(0,0,0,.4);}
+.float-link:hover{border-color:#444;transform:translateX(-4px);}
+.float-link i{font-size:15px;}
+.float-btn{width:54px;height:54px;border-radius:50%;background:var(--accent);border:none;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px rgba(200,240,77,.3);animation:fpulse 3s infinite;}
+.float-btn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(200,240,77,.5);}
+.float-btn.active{transform:rotate(45deg);background:#fff;}
+@keyframes fpulse{0%,100%{box-shadow:0 4px 20px rgba(200,240,77,.3),0 0 0 0 rgba(200,240,77,.3)}50%{box-shadow:0 4px 20px rgba(200,240,77,.3),0 0 0 12px rgba(200,240,77,0)}}
+/* CTA */
+.cta{margin:0 48px 90px;background:var(--accent);border-radius:18px;padding:72px;display:flex;justify-content:space-between;align-items:center;gap:36px;position:relative;overflow:hidden;}
+.cta::before{content:'';position:absolute;top:-60px;right:-60px;width:250px;height:250px;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);pointer-events:none;}
+.cta-title{font-size:clamp(30px,3.8vw,50px);font-weight:600;letter-spacing:-2px;color:#000;line-height:1.05;}
+.cta-sub{font-size:14px;color:rgba(0,0,0,.45);margin-top:10px;}
+.btn-dark{padding:15px 34px;background:#000;color:var(--accent);font-size:14px;font-weight:600;cursor:pointer;border:none;border-radius:8px;white-space:nowrap;font-family:'Inter',sans-serif;transition:all .2s;flex-shrink:0;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.btn-dark:hover{transform:scale(1.03);}
+footer{border-top:1px solid var(--border);padding:40px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;}
+.f-logo{font-size:16px;font-weight:600;}
+.f-copy{font-size:12px;color:var(--muted);}
+.f-socials{display:flex;gap:10px;}
+.soc{width:34px;height:34px;border:1px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;text-decoration:none;transition:all .2s;}
+.soc:hover{border-color:#555;color:var(--white);}
+.reveal{opacity:0;transform:translateY(24px);transition:all .7s cubic-bezier(.2,1,.3,1);}
+.reveal.d1{transition-delay:.1s;}
+.reveal.d2{transition-delay:.2s;}
+.reveal.d3{transition-delay:.3s;}
+.revealed{opacity:1;transform:none;}
+@media(max-width:900px){
+  nav{padding:0 24px;}
+  .nav-links{display:none;}
+  .hero{grid-template-columns:1fr;padding:90px 24px 56px;gap:36px;}
+  .hero-right{height:280px;}
+  .sec{padding:60px 24px;}
+  .about-grid{grid-template-columns:1fr;}
+  .about-img{aspect-ratio:16/9;}
+  .plat-grid,.testi-grid,.pricing-grid{grid-template-columns:1fr;}
+  .faq-grid{grid-template-columns:1fr;}
+  .cta{margin:0 24px 60px;padding:44px 28px;flex-direction:column;}
+  footer{padding:28px 24px;flex-direction:column;align-items:flex-start;}
+  .svc-row{grid-template-columns:40px 1fr 60px;}
+  .tag-row{display:none;}
+  .counter-section{grid-template-columns:repeat(2,1fr);padding:40px 24px;}
+  .float-tg{bottom:20px;right:20px;}
+}
 </style>
 </head>
 <body>
 
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
-<div class="blob blob-3"></div>
-
-<nav>
-  <a href="/" class="logo">
-    <div class="logo-icon"><i class="fas fa-bolt" style="color:#fff"></i></div>
-    SMM<span>Zone</span>.uz
-  </a>
+<nav id="main-nav">
+  <a href="/" class="nav-logo"><div class="logo-dot"></div>SMMZONE</a>
   <div class="nav-links">
-    <a href="/login" class="btn btn-ghost">Kirish</a>
-    <a href="/register" class="btn btn-primary"><i class="fas fa-rocket"></i> Boshlash</a>
+    <a href="#services">Xizmatlar</a>
+    <a href="#pricing">Narxlar</a>
+    <a href="#about">Muallif</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <div class="nav-cta">
+    <a href="/login" class="btn btn-out">Kirish</a>
+    <a href="/register" class="btn btn-acc">Ro'yxatdan o'tish</a>
   </div>
 </nav>
 
+<div class="wrap">
 <section class="hero">
-  <div class="hero-inner">
-    <div class="badge">
-      <div class="badge-dot"></div>
-      O'zbekistondagi #1 SMM Panel
-    </div>
-    <h1>Ijtimoiy Tarmoqlarni<br><em>Kuchaytiring</em></h1>
-    <p>Instagram, YouTube, TikTok, Telegram va boshqa platformalar uchun sifatli xizmatlar. Avtomatik yetkazish, 24/7 ishlaydi.</p>
+  <div>
+    <div class="pill"><span class="live-dot"></span>500+ mijoz ishonadi</div>
+    <h1>Raqamli<br><span class="accent-text">marketing</span><br><span class="dim-text">yangi darajada</span></h1>
+    <p class="hero-desc">Instagram, Telegram va TikTok platformalarida biznesingizni o'sishga olib chiqamiz. Professional SMM — natija kafolati bilan.</p>
     <div class="hero-btns">
-      <a href="/register" class="btn btn-primary btn-lg"><i class="fas fa-rocket"></i> Bepul Boshlash</a>
-      <a href="#narxlar" class="btn btn-outline btn-lg"><i class="fas fa-tag"></i> Narxlar</a>
+      <a href="/register" class="btn-main"><i class="fas fa-bolt"></i> Bepul boshlash</a>
+      <a href="#services" class="btn-ghost">Xizmatlar</a>
     </div>
-    <div class="stats-row">
-      <div class="stat"><div class="stat-num">50K+</div><div class="stat-label">Faol Foydalanuvchilar</div></div>
-      <div class="stat"><div class="stat-num">2M+</div><div class="stat-label">Bajarilgan Buyurtmalar</div></div>
-      <div class="stat"><div class="stat-num">99.9%</div><div class="stat-label">Uptime</div></div>
-      <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Texnik Yordam</div></div>
+    <div class="hero-stats">
+      <div><div class="stat-num">2M<em>+</em></div><div class="stat-lbl">Umumiy qamrov</div></div>
+      <div><div class="stat-num">98<em>%</em></div><div class="stat-lbl">Muvaffaqiyat</div></div>
+      <div><div class="stat-num">3<em>y</em></div><div class="stat-lbl">Tajriba</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-img-main">
+      <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=900&q=80&auto=format" alt="SMM">
+      <div class="img-overlay">
+        <div class="img-tag">LIVE · ANALYTICS</div>
+        <div class="img-title">Kontent Strategiyasi 2026</div>
+      </div>
+    </div>
+    <div class="mini-row">
+      <div class="mini">
+        <span class="badge-g">↑ 24%</span>
+        <div class="mini-icon" style="color:#E1306C"><i class="fab fa-instagram"></i></div>
+        <div class="mini-val">12.8K</div>
+        <div class="mini-lbl">Instagram o'sish</div>
+      </div>
+      <div class="mini">
+        <span class="badge-b">↑ 18%</span>
+        <div class="mini-icon" style="color:#0088cc"><i class="fab fa-telegram"></i></div>
+        <div class="mini-val">8.4K</div>
+        <div class="mini-lbl">Telegram obunachi</div>
+      </div>
     </div>
   </div>
 </section>
+</div>
 
-<section style="background: var(--bg2); position:relative; z-index:1;">
-  <div class="section-header">
-    <div class="section-tag">Imkoniyatlar</div>
-    <h2 class="section-title">Nega SMMZone.uz?</h2>
-    <p class="section-sub">Biz raqobatchilardan bir necha qadam oldinda. Mana sabablari.</p>
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <div class="m-item">
+      Instagram Marketing <span class="m-dot">●</span> Telegram Growth <span class="m-dot">●</span>
+      TikTok Viral <span class="m-dot">●</span> Content Strategy <span class="m-dot">●</span>
+      Brand Identity <span class="m-dot">●</span> SMMZONE 2026 <span class="m-dot">●</span>
+      Iskandarov Azizbek <span class="m-dot">●</span> Digital Analytics <span class="m-dot">●</span>
+      Instagram Marketing <span class="m-dot">●</span> Telegram Growth <span class="m-dot">●</span>
+      TikTok Viral <span class="m-dot">●</span> Content Strategy <span class="m-dot">●</span>
+      Brand Identity <span class="m-dot">●</span> SMMZONE 2026 <span class="m-dot">●</span>
+      Iskandarov Azizbek <span class="m-dot">●</span> Digital Analytics <span class="m-dot">●</span>
+    </div>
   </div>
-  <div class="features-grid">
-    <div class="feature-card"><div class="feature-icon">⚡</div><h3>Tez Yetkazish</h3><p>Buyurtmangiz 1–5 daqiqada ishga tushadi. Avtomatik tizim to'xtamasdan ishlaydi.</p></div>
-    <div class="feature-card"><div class="feature-icon">💎</div><h3>Premium Sifat</h3><p>Real va faol profillarga asoslangan xizmatlar. Account bloklash xavfi yo'q.</p></div>
-    <div class="feature-card"><div class="feature-icon">💰</div><h3>Eng Arzon Narxlar</h3><p>Bozordagi eng past narxlarda eng yaxshi sifat. Katta hajmda chegirmalar.</p></div>
-    <div class="feature-card"><div class="feature-icon">🔒</div><h3>Xavfsiz To'lov</h3><p>Payme, Click, Uzcard, Humo va USDT qabul qilinadi. 100% xavfsiz.</p></div>
-    <div class="feature-card"><div class="feature-icon">🔗</div><h3>API Integratsiya</h3><p>Reseller uchun to'liq REST API. O'z panelingizni qurishingiz mumkin.</p></div>
-    <div class="feature-card"><div class="feature-icon">📊</div><h3>Real Vaqt Monitoring</h3><p>Har bir buyurtmani real vaqtda kuzating. Batafsil statistika va hisobotlar.</p></div>
+</div>
+
+<div class="counter-section">
+  <div class="counter-cell reveal"><div class="counter-num" data-target="500" data-suffix="+">0<em>+</em></div><div class="counter-lbl">Mamnun mijozlar</div></div>
+  <div class="counter-cell reveal d1"><div class="counter-num" data-target="2" data-suffix="M+">0<em>M+</em></div><div class="counter-lbl">Umumiy qamrov</div></div>
+  <div class="counter-cell reveal d2"><div class="counter-num" data-target="98" data-suffix="%">0<em>%</em></div><div class="counter-lbl">Muvaffaqiyat darajasi</div></div>
+  <div class="counter-cell reveal d3"><div class="counter-num" data-target="3" data-suffix=" yil">0<em> yil</em></div><div class="counter-lbl">Professional tajriba</div></div>
+</div>
+
+<div class="wrap" id="services">
+<section class="sec">
+  <div class="sec-label reveal">Xizmatlar</div>
+  <h2 class="sec-title reveal">Nima qilamiz<br><span class="m">va qanday</span></h2>
+  <div class="svc-list">
+    <div class="svc-row reveal"><div class="svc-n">01</div><div><div class="svc-name"><i class="fab fa-instagram" style="color:#E1306C;margin-right:10px"></i>Instagram Marketing</div><div class="svc-desc">Professional akkaunt boshqaruvi va kontent yaratish</div></div><div class="tag-row"><span class="chip">Follower</span><span class="chip">Reklama</span></div><div class="svc-arr"><i class="fas fa-arrow-right"></i></div></div>
+    <div class="svc-row reveal"><div class="svc-n">02</div><div><div class="svc-name"><i class="fab fa-telegram" style="color:#0088cc;margin-right:10px"></i>Telegram Channel</div><div class="svc-desc">Kanal rivojlantirish, bot va monetizatsiya yechimlari</div></div><div class="tag-row"><span class="chip">Obunachi</span><span class="chip">Bot</span></div><div class="svc-arr"><i class="fas fa-arrow-right"></i></div></div>
+    <div class="svc-row reveal"><div class="svc-n">03</div><div><div class="svc-name"><i class="fab fa-tiktok" style="margin-right:10px"></i>TikTok Growth</div><div class="svc-desc">Viral kontent va For You page optimizatsiya</div></div><div class="tag-row"><span class="chip">Viral</span><span class="chip">Trend</span></div><div class="svc-arr"><i class="fas fa-arrow-right"></i></div></div>
+    <div class="svc-row reveal"><div class="svc-n">04</div><div><div class="svc-name"><i class="fas fa-chart-line" style="color:var(--accent);margin-right:10px"></i>Analytics &amp; Strategy</div><div class="svc-desc">Ma'lumotlarga asoslangan marketing strategiyasi</div></div><div class="tag-row"><span class="chip">KPI</span><span class="chip">ROI</span></div><div class="svc-arr"><i class="fas fa-arrow-right"></i></div></div>
+  </div>
+  <div class="plat-grid">
+    <div class="plat-cell reveal"><div class="plat-icon" style="color:#E1306C"><i class="fab fa-instagram"></i></div><div class="plat-name">Instagram</div><div class="plat-desc">Reels, stories va postlar orqali brendingizni kuchaytiring</div><div class="plat-stat" style="color:#E1306C">+240%</div><div class="plat-stat-lbl">o'rtacha o'sish</div></div>
+    <div class="plat-cell reveal" style="border-left:1px solid var(--border);border-right:1px solid var(--border)"><div class="plat-icon" style="color:#0088cc"><i class="fab fa-telegram"></i></div><div class="plat-name">Telegram</div><div class="plat-desc">Kanaldan daromad olish va auditoriyani ko'paytirish</div><div class="plat-stat" style="color:#0088cc">+180%</div><div class="plat-stat-lbl">obunachi o'sish</div></div>
+    <div class="plat-cell reveal"><div class="plat-icon"><i class="fab fa-tiktok"></i></div><div class="plat-name">TikTok</div><div class="plat-desc">Viral videolar va Gen Z auditoriyani jalb qiling</div><div class="plat-stat" style="color:var(--accent)">+320%</div><div class="plat-stat-lbl">ko'rish ko'rsatkichi</div></div>
   </div>
 </section>
+</div>
 
-<section class="platforms-section">
-  <div class="section-header">
-    <div class="section-tag">Platformalar</div>
-    <h2 class="section-title">Barcha Platformalar Uchun</h2>
-    <p class="section-sub">20+ platforma uchun 500+ xizmat turlarini taklif qilamiz.</p>
-  </div>
-  <div class="platforms-grid">
-    <a href="/register" class="platform-card"><span class="p-icon">📸</span><h4>Instagram</h4><div class="p-count">85+ xizmat</div></a>
-    <a href="/register" class="platform-card"><span class="p-icon">▶️</span><h4>YouTube</h4><div class="p-count">60+ xizmat</div></a>
-    <a href="/register" class="platform-card"><span class="p-icon">🎵</span><h4>TikTok</h4><div class="p-count">70+ xizmat</div></a>
-    <a href="/register" class="platform-card"><span class="p-icon">✈️</span><h4>Telegram</h4><div class="p-count">40+ xizmat</div></a>
-    <a href="/register" class="platform-card"><span class="p-icon">🐦</span><h4>Twitter / X</h4><div class="p-count">35+ xizmat</div></a>
-    <a href="/register" class="platform-card"><span class="p-icon">👍</span><h4>Facebook</h4><div class="p-count">50+ xizmat</div></a>
-  </div>
-</section>
-
-<section id="narxlar" style="background:var(--bg); position:relative; z-index:1;">
-  <div class="section-header">
-    <div class="section-tag">Narxlar</div>
-    <h2 class="section-title">Mashhur Xizmatlar</h2>
-    <p class="section-sub">O'zbekistondagi eng arzon narxlar. 1000 ta uchun so'mda.</p>
-  </div>
+<!-- PRICING -->
+<div class="wrap" id="pricing">
+<section class="sec" style="padding-top:0">
+  <div class="sec-label reveal">Narxlar</div>
+  <h2 class="sec-title reveal">Sizga mos<br><span class="m">tarif tanlang</span></h2>
   <div class="pricing-grid">
-    <div class="price-card"><span class="emoji">📸</span><h4>Instagram Followers</h4><div class="price-amount">500</div><div class="price-unit">so'm / 1000 ta</div></div>
-    <div class="price-card featured"><div class="featured-badge">🔥 MASHHUR</div><span class="emoji">▶️</span><h4>YouTube Views</h4><div class="price-amount">800</div><div class="price-unit">so'm / 1000 ta</div></div>
-    <div class="price-card"><span class="emoji">🎵</span><h4>TikTok Likes</h4><div class="price-amount">300</div><div class="price-unit">so'm / 1000 ta</div></div>
-    <div class="price-card"><span class="emoji">✈️</span><h4>Telegram Members</h4><div class="price-amount">1200</div><div class="price-unit">so'm / 1000 ta</div></div>
-  </div>
-  <div style="text-align:center">
-    <a href="/register" class="btn btn-primary btn-lg"><i class="fas fa-list"></i> Barcha narxlarni ko'rish</a>
-  </div>
-</section>
-
-<section style="background:var(--bg2); position:relative; z-index:1; padding: 64px 24px;">
-  <div class="section-header" style="margin-bottom:36px">
-    <div class="section-tag">To'lov Usullari</div>
-    <h2 class="section-title">Qulay To'lov</h2>
-  </div>
-  <div class="payments-row">
-    <div class="pay-chip"><i class="fas fa-credit-card"></i> Payme</div>
-    <div class="pay-chip"><i class="fas fa-mobile-alt"></i> Click</div>
-    <div class="pay-chip"><i class="fas fa-id-card"></i> Uzcard</div>
-    <div class="pay-chip"><i class="fas fa-wallet"></i> Humo</div>
-    <div class="pay-chip"><i class="fab fa-bitcoin"></i> USDT / Crypto</div>
-  </div>
-</section>
-
-<section class="faq-section">
-  <div class="section-header">
-    <div class="section-tag">Savol-Javob</div>
-    <h2 class="section-title">Ko'p So'raladigan Savollar</h2>
-    <p class="section-sub">Savolaringizga javob topa olmadingizmi? Telegram orqali murojaat qiling.</p>
-  </div>
-  <div class="faq-list">
-    <div class="faq-item"><div class="faq-q">SMMZone.uz xavfsizmi? Accountim bloklanadimi?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Bizning barcha xizmatlarimiz Instagram, YouTube va boshqa platformalarning qoidalariga mos ravishda ishlaydi. Biz faqat real va faol profillarga asoslangan xizmatlar taqdim etamiz. Shunga qaramay, bir kunda juda ko'p miqdorda buyurtma berishdan saqlaning — bu har qanday SMM panelida xavf tug'dirishi mumkin.</div></div>
-    <div class="faq-item"><div class="faq-q">Buyurtma bergandan keyin qancha vaqtda boshlanadi?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Odatda buyurtmangiz 1–5 daqiqa ichida avtomatik ravishda boshlanadi. Yuklanish vaqtida ba'zida kechikish bo'lishi mumkin, lekin 15 daqiqadan oshmasligi kerak. Agar 15 daqiqadan ortiq kutgan bo'lsangiz, support bilan bog'laning.</div></div>
-    <div class="faq-item"><div class="faq-q">Balansni qanday to'ldirish mumkin?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Payme, Click, Uzcard, Humo yoki USDT orqali balans to'ldirishingiz mumkin. To'lov darhol qayta ishlanadi va balans 1–2 daqiqa ichida yoziladi. Minimal to'ldirish miqdori 5 000 so'm.</div></div>
-    <div class="faq-item"><div class="faq-q">API bor va u qanday ishlaydi?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Ha, biz to'liq REST API taqdim etamiz. Reseller bo'lsangiz, API orqali o'z panelingizni qurishingiz mumkin. API kaliti shaxsiy kabinetingizda API bo'limida mavjud. Texnik hujjatlar ham o'sha yerda joylashgan.</div></div>
-    <div class="faq-item"><div class="faq-q">Buyurtma to'liq bajarilmasa qaytarim bo'ladimi?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Agar buyurtma texnik sabablarga ko'ra to'liq bajarilmasa, bajarilmagan qism uchun balans avtomatik qaytariladi. Buni "Buyurtmalarim" bo'limidan kuzatishingiz mumkin.</div></div>
-    <div class="faq-item"><div class="faq-q">Qanday qilib reseller bo'lish mumkin?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Ro'yxatdan o'tib, API kalitingizni oling. Bizning narxlarimizga ustama qo'shib o'z mijozlaringizga xizmat ko'rsatishingiz mumkin. Katta hajmli buyurtmalar uchun maxsus chegirmalar mavjud — Telegram orqali bog'laning.</div></div>
-    <div class="faq-item"><div class="faq-q">Yordam kerak bo'lsa qayerga murojaat qilaman?<i class="fas fa-chevron-down"></i></div><div class="faq-a">Telegram orqali @smmzone_uz manziliga yozing. Biz 24/7 ishlaymiz va har qanday muammoingizni hal qilishga tayyormiz. Javob vaqti odatda 5–15 daqiqa.</div></div>
-  </div>
-</section>
-
-<section class="cta-section">
-  <div class="cta-box">
-    <h2>Hoziroq Boshlang 🚀</h2>
-    <p>Minglab foydalanuvchilar allaqachon SMMZone.uz orqali o'sish yo'lida. Siz ham qo'shiling — bepul!</p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <a href="/register" class="btn btn-primary btn-lg"><i class="fas fa-user-plus"></i> Bepul Ro'yxatdan O'tish</a>
-      <a href="https://t.me/smmzone_uz" class="btn btn-outline btn-lg"><i class="fab fa-telegram"></i> Telegram</a>
+    <div class="pricing-card reveal">
+      <div class="pricing-badge-ph"></div>
+      <div class="pricing-name">Starter</div>
+      <div class="pricing-price">Bepul</div>
+      <div class="pricing-period">Ro'yxatdan o'tgandan keyin</div>
+      <div class="pricing-features">
+        <div class="pf"><i class="fas fa-check"></i> Asosiy xizmatlar</div>
+        <div class="pf"><i class="fas fa-check"></i> 5,000 so'm bonus balans</div>
+        <div class="pf"><i class="fas fa-check"></i> API kirish</div>
+        <div class="pf off"><i class="fas fa-times"></i> Chegirma yo'q</div>
+        <div class="pf off"><i class="fas fa-times"></i> Prioritet support yo'q</div>
+      </div>
+      <a href="/register" class="btn-pricing btn-po">Bepul boshlash</a>
+    </div>
+    <div class="pricing-card featured reveal d1">
+      <div class="pricing-badge"><i class="fas fa-star" style="font-size:9px"></i> Eng mashhur</div>
+      <div class="pricing-name">Pro</div>
+      <div class="pricing-price">50K<span> so'm/oy</span></div>
+      <div class="pricing-period">To'ldirish bonuslari bilan</div>
+      <div class="pricing-features">
+        <div class="pf"><i class="fas fa-check"></i> Barcha xizmatlar</div>
+        <div class="pf"><i class="fas fa-check"></i> 10% qo'shimcha balans</div>
+        <div class="pf"><i class="fas fa-check"></i> API + Webhook</div>
+        <div class="pf"><i class="fas fa-check"></i> Tezkor support</div>
+        <div class="pf off"><i class="fas fa-times"></i> Shaxsiy menejer yo'q</div>
+      </div>
+      <a href="/register" class="btn-pricing btn-ps">Hoziroq boshlash →</a>
+    </div>
+    <div class="pricing-card reveal d2">
+      <div class="pricing-badge-ph"></div>
+      <div class="pricing-name">Business</div>
+      <div class="pricing-price">150K<span> so'm/oy</span></div>
+      <div class="pricing-period">Katta hajmdagi bizneslar uchun</div>
+      <div class="pricing-features">
+        <div class="pf"><i class="fas fa-check"></i> Barcha xizmatlar</div>
+        <div class="pf"><i class="fas fa-check"></i> 20% qo'shimcha balans</div>
+        <div class="pf"><i class="fas fa-check"></i> API + Webhook + Reseller</div>
+        <div class="pf"><i class="fas fa-check"></i> 24/7 prioritet support</div>
+        <div class="pf"><i class="fas fa-check"></i> Shaxsiy menejer</div>
+      </div>
+      <a href="https://t.me/yakkavazir" target="_blank" class="btn-pricing btn-po">Bog'lanish</a>
     </div>
   </div>
 </section>
+</div>
+
+<!-- ABOUT -->
+<div class="wrap" id="about">
+<section class="sec" style="padding-top:0">
+  <div class="about-grid">
+    <div class="about-img reveal">
+      <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&q=80&auto=format" alt="Iskandarov Azizbek">
+      <div class="about-img-ov"></div>
+      <div class="img-badge"><div class="ib-name">Iskandarov Azizbek</div><div class="ib-role">SMMZONE · Founder &amp; CEO</div></div>
+    </div>
+    <div class="reveal">
+      <div class="about-tag">Muallif haqida</div>
+      <h2 class="about-title">Raqamli marketingda yangi standart</h2>
+      <p class="about-bio">3 yillik tajribaga ega SMM mutaxassisi. O'zbekistondagi yuzlab bizneslarni raqamli olamda muvaffaqiyatga olib chiqdim. AI va data-driven yondashuvlar bilan klassik SMM usullarini birlashtiraman.</p>
+      <div class="skills">
+        <div><div class="skill-top"><span>Instagram Marketing</span><span>96%</span></div><div class="skill-track"><div class="skill-bar" data-w="96"></div></div></div>
+        <div><div class="skill-top"><span>Content Strategy</span><span>92%</span></div><div class="skill-track"><div class="skill-bar" data-w="92"></div></div></div>
+        <div><div class="skill-top"><span>TikTok Growth</span><span>88%</span></div><div class="skill-track"><div class="skill-bar" data-w="88"></div></div></div>
+        <div><div class="skill-top"><span>Analytics &amp; Data</span><span>90%</span></div><div class="skill-track"><div class="skill-bar" data-w="90"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="wrap" id="reviews">
+<section class="sec" style="padding-top:0">
+  <div class="sec-label reveal">Mijozlar fikri</div>
+  <h2 class="sec-title reveal">Natijalar<br><span class="m">o'z-o'zidan gapiradi</span></h2>
+  <div class="testi-grid">
+    <div class="testi reveal"><div class="stars">★★★★★</div><p class="testi-text">"SMMZONE bilan Instagram sahifamiz 3 oyda 5 000 dan 28 000 followerga yetdi. ROI juda ajoyib!"</p><div class="testi-aut"><div class="av">SK</div><div><div class="av-name">Sardor Karimov</div><div class="av-role">Online Do'kon · Toshkent</div></div></div></div>
+    <div class="testi reveal d1"><div class="stars">★★★★★</div><p class="testi-text">"Telegram kanalimiz obunachilari 2 oyda 3 barobarga ko'paydi. Professional va samarali."</p><div class="testi-aut"><div class="av">MU</div><div><div class="av-name">Malika Umarova</div><div class="av-role">Beauty Studio · Samarqand</div></div></div></div>
+    <div class="testi reveal d2"><div class="stars">★★★★★</div><p class="testi-text">"TikTok videolarimiz viral bo'ldi! Bir haftada 500K view — buni kutmagan edik. Rahmat!"</p><div class="testi-aut"><div class="av">BN</div><div><div class="av-name">Bobur Nazarov</div><div class="av-role">Restaurant · Buxoro</div></div></div></div>
+  </div>
+</section>
+</div>
+
+<!-- FAQ -->
+<div class="wrap" id="faq">
+<section class="sec" style="padding-top:0">
+  <div class="sec-label reveal">FAQ</div>
+  <h2 class="sec-title reveal">Ko'p so'raladigan<br><span class="m">savollar</span></h2>
+  <div class="faq-grid">
+    <div>
+      <div class="faq-item reveal"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">SMMZONE nima va qanday ishlaydi?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></div><div class="faq-a">SMMZONE — bu Instagram, Telegram va TikTok platformalarida follower, like, ko'rish va boshqa xizmatlarni taqdim etuvchi professional SMM panel. Ro'yxatdan o'ting, balans to'ldiring va xizmat buyurtma qiling.</div></div>
+      <div class="faq-item reveal"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">Buyurtma qancha vaqtda bajariladi?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></div><div class="faq-a">Aksariyat xizmatlar 0-30 daqiqa ichida boshlanadi. Buyurtma hajmiga qarab 1-72 soat ichida to'liq bajariladi. Har bir xizmat sahifasida aniq vaqt ko'rsatilgan.</div></div>
+      <div class="faq-item reveal"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">Balansni qanday to'ldirish mumkin?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></div><div class="faq-a">Payme, Click, USDT (TRC-20) va TonKeeper orqali to'ldirish mumkin. Barcha to'lovlar @yakkavazir Telegram bot orqali amalga oshiriladi. Minimal to'lov: 5,000 so'm.</div></div>
+    </div>
+    <div>
+      <div class="faq-item reveal"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">Xizmat sifati qanday kafolatlanadi?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></div><div class="faq-a">Biz faqat yuqori sifatli provayderlar bilan ishlaymiz. Buyurtma to'liq bajarilmasa, refill yoki qaytarib berish kafolati beriladi. 98% muvaffaqiyat darajamiz buning isboti.</div></div>
+      <div class="faq-item reveal"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">API orqali ham foydalanish mumkinmi?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></div><div class="faq-a">Ha! Profil sahifasida API kalitingizni olishingiz va API hujjatlaridan foydalanib o'z tizimingizga integratsiya qilishingiz mumkin. Reseller uchun ham to'liq API mavjud.</div></div>
+      <div class="faq-item reveal"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">Muammo bo'lsa kimga murojaat qilaman?</span><div class="faq-icon"><i class="fas fa-plus"></i></div></div><div class="faq-a">Sayt ichidagi "Yordam" bo'limiga tiket yuboring yoki to'g'ridan-to'g'ri @yakkavazir Telegram'ga murojaat qiling. Ish vaqti: 09:00-22:00, javob vaqti 1-2 soat.</div></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<div class="cta reveal">
+  <div>
+    <div class="cta-title">Biznesingizni<br>o'stirishga<br>tayyormisiz?</div>
+    <p class="cta-sub">Bepul ro'yxatdan o'ting — bugun boshlang</p>
+  </div>
+  <a href="/register" class="btn-dark"><i class="fas fa-bolt"></i> Hoziroq boshlash</a>
+</div>
 
 <footer>
-  <div class="footer-logo">SMM<span>Zone</span>.uz</div>
-  <div class="footer-links">
-    <a href="/"><i class="fas fa-home"></i> Bosh Sahifa</a>
-    <a href="/register"><i class="fas fa-rocket"></i> Boshlash</a>
-    <a href="https://t.me/smmzone_uz"><i class="fab fa-telegram"></i> Telegram</a>
-    <a href="mailto:info@smmzone.uz"><i class="fas fa-envelope"></i> Email</a>
-    <a href="/api"><i class="fas fa-code"></i> API</a>
+  <div class="f-logo"><span style="color:var(--accent)">●</span> SMMZONE</div>
+  <div class="f-copy">© 2026 SMMZONE · Iskandarov Azizbek · Toshkent</div>
+  <div class="f-socials">
+    <a class="soc" href="#"><i class="fab fa-instagram"></i></a>
+    <a class="soc" href="https://t.me/yakkavazir" target="_blank"><i class="fab fa-telegram"></i></a>
+    <a class="soc" href="#"><i class="fab fa-tiktok"></i></a>
   </div>
-  <div class="footer-copy">© 2025 SMMZone.uz — Barcha huquqlar himoyalangan</div>
 </footer>
 
+<!-- FLOATING TG -->
+<div class="float-tg">
+  <div class="float-menu" id="floatMenu">
+    <a href="https://t.me/yakkavazir" target="_blank" class="float-link"><i class="fab fa-telegram" style="color:#0088cc"></i> @yakkavazir — Yordam</a>
+    <a href="/register" class="float-link"><i class="fas fa-user-plus" style="color:var(--accent)"></i> Ro'yxatdan o'tish</a>
+    <a href="/login" class="float-link"><i class="fas fa-sign-in-alt" style="color:var(--muted)"></i> Kirish</a>
+  </div>
+  <button class="float-btn" id="floatBtn" onclick="toggleFloat()">
+    <i class="fab fa-telegram" style="color:#000"></i>
+  </button>
+</div>
+
 <script>
-  document.querySelectorAll('.faq-q').forEach(q => {
-    q.addEventListener('click', () => {
-      const item = q.parentElement;
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
-    });
-  });
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('revealed');obs.unobserve(x.target);}});},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-        }, i * 80);
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1 });
+const skillObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.querySelectorAll('.skill-bar[data-w]').forEach(b=>{setTimeout(()=>{b.style.width=b.dataset.w+'%';},200);});skillObs.unobserve(x.target);}});},{threshold:.3});
+document.querySelectorAll('.about-grid').forEach(el=>skillObs.observe(el));
 
-  document.querySelectorAll('.feature-card, .platform-card, .price-card, .faq-item').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease, border-color 0.3s, box-shadow 0.3s';
-    observer.observe(el);
-  });
+const cntObs=new IntersectionObserver(e=>{e.forEach(x=>{if(!x.isIntersecting)return;const el=x.target.querySelector('[data-target]');if(!el)return;const t=parseInt(el.dataset.target),s=el.innerHTML.match(/<em>(.*?)<\/em>/)?.[1]||'';let c=0;const step=Math.ceil(t/40);const tmr=setInterval(()=>{c=Math.min(c+step,t);el.innerHTML=c+'<em>'+s+'</em>';if(c>=t)clearInterval(tmr);},40);cntObs.unobserve(x.target);});},{threshold:.4});
+document.querySelectorAll('.counter-cell').forEach(el=>cntObs.observe(el));
+
+function toggleFaq(btn){const item=btn.closest('.faq-item');const isOpen=item.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(i=>i.classList.remove('open'));if(!isOpen)item.classList.add('open');}
+
+let fOpen=false;
+function toggleFloat(){fOpen=!fOpen;const btn=document.getElementById('floatBtn');const menu=document.getElementById('floatMenu');btn.classList.toggle('active',fOpen);menu.classList.toggle('show',fOpen);btn.innerHTML=fOpen?'<i class="fas fa-times" style="color:#000"></i>':'<i class="fab fa-telegram" style="color:#000"></i>';}
+
+window.addEventListener('scroll',()=>{document.getElementById('main-nav').classList.toggle('scrolled',window.scrollY>50);});
 </script>
 </body>
 </html>

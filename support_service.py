@@ -1,0 +1,81 @@
+from flask import Blueprint, request, session, redirect, url_for, render_template, flash
+from database.db import get_db
+
+support_bp = Blueprint("support", __name__)
+
+@support_bp.route("/support")
+def support_page():
+    if "user_id" not in session:
+        return redirect(url_for("auth.login_page"))
+    db = get_db()
+    tickets = db.execute(
+        """SELECT t.*, u.username FROM support_tickets t
+           JOIN users u ON u.id = t.user_id
+           WHERE t.user_id = ? ORDER BY t.created_at DESC""",
+        (session["user_id"],)
+    ).fetchall()
+    return render_template("support.html", tickets=tickets)
+
+@support_bp.route("/support/new", methods=["POST"])
+def support_new():
+    if "user_id" not in session:
+        return redirect(url_for("auth.login_page"))
+    subject  = request.form.get("subject",  "").strip()
+    message  = request.form.get("message",  "").strip()
+    category = request.form.get("category", "other")
+    priority = request.form.get("priority", "medium")
+    if not subject or not message:
+        flash("Mavzu va xabar to'ldirilishi shart", "error")
+        return redirect(url_for("support.support_page"))
+    db = get_db()
+    db.execute(
+        """INSERT INTO support_tickets (user_id, subject, message, category, priority, status)
+           VALUES (?, ?, ?, ?, ?, 'open')""",
+        (session["user_id"], subject, message, category, priority)
+    )
+    db.commit()
+    flash("Savolingiz yuborildi! Tez orada javob beramiz.", "success")
+    return redirect(url_for("support.support_page"))
+
+@support_bp.route("/admin/support")
+def admin_support():
+    if session.get("role") != "admin":
+        return redirect(url_for("user.dashboard"))
+    db = get_db()
+    status = request.args.get("status", "")
+    q = """SELECT t.*, u.username FROM support_tickets t
+           JOIN users u ON u.id = t.user_id {where}
+           ORDER BY CASE t.priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END,
+           t.created_at DESC"""
+    tickets = db.execute(q.format(where="WHERE t.status=?" if status else ""),
+                         (status,) if status else ()).fetchall()
+    return render_template("admin_support.html", tickets=tickets)
+
+@support_bp.route("/admin/support/reply", methods=["POST"])
+def admin_reply():
+    if session.get("role") != "admin":
+        return redirect(url_for("user.dashboard"))
+    ticket_id = request.form.get("ticket_id")
+    reply     = request.form.get("reply", "").strip()
+    if not ticket_id or not reply:
+        flash("Javob bo'sh bo'lishi mumkin emas", "error")
+        return redirect(url_for("support.admin_support"))
+    db = get_db()
+    db.execute(
+        """UPDATE support_tickets SET reply=?, status='answered',
+           replied_at=CURRENT_TIMESTAMP WHERE id=?""",
+        (reply, ticket_id)
+    )
+    db.commit()
+    flash("Javob muvaffaqiyatli yuborildi!", "success")
+    return redirect(url_for("support.admin_support"))
+
+@support_bp.route("/admin/support/close/<int:ticket_id>", methods=["POST"])
+def admin_close(ticket_id):
+    if session.get("role") != "admin":
+        return redirect(url_for("user.dashboard"))
+    db = get_db()
+    db.execute("UPDATE support_tickets SET status='closed' WHERE id=?", (ticket_id,))
+    db.commit()
+    flash("Tiket yopildi", "success")
+    return redirect(url_for("support.admin_support"))

@@ -1,5 +1,6 @@
-# bot.py
-import logging, sqlite3, asyncio
+import logging, asyncio, os
+import psycopg2
+import psycopg2.extras
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -13,18 +14,17 @@ from aiogram.types import (
 logging.basicConfig(level=logging.INFO)
 
 # ── Sozlamalar ────────────────────────────────────────────────────────────────
-TG_TOKEN    = "8189164536:AAExAqjk2LC-TxSqM3bsmwzRDTD4WTEB47Q"
-TG_ADMIN    = 7721593413
-CARD_NUMBER = "9860 0999 3876 5637 89"
-DB_PATH     = "/Users/aziz/PycharmProjects/smm_paenl/smm_panel.db"
-MIN_DEPOSIT = 5000
-QQS_RATE    = 0.015   # 1.5% QQS
-TIMER_SEC   = 7 * 60  # 7 daqiqa
+TG_TOKEN     = os.environ.get("TG_BOT_TOKEN", "8524574712:AAGAL1UTGx84ggiap1SAdp57s_dc7MyRXu8")
+TG_ADMIN     = int(os.environ.get("TG_ADMIN_CHAT_ID", "7721593413"))
+CARD_NUMBER  = os.environ.get("CARD_NUMBER", "9860 0999 3876 5637 89")
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://smm_db_pgqi_user:XVSnuhmMhaGtcxvZ4pV9QKyyIOqkkSHH@dpg-d6qj0q24d50c73be5bj0-a.oregon-postgres.render.com/smm_db_pgqi")
+MIN_DEPOSIT  = 5000
+QQS_RATE     = 0.015
+TIMER_SEC    = 7 * 60
 
 bot = Bot(token=TG_TOKEN)
 dp  = Dispatcher(storage=MemoryStorage())
 
-# Aktiv timerlarni saqlash: {tg_user_id: asyncio.Task}
 active_timers: dict[int, asyncio.Task] = {}
 
 
@@ -44,105 +44,127 @@ class AdminState(StatesGroup):
 
 # ── DB yordamchilar ───────────────────────────────────────────────────────────
 def db_conn():
-    con = sqlite3.connect(DB_PATH)
-    con.row_factory = sqlite3.Row
+    con = psycopg2.connect(DATABASE_URL)
     return con
 
+def fetchone(query, params=()):
+    with db_conn() as con:
+        cur = con.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(query.replace("?", "%s"), params)
+        return cur.fetchone()
+
+def fetchall(query, params=()):
+    with db_conn() as con:
+        cur = con.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute(query.replace("?", "%s"), params)
+        return cur.fetchall()
+
+def execute(query, params=()):
+    with db_conn() as con:
+        cur = con.cursor()
+        cur.execute(query.replace("?", "%s"), params)
+        con.commit()
+
+def fetchval(query, params=()):
+    with db_conn() as con:
+        cur = con.cursor()
+        cur.execute(query.replace("?", "%s"), params)
+        row = cur.fetchone()
+        return row[0] if row else 0
+
+
+# ── DB funksiyalar ────────────────────────────────────────────────────────────
 def get_user_by_username(username: str):
-    with db_conn() as db:
-        return db.execute("SELECT * FROM users WHERE username=?", (username,)).fetchone()
+    return fetchone("SELECT * FROM users WHERE username=%s", (username,))
 
 def confirm_deposit(user_id: int, amount: float, tx_ref: str):
-    """amount — asosiy summa (QQS siz). QQS ajratiladi, foydalanuvchi asosiy summani oladi."""
-    with db_conn() as db:
-        db.execute("UPDATE users SET balance=balance+? WHERE id=?", (amount, user_id))
-        db.execute(
+    with db_conn() as con:
+        cur = con.cursor()
+        cur.execute(
+            "UPDATE users SET balance=balance+%s WHERE id=%s",
+            (amount, user_id)
+        )
+        cur.execute(
             "INSERT INTO deposits (user_id, amount, method, status, external_id, confirmed_at) "
-            "VALUES (?, ?, 'Karta', 'completed', ?, datetime('now'))",
+            "VALUES (%s, %s, 'Karta', 'completed', %s, to_char(now(),'YYYY-MM-DD HH24:MI:SS'))",
             (user_id, amount, tx_ref)
         )
-        db.execute(
+        cur.execute(
             "INSERT INTO transactions (user_id, type, amount, description, ref_id) "
-            "VALUES (?, 'credit', ?, 'Karta orqali to''lov tasdiqlandi', ?)",
+            "VALUES (%s, 'credit', %s, 'Karta orqali to''lov tasdiqlandi', %s)",
             (user_id, amount, tx_ref)
         )
         # Referal 1% bonus
-        user = db.execute("SELECT referred_by FROM users WHERE id=?", (user_id,)).fetchone()
-        if user and user["referred_by"]:
+        cur.execute("SELECT referred_by FROM users WHERE id=%s", (user_id,))
+        user = cur.fetchone()
+        if user and user[0]:
             bonus = round(amount * 0.01, 2)
-            db.execute(
-                "UPDATE users SET balance=balance+?, ref_earnings=ref_earnings+? WHERE id=?",
-                (bonus, bonus, user["referred_by"])
+            cur.execute(
+                "UPDATE users SET balance=balance+%s, ref_earnings=ref_earnings+%s WHERE id=%s",
+                (bonus, bonus, user[0])
             )
-            db.execute(
-                "INSERT INTO transactions (user_id, type, amount, description) VALUES (?, 'credit', ?, ?)",
-                (user["referred_by"], bonus, "Referal bonus 1%")
+            cur.execute(
+                "INSERT INTO transactions (user_id, type, amount, description) VALUES (%s, 'credit', %s, %s)",
+                (user[0], bonus, "Referal bonus 1%")
             )
-        db.commit()
+        con.commit()
 
 def is_maintenance():
-    with db_conn() as db:
-        row = db.execute("SELECT value FROM settings WHERE key='maintenance'").fetchone()
-        return row and str(row["value"]) == "1"
+    row = fetchone("SELECT value FROM settings WHERE key='maintenance'")
+    return row and str(row["value"]) == "1"
 
 def set_maintenance(val: bool):
-    with db_conn() as db:
-        db.execute("UPDATE settings SET value=? WHERE key='maintenance'", ("1" if val else "0",))
-        db.commit()
+    execute("UPDATE settings SET value=%s WHERE key='maintenance'", ("1" if val else "0",))
 
 def get_stats():
-    with db_conn() as db:
-        users     = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-        orders    = db.execute("SELECT COUNT(*) FROM orders").fetchone()[0]
-        completed = db.execute("SELECT COUNT(*) FROM orders WHERE status='Completed'").fetchone()[0]
-        pending   = db.execute("SELECT COUNT(*) FROM orders WHERE status IN ('Pending','Processing')").fetchone()[0]
-        daromad   = db.execute("SELECT COALESCE(SUM(amount),0) FROM deposits WHERE status='completed'").fetchone()[0]
-        bugun     = db.execute("SELECT COALESCE(SUM(amount),0) FROM deposits WHERE status='completed' AND date(confirmed_at)=date('now')").fetchone()[0]
-        return {"users": users, "orders": orders, "completed": completed,
-                "pending": pending, "daromad": daromad, "bugun": bugun}
+    users     = fetchval("SELECT COUNT(*) FROM users")
+    orders    = fetchval("SELECT COUNT(*) FROM orders")
+    completed = fetchval("SELECT COUNT(*) FROM orders WHERE status='Completed'")
+    pending   = fetchval("SELECT COUNT(*) FROM orders WHERE status IN ('Pending','Processing')")
+    daromad   = fetchval("SELECT COALESCE(SUM(amount),0) FROM deposits WHERE status='completed'")
+    bugun     = fetchval(
+        "SELECT COALESCE(SUM(amount),0) FROM deposits "
+        "WHERE status='completed' AND confirmed_at::date = CURRENT_DATE"
+    )
+    return {
+        "users": users, "orders": orders, "completed": completed,
+        "pending": pending, "daromad": daromad, "bugun": bugun
+    }
 
 def get_all_users(page=0, limit=10):
-    with db_conn() as db:
-        rows  = db.execute(
-            "SELECT id, username, balance, total_orders, is_active FROM users "
-            "ORDER BY id DESC LIMIT ? OFFSET ?", (limit, page * limit)
-        ).fetchall()
-        total = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-        return rows, total
+    rows  = fetchall(
+        "SELECT id, username, balance, total_orders, is_active FROM users "
+        "ORDER BY id DESC LIMIT %s OFFSET %s", (limit, page * limit)
+    )
+    total = fetchval("SELECT COUNT(*) FROM users")
+    return rows, total
 
 def get_user_orders(username: str, limit=5):
-    with db_conn() as db:
-        u = db.execute("SELECT id FROM users WHERE username=?", (username,)).fetchone()
-        if not u: return []
-        return db.execute(
-            "SELECT o.id, s.name, o.quantity, o.price, o.status "
-            "FROM orders o JOIN services s ON o.service_id=s.id "
-            "WHERE o.user_id=? ORDER BY o.created_at DESC LIMIT ?",
-            (u["id"], limit)
-        ).fetchall()
+    user = fetchone("SELECT id FROM users WHERE username=%s", (username,))
+    if not user:
+        return []
+    return fetchall(
+        "SELECT o.id, s.name, o.quantity, o.price, o.status "
+        "FROM orders o JOIN services s ON o.service_id=s.id "
+        "WHERE o.user_id=%s ORDER BY o.created_at DESC LIMIT %s",
+        (user["id"], limit)
+    )
 
 
 # ── QQS hisoblash ─────────────────────────────────────────────────────────────
-def hisobla(asosiy: int) -> tuple[int, int, int]:
-    """
-    Qaytaradi: (asosiy, qqs, jami)
-    Foydalanuvchi jami ni to'laydi.
-    """
+def hisobla(asosiy: int):
     qqs  = round(asosiy * QQS_RATE)
     jami = asosiy + qqs
     return asosiy, qqs, jami
 
 
-# ── Timer: 7 daqiqa ichida to'lov bo'lmasa bekor ─────────────────────────────
+# ── Timer ─────────────────────────────────────────────────────────────────────
 async def start_payment_timer(tg_user_id: int, admin_msg_id: int, state: FSMContext):
-    """7 daqiqa kutadi, so'ng to'lovni bekor qiladi."""
     try:
         await asyncio.sleep(TIMER_SEC)
-        # Agar hali chek kutilayotgan holatda bo'lsa
         current_state = await state.get_state()
         if current_state == TolovState.chek.state:
             await state.clear()
-            # Foydalanuvchiga xabar
             try:
                 await bot.send_message(
                     tg_user_id,
@@ -150,12 +172,10 @@ async def start_payment_timer(tg_user_id: int, admin_msg_id: int, state: FSMCont
                     "7 daqiqa ichida chek yuborilmadi.\n"
                     "To'lov <b>avtomatik bekor qilindi</b>.\n\n"
                     "Qaytadan urinish uchun /start ni bosing.",
-                    parse_mode="HTML",
-                    reply_markup=main_menu()
+                    parse_mode="HTML", reply_markup=main_menu()
                 )
             except Exception:
                 pass
-            # Adminga ham xabar
             try:
                 await bot.send_message(
                     TG_ADMIN,
@@ -165,10 +185,9 @@ async def start_payment_timer(tg_user_id: int, admin_msg_id: int, state: FSMCont
             except Exception:
                 pass
     except asyncio.CancelledError:
-        pass  # To'lov tasdiqlandi — timer bekor qilindi
+        pass
     finally:
         active_timers.pop(tg_user_id, None)
-
 
 def cancel_timer(tg_user_id: int):
     task = active_timers.pop(tg_user_id, None)
@@ -190,9 +209,9 @@ def main_menu():
 def admin_menu():
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="📊 Statistika"),        KeyboardButton(text="👥 Foydalanuvchilar")],
-            [KeyboardButton(text="💰 Balans boshqaruv"),  KeyboardButton(text="📦 Buyurtmalar")],
-            [KeyboardButton(text="📢 Xabar yuborish"),    KeyboardButton(text="🔧 Texnik ish")],
+            [KeyboardButton(text="📊 Statistika"),       KeyboardButton(text="👥 Foydalanuvchilar")],
+            [KeyboardButton(text="💰 Balans boshqaruv"), KeyboardButton(text="📦 Buyurtmalar")],
+            [KeyboardButton(text="📢 Xabar yuborish"),   KeyboardButton(text="🔧 Texnik ish")],
             [KeyboardButton(text="💳 Balans to'ldirish")]
         ],
         resize_keyboard=True
@@ -234,10 +253,8 @@ async def start(message: types.Message, state: FSMContext):
             reply_markup=main_menu(), parse_mode="HTML"
         )
 
-
 @dp.message(Command("admin"))
 async def admin_command(message: types.Message, state: FSMContext):
-    """Faqat admin uchun /admin buyrug'i."""
     if message.from_user.id != TG_ADMIN:
         await message.answer("❌ Sizda ruxsat yo'q!")
         return
@@ -252,11 +269,9 @@ async def admin_command(message: types.Message, state: FSMContext):
         f"⏳ Kutilayotgan: <b>{s['pending']}</b>\n\n"
         f"💰 Jami daromad: <b>{s['daromad']:,.0f} so'm</b>\n"
         f"📅 Bugungi daromad: <b>{s['bugun']:,.0f} so'm</b>\n\n"
-        f"🔧 Texnik ish: {m}\n\n"
-        f"Quyidagi menyudan tanlang 👇",
+        f"🔧 Texnik ish: {m}",
         reply_markup=admin_menu(), parse_mode="HTML"
     )
-
 
 @dp.message(F.text == "🔙 Orqaga")
 async def orqaga(message: types.Message, state: FSMContext):
@@ -279,7 +294,7 @@ async def yordam(message: types.Message):
 
 
 # ════════════════════════════════════════════════════════════
-#  FOYDALANUVCHI — TO'LOV (QQS + 7 daqiqa timer)
+#  FOYDALANUVCHI — TO'LOV
 # ════════════════════════════════════════════════════════════
 
 @dp.message(F.text == "💳 Balans to'ldirish")
@@ -289,7 +304,10 @@ async def balans_toldirish(message: types.Message, state: FSMContext):
         return
     cancel_timer(message.from_user.id)
     await state.clear()
-    await message.answer("👤 Saytdagi <b>username</b> ingizni yuboring:", reply_markup=back_btn(), parse_mode="HTML")
+    await message.answer(
+        "👤 Saytdagi <b>username</b> ingizni yuboring:",
+        reply_markup=back_btn(), parse_mode="HTML"
+    )
     await state.set_state(TolovState.username)
 
 @dp.message(TolovState.username)
@@ -328,10 +346,8 @@ async def tolov_summa(message: types.Message, state: FSMContext):
     if asosiy < MIN_DEPOSIT:
         await message.answer(f"❌ Minimal summa: {MIN_DEPOSIT:,} so'm")
         return
-
     asosiy, qqs, jami = hisobla(asosiy)
     await state.update_data(summa=asosiy, qqs=qqs, jami=jami)
-
     sent = await message.answer(
         f"💳 <b>To'lov ma'lumotlari:</b>\n\n"
         f"🏦 Karta: <code>{CARD_NUMBER}</code>\n\n"
@@ -342,26 +358,20 @@ async def tolov_summa(message: types.Message, state: FSMContext):
         f"Vaqt tugasa to'lov avtomatik bekor qilinadi.",
         parse_mode="HTML"
     )
-
-    # 7 daqiqa timerini ishga tushirish
     cancel_timer(message.from_user.id)
     task = asyncio.create_task(
         start_payment_timer(message.from_user.id, sent.message_id, state)
     )
     active_timers[message.from_user.id] = task
-
     await state.set_state(TolovState.chek)
 
 @dp.message(TolovState.chek, F.photo)
 async def tolov_chek(message: types.Message, state: FSMContext):
-    # Chek keldi — timerni to'xtatamiz
     cancel_timer(message.from_user.id)
-
-    data = await state.get_data()
+    data   = await state.get_data()
     asosiy = data['summa']
     qqs    = data['qqs']
     jami   = data['jami']
-
     kb = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(
             text="✅ Tasdiqlash",
@@ -403,13 +413,10 @@ async def admin_confirm(callback: types.CallbackQuery):
         return
     parts   = callback.data.split("_")
     user_id = int(parts[1])
-    # asosiy summa tasdiqlanganda balansgа qo'shiladi (QQS davlatga)
     asosiy  = float(parts[2])
     tg_id   = int(parts[3])
-
     _, qqs, jami = hisobla(int(asosiy))
     confirm_deposit(user_id, asosiy, f"tg_{tg_id}_{asosiy}")
-
     await callback.message.edit_caption(
         callback.message.caption + "\n\n✅ <b>TASDIQLANDI</b>",
         parse_mode="HTML"
@@ -426,7 +433,6 @@ async def admin_confirm(callback: types.CallbackQuery):
     except Exception:
         pass
     await callback.answer("✅ Tasdiqlandi!")
-
 
 @dp.callback_query(F.data.startswith("reject_"))
 async def admin_reject(callback: types.CallbackQuery):
@@ -458,7 +464,10 @@ async def admin_reject(callback: types.CallbackQuery):
 @dp.message(F.text == "📊 Mening hisobim")
 async def mening_hisobim(message: types.Message, state: FSMContext):
     await state.clear()
-    await message.answer("👤 Saytdagi <b>username</b> ingizni yuboring:", reply_markup=back_btn(), parse_mode="HTML")
+    await message.answer(
+        "👤 Saytdagi <b>username</b> ingizni yuboring:",
+        reply_markup=back_btn(), parse_mode="HTML"
+    )
     await state.set_state(AdminState.user_search)
 
 @dp.message(AdminState.user_search)
@@ -473,7 +482,7 @@ async def user_search(message: types.Message, state: FSMContext):
         await message.answer("❌ Foydalanuvchi topilmadi!")
         await state.clear()
         return
-    orders = get_user_orders(message.text.strip())
+    orders      = get_user_orders(message.text.strip())
     orders_text = ""
     for o in orders:
         emoji = {"Completed": "✅", "Pending": "⏳", "Processing": "🔄",
@@ -533,7 +542,7 @@ async def foydalanuvchilar(message: types.Message):
 @dp.callback_query(F.data.startswith("users_page_"))
 async def users_page(callback: types.CallbackQuery):
     if callback.from_user.id != TG_ADMIN: return
-    page = int(callback.data.split("_")[2])
+    page        = int(callback.data.split("_")[2])
     users, total = get_all_users(page=page)
     if not users:
         await callback.answer("Bu yerda hech kim yo'q!")
@@ -588,13 +597,14 @@ async def balance_action_cb(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(bal_action=action)
     if action == "bal_zero":
         data = await state.get_data()
-        with db_conn() as db:
-            db.execute("UPDATE users SET balance=0 WHERE id=?", (data["user_id"],))
-            db.execute(
-                "INSERT INTO transactions (user_id, type, amount, description) VALUES (?, 'debit', ?, ?)",
+        with db_conn() as con:
+            cur = con.cursor()
+            cur.execute("UPDATE users SET balance=0 WHERE id=%s", (data["user_id"],))
+            cur.execute(
+                "INSERT INTO transactions (user_id, type, amount, description) VALUES (%s, 'debit', %s, %s)",
                 (data["user_id"], data["current_balance"], "Admin tomonidan nolga tushirildi")
             )
-            db.commit()
+            con.commit()
         await callback.message.edit_text(
             f"✅ <b>{data['username']}</b> balansi nolga tushirildi!", parse_mode="HTML"
         )
@@ -619,35 +629,35 @@ async def admin_bal_amount(message: types.Message, state: FSMContext):
         return
     data   = await state.get_data()
     action = data["bal_action"]
-    with db_conn() as db:
+    with db_conn() as con:
+        cur = con.cursor()
         if action == "bal_add":
-            db.execute("UPDATE users SET balance=balance+? WHERE id=?", (amount, data["user_id"]))
-            db.execute(
-                "INSERT INTO transactions (user_id, type, amount, description) VALUES (?, 'credit', ?, ?)",
+            cur.execute("UPDATE users SET balance=balance+%s WHERE id=%s", (amount, data["user_id"]))
+            cur.execute(
+                "INSERT INTO transactions (user_id, type, amount, description) VALUES (%s, 'credit', %s, %s)",
                 (data["user_id"], amount, "Admin tomonidan qo'shildi")
             )
             text = f"✅ <b>{data['username']}</b> ga <b>{amount:,.0f} so'm</b> qo'shildi!"
         else:
-            db.execute("UPDATE users SET balance=balance-? WHERE id=?", (amount, data["user_id"]))
-            db.execute(
-                "INSERT INTO transactions (user_id, type, amount, description) VALUES (?, 'debit', ?, ?)",
+            cur.execute("UPDATE users SET balance=balance-%s WHERE id=%s", (amount, data["user_id"]))
+            cur.execute(
+                "INSERT INTO transactions (user_id, type, amount, description) VALUES (%s, 'debit', %s, %s)",
                 (data["user_id"], amount, "Admin tomonidan ayirildi")
             )
             text = f"✅ <b>{data['username']}</b> dan <b>{amount:,.0f} so'm</b> ayirildi!"
-        db.commit()
+        con.commit()
     await message.answer(text, parse_mode="HTML", reply_markup=admin_menu())
     await state.clear()
 
 @dp.message(F.text == "📦 Buyurtmalar")
 async def buyurtmalar(message: types.Message):
     if message.from_user.id != TG_ADMIN: return
-    with db_conn() as db:
-        orders = db.execute(
-            "SELECT o.id, u.username, s.name, o.quantity, o.price, o.status "
-            "FROM orders o JOIN users u ON o.user_id=u.id "
-            "JOIN services s ON o.service_id=s.id "
-            "ORDER BY o.created_at DESC LIMIT 10"
-        ).fetchall()
+    orders = fetchall(
+        "SELECT o.id, u.username, s.name, o.quantity, o.price, o.status "
+        "FROM orders o JOIN users u ON o.user_id=u.id "
+        "JOIN services s ON o.service_id=s.id "
+        "ORDER BY o.created_at DESC LIMIT 10"
+    )
     if not orders:
         await message.answer("📦 Hech qanday buyurtma yo'q!")
         return
@@ -664,7 +674,10 @@ async def buyurtmalar(message: types.Message):
 @dp.message(F.text == "📢 Xabar yuborish")
 async def xabar_yuborish(message: types.Message, state: FSMContext):
     if message.from_user.id != TG_ADMIN: return
-    await message.answer("📢 Barcha foydalanuvchilarga yuboriladigan xabarni kiriting:", reply_markup=back_btn())
+    await message.answer(
+        "📢 Barcha foydalanuvchilarga yuboriladigan xabarni kiriting:",
+        reply_markup=back_btn()
+    )
     await state.set_state(AdminState.xabar_matn)
 
 @dp.message(AdminState.xabar_matn)
@@ -686,11 +699,10 @@ async def xabar_matn(message: types.Message, state: FSMContext):
 @dp.callback_query(F.data == "send_broadcast")
 async def send_broadcast(callback: types.CallbackQuery, state: FSMContext):
     if callback.from_user.id != TG_ADMIN: return
-    data = await state.get_data()
-    matn = data.get("broadcast_text", "")
+    data  = await state.get_data()
+    matn  = data.get("broadcast_text", "")
+    total = fetchval("SELECT COUNT(*) FROM users")
     await callback.message.edit_text("⏳ Yuborilmoqda...")
-    with db_conn() as db:
-        total = db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
     await bot.send_message(
         TG_ADMIN,
         f"✅ Xabar yuborildi!\n👥 Jami foydalanuvchilar: {total}\n\n<b>Xabar:</b>\n{matn}",

@@ -3,399 +3,506 @@
 {% block content %}
 
 <style>
-  .page-header {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --bg:      #050a14;
+    --card:    #0d1628;
+    --card2:   #111d35;
+    --border:  rgba(99,179,237,0.12);
+    --border2: rgba(99,179,237,0.22);
+    --accent:  #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --text:    #e2eaf8;
+    --muted:   #7a8fad;
+    --white:   #ffffff;
+    --grad:    linear-gradient(135deg, #38bdf8, #818cf8);
+    --grad-g:  linear-gradient(135deg, #34d399, #059669);
+    --err:     #f87171;
+    --ok:      #34d399;
+  }
+
+  @keyframes fadeUp  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @keyframes glow    { 0%,100%{box-shadow:0 0 20px rgba(56,189,248,.25)} 50%{box-shadow:0 0 40px rgba(56,189,248,.5)} }
+
+  /* ── HEADER ── */
+  .pf-header {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
-    animation: fadeUp 0.5s ease both;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
+    animation: fadeUp .45s ease both;
   }
-  .page-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 24px; font-weight: 800;
-    color: var(--white); letter-spacing: -0.5px;
-    display: flex; align-items: center; gap: 12px;
+  .pf-header-left { display: flex; align-items: center; gap: 14px; }
+  .pf-header-icon {
+    width: 44px; height: 44px; background: var(--grad);
+    border-radius: 14px; display: flex; align-items: center;
+    justify-content: center; font-size: 18px; color: #fff;
+    box-shadow: 0 0 22px rgba(56,189,248,.3); flex-shrink: 0;
   }
-  .page-title-icon {
-    width: 40px; height: 40px;
-    background: var(--grad);
-    border-radius: 11px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; color: #fff;
-  }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  .pf-title     { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--white); letter-spacing:-.5px; }
+  .pf-subtitle  { font-size:13px; color:var(--muted); margin-top:2px; }
 
-  /* LAYOUT */
-  .profile-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    animation: fadeUp 0.5s 0.1s ease both;
-  }
-  .col-left  { display: flex; flex-direction: column; gap: 20px; }
-  .col-right { display: flex; flex-direction: column; gap: 20px; }
-
-  /* CARD */
-  .p-card {
+  /* ── HERO BANNER ── */
+  .pf-hero {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 26px;
+    border-radius: 20px; padding: 28px;
+    margin-bottom: 20px;
     position: relative; overflow: hidden;
+    animation: fadeUp .45s .05s ease both;
   }
-  .p-card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 15px; font-weight: 700;
-    color: var(--white);
-    display: flex; align-items: center; gap: 8px;
-    margin-bottom: 22px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
+  .pf-hero::before {
+    content: ''; position: absolute; top:0; left:0; right:0;
+    height: 2px; background: var(--grad);
   }
-  .p-card-title i { color: var(--accent); font-size: 14px; }
+  .pf-hero-glow {
+    position: absolute; top:-60px; right:-60px;
+    width:250px; height:250px;
+    background: radial-gradient(circle, rgba(56,189,248,.07), transparent 70%);
+    pointer-events: none;
+  }
+  .pf-hero-inner { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
 
-  /* AVATAR SECTION */
-  .avatar-section {
-    display: flex; align-items: center; gap: 20px;
-    margin-bottom: 24px; padding-bottom: 22px;
-    border-bottom: 1px solid var(--border);
-  }
-  .avatar {
-    width: 72px; height: 72px; border-radius: 20px;
+  /* AVATAR */
+  .pf-avatar-wrap { position:relative; flex-shrink:0; }
+  .pf-avatar {
+    width:80px; height:80px; border-radius:22px;
     background: var(--grad);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-size: 28px; font-weight: 800; color: #fff;
-    flex-shrink: 0;
-    box-shadow: 0 8px 24px rgba(56,189,248,0.3);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Syne',sans-serif;
+    font-size:32px; font-weight:800; color:#fff;
+    box-shadow: 0 8px 28px rgba(56,189,248,.35);
+    animation: glow 4s ease-in-out infinite;
   }
-  .avatar-info { flex: 1; }
-  .avatar-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px; font-weight: 800;
-    color: var(--white); margin-bottom: 4px;
-    letter-spacing: -0.3px;
-  }
-  .avatar-email { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
-  .avatar-badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 10px; border-radius: 100px;
-    font-size: 11px; font-weight: 700;
-    background: rgba(52,211,153,0.1);
-    border: 1px solid rgba(52,211,153,0.2);
-    color: #34d399;
-  }
-  .avatar-badge.admin {
-    background: rgba(167,139,250,0.1);
-    border-color: rgba(167,139,250,0.2);
-    color: #a78bfa;
+  .pf-avatar-status {
+    position:absolute; bottom:-3px; right:-3px;
+    width:16px; height:16px; border-radius:50%;
+    background:#34d399; border:2px solid var(--card);
+    animation: pulse 2s infinite;
   }
 
-  /* STATS ROW */
-  .stats-row {
-    display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+  .pf-user-info { flex:1; min-width:0; }
+  .pf-username {
+    font-family:'Syne',sans-serif;
+    font-size:22px; font-weight:800; color:var(--white);
+    letter-spacing:-.5px; margin-bottom:4px;
   }
-  .mini-stat {
-    background: var(--card2);
-    border: 1px solid var(--border);
-    border-radius: 14px; padding: 16px 14px;
-    text-align: center;
-    transition: border-color 0.2s, transform 0.2s;
+  .pf-email { font-size:13px; color:var(--muted); margin-bottom:10px; }
+  .pf-badges { display:flex; gap:8px; flex-wrap:wrap; }
+  .pf-badge {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 12px; border-radius:100px;
+    font-size:11px; font-weight:700;
   }
-  .mini-stat:hover { border-color: rgba(56,189,248,0.25); transform: translateY(-2px); }
-  .mini-stat-val {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px; font-weight: 800;
-    background: var(--grad);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 4px;
-  }
-  .mini-stat-label { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .pf-badge-user  { background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.2); color:#34d399; }
+  .pf-badge-admin { background:rgba(167,139,250,.1); border:1px solid rgba(167,139,250,.2); color:#a78bfa; }
+  .pf-badge-date  { background:rgba(56,189,248,.08); border:1px solid rgba(56,189,248,.15); color:var(--muted); }
+  .pf-badge-date b { color:var(--white); }
 
-  /* FORM */
-  .form-group { margin-bottom: 18px; }
-  .form-group:last-of-type { margin-bottom: 0; }
-  .form-label {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.8px;
-    color: var(--muted); margin-bottom: 8px;
+  /* HERO STATS */
+  .pf-hero-stats {
+    display:flex; gap:1px; margin-left:auto;
+    background:var(--border); border:1px solid var(--border);
+    border-radius:16px; overflow:hidden; flex-shrink:0;
+  }
+  .pf-hstat {
+    background:var(--card2); padding:18px 24px;
+    text-align:center; min-width:90px;
+    transition:background .2s;
+  }
+  .pf-hstat:hover { background:#152040; }
+  .pf-hstat-num {
+    font-family:'Syne',sans-serif;
+    font-size:22px; font-weight:800; letter-spacing:-1px;
+    background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    line-height:1; margin-bottom:4px;
+  }
+  .pf-hstat-lbl { font-size:10px; color:var(--muted); letter-spacing:.3px; white-space:nowrap; }
+
+  /* ── GRID ── */
+  .pf-grid {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:20px; animation:fadeUp .45s .1s ease both;
+  }
+  .pf-col { display:flex; flex-direction:column; gap:20px; }
+
+  /* ── CARD ── */
+  .pf-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:20px; padding:26px;
+    position:relative; overflow:hidden;
+  }
+  .pf-card::before {
+    content:''; position:absolute; top:0; left:0; right:0;
+    height:1px; background:var(--grad); opacity:.4;
+  }
+  .pf-card-title {
+    font-family:'Syne',sans-serif;
+    font-size:14px; font-weight:700; color:var(--white);
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:22px; padding-bottom:16px;
+    border-bottom:1px solid var(--border);
+  }
+  .pf-card-title-icon {
+    width:30px; height:30px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; flex-shrink:0;
   }
 
-  .input-wrap { position: relative; }
-  .input-icon {
-    position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
-    color: var(--muted); font-size: 13px; pointer-events: none;
-    transition: color 0.2s;
+  /* ── FORM ── */
+  .pf-form-group { margin-bottom:18px; }
+  .pf-form-group:last-of-type { margin-bottom:0; }
+  .pf-label {
+    display:block; font-size:11px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.8px;
+    color:var(--muted); margin-bottom:8px;
   }
-  .input-wrap:focus-within .input-icon { color: var(--accent); }
+  .pf-input-wrap { position:relative; }
+  .pf-input-icon {
+    position:absolute; left:13px; top:50%; transform:translateY(-50%);
+    color:var(--muted); font-size:13px; pointer-events:none;
+    transition:color .2s;
+  }
+  .pf-input-wrap:focus-within .pf-input-icon { color:var(--accent); }
+  .pf-input {
+    width:100%; padding:12px 14px 12px 38px;
+    background:var(--card2); border:1px solid var(--border);
+    border-radius:11px; color:var(--white);
+    font-family:'DM Sans',sans-serif;
+    font-size:14px; outline:none;
+    transition:border-color .25s, box-shadow .25s, background .25s;
+  }
+  .pf-input::placeholder { color:#3a4a62; }
+  .pf-input:focus {
+    border-color:rgba(56,189,248,.5);
+    box-shadow:0 0 0 3px rgba(56,189,248,.08);
+    background:#0f1c33;
+  }
+  .pf-input.valid   { border-color:rgba(52,211,153,.4); }
+  .pf-input.invalid { border-color:rgba(248,113,113,.4); }
 
-  .form-control {
-    width: 100%;
-    padding: 12px 14px 12px 38px;
-    background: var(--card2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px; outline: none;
-    transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+  .pf-pw-toggle {
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    background:none; border:none; cursor:pointer;
+    color:var(--muted); font-size:13px;
+    transition:color .2s; padding:4px;
   }
-  .form-control:focus {
-    border-color: rgba(56,189,248,0.5);
-    box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
-    background: #0f1c33;
-  }
-  .form-control::placeholder { color: #3a4a62; }
-  .form-control:disabled {
-    opacity: 0.5; cursor: not-allowed;
-  }
+  .pf-pw-toggle:hover { color:var(--accent); }
 
-  .pw-toggle {
-    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; cursor: pointer;
-    color: var(--muted); font-size: 13px;
-    transition: color 0.2s; padding: 4px;
-  }
-  .pw-toggle:hover { color: var(--accent); }
+  /* PASSWORD STRENGTH */
+  .pf-pw-str { margin-top:7px; display:none; }
+  .pf-pw-str.show { display:block; }
+  .str-bar { height:3px; border-radius:2px; background:var(--card2); overflow:hidden; margin-bottom:5px; }
+  .str-fill { height:100%; border-radius:2px; width:0; transition:width .4s, background .4s; }
+  .str-text { font-size:11px; color:var(--muted); }
 
-  /* PW STRENGTH */
-  .pw-strength { margin-top: 6px; display: none; }
-  .pw-strength.show { display: block; }
-  .strength-bar { height: 3px; border-radius: 2px; background: var(--card2); overflow: hidden; margin-bottom: 5px; }
-  .strength-fill { height: 100%; border-radius: 2px; width: 0%; transition: width 0.4s, background 0.4s; }
-  .strength-text { font-size: 11px; color: var(--muted); }
+  .pf-divider { height:1px; background:var(--border); margin:20px 0; }
 
-  /* BUTTONS */
+  /* ── BUTTONS ── */
   .btn-save {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 12px 24px; border-radius: 12px;
-    background: var(--grad); color: #fff; border: none;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px; font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 0 20px rgba(56,189,248,0.2);
-    transition: all 0.22s ease;
-    margin-top: 20px;
+    display:inline-flex; align-items:center; gap:8px;
+    padding:12px 24px; border-radius:12px;
+    background:var(--grad); color:#fff; border:none;
+    font-family:'Syne',sans-serif;
+    font-size:14px; font-weight:700; cursor:pointer;
+    box-shadow:0 0 20px rgba(56,189,248,.2);
+    transition:all .22s; margin-top:20px;
   }
-  .btn-save:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 28px rgba(56,189,248,0.35); }
+  .btn-save:hover { opacity:.9; transform:translateY(-1px); box-shadow:0 4px 28px rgba(56,189,248,.35); }
 
   .btn-danger {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 18px; border-radius: 11px;
-    background: rgba(248,113,113,0.08); color: #f87171;
-    border: 1px solid rgba(248,113,113,0.2);
-    font-size: 13px; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
+    display:inline-flex; align-items:center; gap:7px;
+    padding:10px 18px; border-radius:10px;
+    background:rgba(248,113,113,.07); color:#f87171;
+    border:1px solid rgba(248,113,113,.2);
+    font-size:13px; font-weight:600;
+    cursor:pointer; transition:all .2s;
+    font-family:'DM Sans',sans-serif;
   }
-  .btn-danger:hover { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.4); }
+  .btn-danger:hover { background:rgba(248,113,113,.14); border-color:rgba(248,113,113,.4); }
 
-  /* API KEY */
-  .api-key-box {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px; padding: 14px 16px;
-    font-family: 'Courier New', monospace;
-    font-size: 12px; color: #34d399;
-    word-break: break-all; letter-spacing: 0.5px;
-    line-height: 1.6; margin-bottom: 14px;
-    user-select: all; cursor: text;
+  /* ── API KEY ── */
+  .pf-api-box {
+    background:var(--bg); border:1px solid rgba(52,211,153,.15);
+    border-radius:12px; padding:14px 16px;
+    font-family:'Courier New',monospace;
+    font-size:12px; color:#34d399;
+    word-break:break-all; letter-spacing:.5px;
+    line-height:1.6; margin-bottom:14px;
+    user-select:all; cursor:text;
+    position:relative;
   }
-  .api-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pf-api-actions { display:flex; gap:10px; flex-wrap:wrap; }
   .btn-copy {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 9px 16px; border-radius: 10px;
-    background: var(--card2); color: var(--text);
-    border: 1px solid var(--border);
-    font-size: 12px; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
+    display:inline-flex; align-items:center; gap:7px;
+    padding:9px 16px; border-radius:10px;
+    background:var(--card2); color:var(--text);
+    border:1px solid var(--border);
+    font-size:12px; font-weight:600;
+    cursor:pointer; transition:all .2s;
+    font-family:'DM Sans',sans-serif;
   }
-  .btn-copy:hover { border-color: rgba(56,189,248,0.3); color: var(--white); }
-  .btn-copy.copied { color: #34d399; border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.08); }
+  .btn-copy:hover { border-color:rgba(56,189,248,.3); color:var(--white); }
+  .btn-copy.copied { color:#34d399; border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.07); }
 
-  /* MEMBER SINCE */
-  .member-since {
-    display: flex; align-items: center; gap: 8px;
-    padding: 12px 16px;
-    background: rgba(56,189,248,0.04);
-    border: 1px solid rgba(56,189,248,0.1);
-    border-radius: 12px;
-    font-size: 13px; color: var(--muted);
+  /* ── REF CARD ── */
+  .pf-ref-box {
+    background:rgba(56,189,248,.04);
+    border:1px solid rgba(56,189,248,.12);
+    border-radius:12px; padding:16px;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; flex-wrap:wrap;
   }
-  .member-since i { color: var(--accent); }
-  .member-since b { color: var(--white); }
+  .pf-ref-code {
+    font-family:'Courier New',monospace;
+    font-size:18px; font-weight:700; letter-spacing:4px;
+    background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .pf-ref-lbl { font-size:11px; color:var(--muted); margin-bottom:4px; }
+  .pf-ref-link {
+    font-size:12px; color:var(--muted);
+    word-break:break-all; margin-top:10px;
+    padding:10px 14px;
+    background:var(--card2); border:1px solid var(--border);
+    border-radius:9px; display:flex; align-items:center; gap:8px;
+  }
+  .pf-ref-link i { color:var(--accent); flex-shrink:0; }
+  .pf-ref-link span { color:var(--accent3); font-family:'Courier New',monospace; font-size:11px; word-break:break-all; }
 
-  /* DIVIDER */
-  .form-divider {
-    height: 1px; background: var(--border); margin: 20px 0;
+  /* ── INFO ROW ── */
+  .pf-info-note {
+    display:flex; align-items:flex-start; gap:8px;
+    margin-top:14px; font-size:12px; color:var(--muted); line-height:1.6;
   }
+  .pf-info-note i { color:var(--accent); margin-top:1px; flex-shrink:0; }
+  .pf-info-note a { color:var(--accent); text-decoration:none; }
+  .pf-info-note a:hover { text-decoration:underline; }
 
-  @media (max-width: 860px) {
-    .profile-grid { grid-template-columns: 1fr; }
-    .stats-row { grid-template-columns: repeat(3,1fr); }
+  @media (max-width:900px) {
+    .pf-grid { grid-template-columns:1fr; }
+    .pf-hero-stats { margin-left:0; width:100%; }
+    .pf-hstat { flex:1; }
   }
-  @media (max-width: 480px) {
-    .stats-row { grid-template-columns: 1fr 1fr; }
-    .avatar-section { flex-direction: column; text-align: center; }
+  @media (max-width:560px) {
+    .pf-hero-inner { flex-direction:column; align-items:flex-start; }
+    .pf-avatar { width:64px; height:64px; font-size:26px; }
   }
 </style>
 
 <!-- HEADER -->
-<div class="page-header">
-  <h1 class="page-title">
-    <div class="page-title-icon"><i class="fas fa-user"></i></div>
-    Profil
-  </h1>
+<div class="pf-header">
+  <div class="pf-header-left">
+    <div class="pf-header-icon"><i class="fas fa-user"></i></div>
+    <div>
+      <div class="pf-title">Profil</div>
+      <div class="pf-subtitle">Shaxsiy ma'lumotlar va sozlamalar</div>
+    </div>
+  </div>
 </div>
 
-<div class="profile-grid">
+<!-- HERO BANNER -->
+<div class="pf-hero">
+  <div class="pf-hero-glow"></div>
+  <div class="pf-hero-inner">
 
-  <!-- LEFT COLUMN -->
-  <div class="col-left">
+    <div class="pf-avatar-wrap">
+      <div class="pf-avatar">{{ user.username[0].upper() }}</div>
+      <div class="pf-avatar-status"></div>
+    </div>
 
-    <!-- OVERVIEW CARD -->
-    <div class="p-card">
-      <div class="avatar-section">
-        <div class="avatar">{{ user.username[0].upper() }}</div>
-        <div class="avatar-info">
-          <div class="avatar-name">{{ user.username }}</div>
-          <div class="avatar-email">{{ user.email }}</div>
-          <span class="avatar-badge {% if user.role == 'admin' %}admin{% endif %}">
-            <i class="fas fa-{% if user.role == 'admin' %}shield-alt{% else %}check{% endif %}"></i>
-            {% if user.role == 'admin' %}Admin{% else %}Foydalanuvchi{% endif %}
-          </span>
-        </div>
-      </div>
-
-      <div class="stats-row">
-        <div class="mini-stat">
-          <div class="mini-stat-val">{{ stats.total_orders }}</div>
-          <div class="mini-stat-label">Jami Orderlar</div>
-        </div>
-        <div class="mini-stat">
-          <div class="mini-stat-val">{{ stats.completed }}</div>
-          <div class="mini-stat-label">Bajarilgan</div>
-        </div>
-        <div class="mini-stat">
-          <div class="mini-stat-val">{{ "{:,.0f}".format(stats.total_spent) }}</div>
-          <div class="mini-stat-label">Sarflangan so'm</div>
-        </div>
-      </div>
-
-      <div style="margin-top:16px">
-        <div class="member-since">
+    <div class="pf-user-info">
+      <div class="pf-username">{{ user.username }}</div>
+      <div class="pf-email">{{ user.email }}</div>
+      <div class="pf-badges">
+        <span class="pf-badge {% if user.role == 'admin' %}pf-badge-admin{% else %}pf-badge-user{% endif %}">
+          <i class="fas fa-{% if user.role == 'admin' %}shield-alt{% else %}circle-check{% endif %}"></i>
+          {% if user.role == 'admin' %}Admin{% else %}Foydalanuvchi{% endif %}
+        </span>
+        <span class="pf-badge pf-badge-date">
           <i class="fas fa-calendar-alt"></i>
-          A'zo bo'lgan: <b>{{ user.created_at[:10] }}</b>
-        </div>
+          A'zo: <b>{{ user.created_at[:10] }}</b>
+        </span>
       </div>
     </div>
 
-    <!-- EDIT PROFILE CARD -->
-    <div class="p-card">
-      <div class="p-card-title"><i class="fas fa-edit"></i> Ma'lumotlarni Tahrirlash</div>
+    <div class="pf-hero-stats">
+      <div class="pf-hstat">
+        <div class="pf-hstat-num">{{ stats.total_orders }}</div>
+        <div class="pf-hstat-lbl">Jami order</div>
+      </div>
+      <div class="pf-hstat">
+        <div class="pf-hstat-num">{{ stats.completed }}</div>
+        <div class="pf-hstat-lbl">Bajarilgan</div>
+      </div>
+      <div class="pf-hstat">
+        <div class="pf-hstat-num">{{ "{:,.0f}".format(stats.total_spent) }}</div>
+        <div class="pf-hstat-lbl">Sarflangan so'm</div>
+      </div>
+    </div>
 
+  </div>
+</div>
+
+<!-- GRID -->
+<div class="pf-grid">
+
+  <!-- LEFT -->
+  <div class="pf-col">
+
+    <!-- EDIT PROFILE -->
+    <div class="pf-card">
+      <div class="pf-card-title">
+        <div class="pf-card-title-icon" style="background:rgba(56,189,248,.1);color:var(--accent)">
+          <i class="fas fa-pen"></i>
+        </div>
+        Ma'lumotlarni Tahrirlash
+      </div>
       <form method="POST" action="/profile/update">
-        <div class="form-group">
-          <label class="form-label"><i class="fas fa-at" style="color:var(--accent)"></i> Username</label>
-          <div class="input-wrap">
-            <input type="text" name="username" class="form-control"
-                   value="{{ user.username }}" required minlength="3">
-            <i class="fas fa-user input-icon"></i>
+        <div class="pf-form-group">
+          <label class="pf-label">Username</label>
+          <div class="pf-input-wrap">
+            <i class="fas fa-at pf-input-icon"></i>
+            <input type="text" name="username" class="pf-input"
+                   value="{{ user.username }}" required minlength="3" autocomplete="username">
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label"><i class="fas fa-envelope" style="color:var(--accent)"></i> Email</label>
-          <div class="input-wrap">
-            <input type="email" name="email" class="form-control"
-                   value="{{ user.email }}" required>
-            <i class="fas fa-at input-icon"></i>
+        <div class="pf-form-group">
+          <label class="pf-label">Email</label>
+          <div class="pf-input-wrap">
+            <i class="fas fa-envelope pf-input-icon"></i>
+            <input type="email" name="email" class="pf-input"
+                   value="{{ user.email }}" required autocomplete="email">
           </div>
         </div>
         <button type="submit" class="btn-save">
-          <i class="fas fa-save"></i> Saqlash
+          <i class="fas fa-floppy-disk"></i> Saqlash
         </button>
       </form>
     </div>
 
+    <!-- REFERRAL -->
+    <div class="pf-card">
+      <div class="pf-card-title">
+        <div class="pf-card-title-icon" style="background:rgba(52,211,153,.1);color:#34d399">
+          <i class="fas fa-gift"></i>
+        </div>
+        Referal Dasturi
+      </div>
+
+      <div class="pf-ref-box">
+        <div>
+          <div class="pf-ref-lbl">Sizning referal kodingiz</div>
+          <div class="pf-ref-code">{{ user.ref_code }}</div>
+        </div>
+        <button class="btn-copy" id="ref-copy-btn" onclick="copyRef()">
+          <i class="fas fa-copy"></i> Nusxalash
+        </button>
+      </div>
+
+      <div class="pf-ref-link">
+        <i class="fas fa-link"></i>
+        <span id="ref-link-text">{{ request.host_url }}register?ref={{ user.ref_code }}</span>
+      </div>
+
+      <div class="pf-info-note">
+        <i class="fas fa-circle-info"></i>
+        Do'stlaringizni taklif qiling va ular ro'yxatdan o'tganda bonus oling!
+      </div>
+    </div>
+
   </div>
 
-  <!-- RIGHT COLUMN -->
-  <div class="col-right">
+  <!-- RIGHT -->
+  <div class="pf-col">
 
-    <!-- CHANGE PASSWORD CARD -->
-    <div class="p-card">
-      <div class="p-card-title"><i class="fas fa-lock"></i> Parolni O'zgartirish</div>
+    <!-- CHANGE PASSWORD -->
+    <div class="pf-card">
+      <div class="pf-card-title">
+        <div class="pf-card-title-icon" style="background:rgba(129,140,248,.1);color:#818cf8">
+          <i class="fas fa-lock"></i>
+        </div>
+        Parolni O'zgartirish
+      </div>
 
-      <form method="POST" action="/profile/change-password" id="pw-form">
-        <div class="form-group">
-          <label class="form-label">Joriy Parol</label>
-          <div class="input-wrap">
-            <input type="password" name="current_password" id="cur-pw" class="form-control"
-                   placeholder="••••••••" required>
-            <i class="fas fa-lock input-icon"></i>
-            <button type="button" class="pw-toggle" onclick="togglePw('cur-pw','eye-cur')">
+      <form method="POST" action="/profile/change-password">
+        <div class="pf-form-group">
+          <label class="pf-label">Joriy Parol</label>
+          <div class="pf-input-wrap">
+            <i class="fas fa-lock pf-input-icon"></i>
+            <input type="password" name="current_password" id="cur-pw"
+                   class="pf-input" placeholder="••••••••" required>
+            <button type="button" class="pf-pw-toggle" onclick="togglePw('cur-pw','eye-cur')">
               <i class="fas fa-eye" id="eye-cur"></i>
             </button>
           </div>
         </div>
 
-        <div class="form-divider"></div>
+        <div class="pf-divider"></div>
 
-        <div class="form-group">
-          <label class="form-label">Yangi Parol</label>
-          <div class="input-wrap">
-            <input type="password" name="new_password" id="new-pw" class="form-control"
-                   placeholder="Kamida 8 belgi" required minlength="8"
-                   oninput="checkStrength(this)">
-            <i class="fas fa-key input-icon"></i>
-            <button type="button" class="pw-toggle" onclick="togglePw('new-pw','eye-new')">
+        <div class="pf-form-group">
+          <label class="pf-label">Yangi Parol</label>
+          <div class="pf-input-wrap">
+            <i class="fas fa-key pf-input-icon"></i>
+            <input type="password" name="new_password" id="new-pw"
+                   class="pf-input" placeholder="Kamida 8 belgi"
+                   required minlength="8" oninput="checkStrength(this)">
+            <button type="button" class="pf-pw-toggle" onclick="togglePw('new-pw','eye-new')">
               <i class="fas fa-eye" id="eye-new"></i>
             </button>
           </div>
-          <div class="pw-strength" id="pw-str">
-            <div class="strength-bar"><div class="strength-fill" id="str-fill"></div></div>
-            <div class="strength-text" id="str-text"></div>
+          <div class="pf-pw-str" id="pw-str">
+            <div class="str-bar"><div class="str-fill" id="str-fill"></div></div>
+            <div class="str-text" id="str-text"></div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Yangi Parolni Tasdiqlang</label>
-          <div class="input-wrap">
-            <input type="password" name="confirm_password" id="conf-pw" class="form-control"
-                   placeholder="••••••••" required oninput="checkConfirm(this)">
-            <i class="fas fa-shield-alt input-icon"></i>
-            <button type="button" class="pw-toggle" onclick="togglePw('conf-pw','eye-conf')">
+        <div class="pf-form-group">
+          <label class="pf-label">Yangi Parolni Tasdiqlang</label>
+          <div class="pf-input-wrap">
+            <i class="fas fa-shield-alt pf-input-icon"></i>
+            <input type="password" name="confirm_password" id="conf-pw"
+                   class="pf-input" placeholder="••••••••"
+                   required oninput="checkConfirm(this)">
+            <button type="button" class="pf-pw-toggle" onclick="togglePw('conf-pw','eye-conf')">
               <i class="fas fa-eye" id="eye-conf"></i>
             </button>
           </div>
         </div>
 
-        <button type="submit" class="btn-save">
+        <button type="submit" class="btn-save" style="background:linear-gradient(135deg,#818cf8,#6366f1);box-shadow:0 0 20px rgba(129,140,248,.2)">
           <i class="fas fa-lock"></i> Parolni Yangilash
         </button>
       </form>
     </div>
 
-    <!-- API KEY CARD -->
-    <div class="p-card">
-      <div class="p-card-title"><i class="fas fa-key"></i> API Kalit</div>
+    <!-- API KEY -->
+    <div class="pf-card">
+      <div class="pf-card-title">
+        <div class="pf-card-title-icon" style="background:rgba(52,211,153,.1);color:#34d399">
+          <i class="fas fa-terminal"></i>
+        </div>
+        API Kalit
+      </div>
 
-      <div class="api-key-box" id="api-key-box">{{ user.api_key }}</div>
+      <div class="pf-api-box" id="api-key-box">{{ user.api_key }}</div>
 
-      <div class="api-actions">
+      <div class="pf-api-actions">
         <button class="btn-copy" id="copy-key-btn" onclick="copyKey()">
           <i class="fas fa-copy"></i> Nusxalash
         </button>
         <form method="POST" action="/profile/regen-key"
               onsubmit="return confirm('Diqqat! Eski API kalit ishlamay qoladi. Davom etasizmi?')">
           <button type="submit" class="btn-danger">
-            <i class="fas fa-sync"></i> Yangilash
+            <i class="fas fa-rotate"></i> Yangilash
           </button>
         </form>
       </div>
 
-      <div style="margin-top:16px;font-size:12px;color:var(--muted);line-height:1.6">
-        <i class="fas fa-info-circle" style="color:var(--accent)"></i>
-        API kalitini hech kimga bermang. Reseller uchun <a href="/api-docs" style="color:var(--accent);text-decoration:none">API hujjatlarini</a> ko'ring.
+      <div class="pf-info-note">
+        <i class="fas fa-triangle-exclamation"></i>
+        API kalitini hech kimga bermang. Reseller uchun
+        <a href="/api-docs">API hujjatlarini</a> ko'ring.
       </div>
     </div>
 
@@ -405,55 +512,61 @@
 {% endblock %}
 {% block scripts %}
 <script>
-  function togglePw(fieldId, eyeId) {
-    const f = document.getElementById(fieldId);
-    const e = document.getElementById(eyeId);
-    const v = f.type === 'text';
-    f.type = v ? 'password' : 'text';
-    e.className = v ? 'fas fa-eye' : 'fas fa-eye-slash';
+  function togglePw(fId, eId) {
+    const f = document.getElementById(fId), e = document.getElementById(eId);
+    f.type = f.type === 'text' ? 'password' : 'text';
+    e.className = f.type === 'text' ? 'fas fa-eye-slash' : 'fas fa-eye';
   }
 
-  function checkStrength(input) {
-    const val = input.value;
+  function checkStrength(inp) {
+    const v = inp.value;
     const wrap = document.getElementById('pw-str');
     const fill = document.getElementById('str-fill');
     const text = document.getElementById('str-text');
-    if (!val) { wrap.classList.remove('show'); return; }
+    if (!v) { wrap.classList.remove('show'); return; }
     wrap.classList.add('show');
     let score = 0;
-    if (val.length >= 8)  score++;
-    if (val.length >= 12) score++;
-    if (/[A-Z]/.test(val)) score++;
-    if (/[0-9]/.test(val)) score++;
-    if (/[^a-zA-Z0-9]/.test(val)) score++;
-    const levels = [
-      { w:'20%',  bg:'#f87171', label:'Juda zaif' },
-      { w:'40%',  bg:'#fb923c', label:'Zaif' },
-      { w:'60%',  bg:'#facc15', label:"O'rtacha" },
-      { w:'80%',  bg:'#a3e635', label:'Kuchli' },
-      { w:'100%', bg:'#34d399', label:'Juda kuchli 💪' },
+    if (v.length >= 8)  score++;
+    if (v.length >= 12) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^a-zA-Z0-9]/.test(v)) score++;
+    const lvls = [
+      { w:'20%',  bg:'#f87171', lbl:'Juda zaif' },
+      { w:'40%',  bg:'#fb923c', lbl:'Zaif' },
+      { w:'60%',  bg:'#facc15', lbl:"O'rtacha" },
+      { w:'80%',  bg:'#a3e635', lbl:'Kuchli' },
+      { w:'100%', bg:'#34d399', lbl:'Juda kuchli 💪' },
     ];
-    const lvl = levels[Math.min(score - 1, 4)] || levels[0];
-    fill.style.width      = lvl.w;
-    fill.style.background = lvl.bg;
-    text.textContent      = lvl.label;
-    text.style.color      = lvl.bg;
+    const l = lvls[Math.min(score - 1, 4)] || lvls[0];
+    fill.style.width = l.w; fill.style.background = l.bg;
+    text.textContent = l.lbl; text.style.color = l.bg;
   }
 
-  function checkConfirm(input) {
+  function checkConfirm(inp) {
     const pw = document.getElementById('new-pw').value;
-    if (!input.value) { input.classList.remove('valid','invalid'); return; }
-    if (input.value === pw) {
-      input.style.borderColor = 'rgba(52,211,153,0.5)';
-    } else {
-      input.style.borderColor = 'rgba(248,113,113,0.5)';
-    }
+    inp.classList.remove('valid','invalid');
+    if (!inp.value) return;
+    inp.classList.add(inp.value === pw ? 'valid' : 'invalid');
   }
 
   function copyKey() {
     const key = document.getElementById('api-key-box').textContent.trim();
+    const btn = document.getElementById('copy-key-btn');
     navigator.clipboard.writeText(key).then(() => {
-      const btn = document.getElementById('copy-key-btn');
+      btn.classList.add('copied');
+      btn.innerHTML = '<i class="fas fa-check"></i> Nusxalandi!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<i class="fas fa-copy"></i> Nusxalash';
+      }, 2200);
+    });
+  }
+
+  function copyRef() {
+    const link = document.getElementById('ref-link-text').textContent.trim();
+    const btn  = document.getElementById('ref-copy-btn');
+    navigator.clipboard.writeText(link).then(() => {
       btn.classList.add('copied');
       btn.innerHTML = '<i class="fas fa-check"></i> Nusxalandi!';
       setTimeout(() => {

@@ -11,7 +11,7 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 CURRENCY_RATE = 12500
 MARKUP        = 1.04
 
-# ── Cache (xizmatlar ro'yxatini 5 daqiqa saqlab turadi) ──────────────────────
+# ── Cache ─────────────────────────────────────────────────────────────────────
 _cache = {}
 def cache_get(key):
     item = _cache.get(key)
@@ -32,8 +32,6 @@ def cache_clear():
 def dashboard():
     db    = get_db()
     today = __import__("datetime").datetime.now().strftime("%Y-%m-%d")
-
-    # ✅ Barcha statistikani 1 ta query bilan
     stats = {
         "total_users":    db.execute("SELECT COUNT(*) FROM users").fetchone()[0],
         "total_orders":   db.execute("SELECT COUNT(*) FROM orders").fetchone()[0],
@@ -60,8 +58,8 @@ def dashboard():
 def services():
     db   = get_db()
     svcs = r2l(db.execute(
-        "SELECT s.id, s.name, s.type, s.price_per_1000, s.min_order, s.max_order, "
-        "s.is_active, s.provider_id, c.name as cat_name "
+        "SELECT s.id, s.name, s.name_uz, s.description_uz, s.type, s.price_per_1000, "
+        "s.min_order, s.max_order, s.is_active, s.is_recommended, s.provider_id, c.name as cat_name "
         "FROM services s "
         "JOIN categories c ON s.category_id=c.id "
         "ORDER BY c.sort_order, s.id"
@@ -70,17 +68,73 @@ def services():
     return render_template("admin/services.html", services=svcs, categories=cats)
 
 
+# ── ID BO'YICHA QIDIRISH (AJAX) ───────────────────────────────────────────────
+@admin_bp.route("/services/search-by-id", methods=["GET"])
+@admin_required
+def search_service_by_id():
+    """Provider ID bo'yicha xizmat ma'lumotlarini provayderdan olish"""
+    provider_id = request.args.get("provider_id", "").strip()
+    if not provider_id:
+        return jsonify({"ok": False, "message": "ID kiriting"})
+
+    import requests as _req
+    try:
+        url  = f"{Config.PROVIDER_URL}?action=services&key={Config.PROVIDER_KEY}"
+        cached = cache_get("all_services")
+        if cached:
+            all_svcs = cached
+        else:
+            resp = _req.get(url, timeout=15)
+            all_svcs = resp.json()
+            cache_set("all_services", all_svcs)
+
+        if not isinstance(all_svcs, list):
+            return jsonify({"ok": False, "message": "Provider xatosi"})
+
+        # ID bo'yicha qidirish
+        found = None
+        for s in all_svcs:
+            if str(s.get("service", "")) == str(provider_id):
+                found = s
+                break
+
+        if not found:
+            return jsonify({"ok": False, "message": f"ID {provider_id} topilmadi"})
+
+        raw_rate       = float(found.get("rate", 0))
+        price_per_1000 = round(raw_rate * CURRENCY_RATE * MARKUP, 2)
+
+        return jsonify({
+            "ok": True,
+            "data": {
+                "provider_id":   found["service"],
+                "name":          found["name"],
+                "category":      found.get("category", ""),
+                "type":          found.get("type", "Default"),
+                "price_per_1000": price_per_1000,
+                "min_order":     int(found.get("min", 10)),
+                "max_order":     int(found.get("max", 100000)),
+                "rate_usd":      raw_rate,
+            }
+        })
+    except Exception as e:
+        return jsonify({"ok": False, "message": str(e)})
+
+
 @admin_bp.route("/services/add", methods=["POST"])
 @admin_required
 def add_service():
     d  = request.form
     db = get_db()
     db.execute(
-        "INSERT INTO services (category_id, provider_id, name, description, type, price_per_1000, min_order, max_order) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO services (category_id, provider_id, name, name_uz, description, description_uz, "
+        "type, price_per_1000, min_order, max_order, is_recommended) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (d["category_id"], d.get("provider_id") or None, d["name"],
-         d.get("description", ""), d.get("type", "Default"),
-         float(d["price_per_1000"]), int(d["min_order"]), int(d["max_order"]))
+         d.get("name_uz", ""), d.get("description", ""), d.get("description_uz", ""),
+         d.get("type", "Default"), float(d["price_per_1000"]),
+         int(d["min_order"]), int(d["max_order"]),
+         int(d.get("is_recommended", 0)))
     )
     db.commit()
     cache_clear()
@@ -94,20 +148,38 @@ def update_service(sid):
     d  = request.form
     db = get_db()
     db.execute(
-        "UPDATE services SET name=?, price_per_1000=?, min_order=?, max_order=?, "
-        "is_active=?, description=?, type=? WHERE id=?",
-        (d["name"], float(d["price_per_1000"]), int(d["min_order"]), int(d["max_order"]),
-         int(d.get("is_active", 1)), d.get("description", ""), d.get("type", "Default"), sid)
+        "UPDATE services SET name=?, name_uz=?, price_per_1000=?, min_order=?, max_order=?, "
+        "is_active=?, description=?, description_uz=?, type=?, is_recommended=? WHERE id=?",
+        (d["name"], d.get("name_uz", ""), float(d["price_per_1000"]),
+         int(d["min_order"]), int(d["max_order"]),
+         int(d.get("is_active", 1)), d.get("description", ""),
+         d.get("description_uz", ""), d.get("type", "Default"),
+         int(d.get("is_recommended", 0)), sid)
     )
     db.commit()
     cache_clear()
     return jsonify({"ok": True})
 
 
+# ── TAVSIYA ETILGAN XIZMATNI BELGILASH ───────────────────────────────────────
+@admin_bp.route("/services/<int:sid>/recommend", methods=["POST"])
+@admin_required
+def toggle_recommend(sid):
+    db  = get_db()
+    svc = db.execute("SELECT is_recommended FROM services WHERE id=?", (sid,)).fetchone()
+    if not svc:
+        return jsonify({"ok": False})
+    new_val = 0 if svc["is_recommended"] else 1
+    db.execute("UPDATE services SET is_recommended=? WHERE id=?", (new_val, sid))
+    db.commit()
+    cache_clear()
+    return jsonify({"ok": True, "is_recommended": new_val})
+
+
 @admin_bp.route("/services/import", methods=["POST"])
 @admin_required
 def import_services():
-    """Provider dan xizmatlarni import qilish — narx so'mda, 4% ustama bilan"""
+    """Provider dan xizmatlarni import qilish — avto ID, narx so'mda, 4% ustama"""
     import requests as _req
     try:
         url  = f"{Config.PROVIDER_URL}?action=services&key={Config.PROVIDER_KEY}"
@@ -123,10 +195,10 @@ def import_services():
 
     db    = get_db()
     count = 0
+    updated = 0
 
     for s in svcs:
-        # ✅ Narx hisoblash: USD -> So'm + 4% ustama
-        raw_rate      = float(s.get("rate", 0))
+        raw_rate       = float(s.get("rate", 0))
         price_per_1000 = round(raw_rate * CURRENCY_RATE * MARKUP, 2)
 
         cat_name = s.get("category", "Boshqa")
@@ -137,26 +209,28 @@ def import_services():
         else:
             cat_id = cat["id"]
 
-        # Mavjud bo'lsa yangilash, bo'lmasa qo'shish
-        existing = db.execute("SELECT id FROM services WHERE provider_id=?", (s["service"],)).fetchone()
+        # provider_id = provayderning o'z ID si (avto saqlanadi)
+        existing = db.execute("SELECT id FROM services WHERE provider_id=?", (str(s["service"]),)).fetchone()
         if existing:
             db.execute(
-                "UPDATE services SET name=?, type=?, price_per_1000=?, min_order=?, max_order=?, category_id=? WHERE provider_id=?",
+                "UPDATE services SET name=?, type=?, price_per_1000=?, "
+                "min_order=?, max_order=?, category_id=? WHERE provider_id=?",
                 (s["name"], s.get("type", "Default"), price_per_1000,
-                 int(s.get("min", 10)), int(s.get("max", 100000)), cat_id, s["service"])
+                 int(s.get("min", 10)), int(s.get("max", 100000)), cat_id, str(s["service"]))
             )
+            updated += 1
         else:
             db.execute(
                 "INSERT INTO services (category_id, provider_id, name, type, price_per_1000, min_order, max_order) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (cat_id, s["service"], s["name"], s.get("type", "Default"),
+                (cat_id, str(s["service"]), s["name"], s.get("type", "Default"),
                  price_per_1000, int(s.get("min", 10)), int(s.get("max", 100000)))
             )
             count += 1
 
     db.commit()
     cache_clear()
-    flash(f"{count} ta yangi xizmat import qilindi! Narxlar so'mda (4% ustama bilan)", "success")
+    flash(f"✅ {count} yangi + {updated} yangilandi. Narxlar so'mda (4% ustama)", "success")
     return redirect(url_for("admin.services"))
 
 

@@ -1,366 +1,162 @@
-{% extends "base.html" %}
-{% block auth_content %}
 <!DOCTYPE html>
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Kirish — SMMZone.uz</title>
+<title>Kirish — SMMZONE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --black:#080808; --white:#f5f5f0; --accent:#c8f04d; --gray:#141414; --muted:#666; --border:#2a2a2a; }
+  body { background:var(--black); color:var(--white); font-family:'Inter',system-ui,sans-serif; min-height:100vh; display:flex; flex-direction:column; }
 
-  :root {
-    --bg:      #050a14;
-    --card:    #0d1628;
-    --card2:   #111d35;
-    --border:  rgba(99,179,237,0.12);
-    --accent:  #38bdf8;
-    --accent2: #818cf8;
-    --accent3: #34d399;
-    --text:    #e2eaf8;
-    --muted:   #7a8fad;
-    --white:   #ffffff;
-    --grad:    linear-gradient(135deg, #38bdf8, #818cf8);
-    --err:     #f87171;
-    --ok:      #34d399;
-  }
+  nav { padding:0 48px; height:60px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+  .nav-logo { font-size:17px; font-weight:600; display:flex; align-items:center; gap:8px; text-decoration:none; color:var(--white); }
+  .logo-dot { width:7px; height:7px; background:var(--accent); border-radius:50%; }
+  .nav-right { font-size:13px; color:var(--muted); }
+  .nav-right a { color:var(--accent); text-decoration:none; font-weight:500; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
+  main { flex:1; display:grid; grid-template-columns:1fr 1fr; max-width:1100px; margin:0 auto; width:100%; padding:60px 48px; gap:80px; align-items:center; }
 
-  /* ANIMATED BACKGROUND */
-  .bg-scene {
-    position: fixed; inset: 0; z-index: 0;
-    overflow: hidden;
-  }
-  .blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    animation: drift 12s ease-in-out infinite alternate;
-  }
-  .blob-1 { width: 500px; height: 500px; background: rgba(56,189,248,0.08); top: -150px; left: -150px; animation-delay: 0s; }
-  .blob-2 { width: 400px; height: 400px; background: rgba(129,140,248,0.08); bottom: -100px; right: -100px; animation-delay: -4s; }
-  .blob-3 { width: 250px; height: 250px; background: rgba(52,211,153,0.05); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -8s; }
+  .left-tag { font-size:11px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+  .left-tag::before { content:''; width:20px; height:1px; background:var(--muted); }
+  .left-title { font-size:clamp(36px,4vw,52px); font-weight:600; letter-spacing:-2px; line-height:1.05; margin-bottom:16px; }
+  .left-title em { color:var(--accent); font-style:italic; }
+  .left-desc { font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:36px; }
 
-  @keyframes drift {
-    from { transform: translate(0, 0) scale(1); }
-    to   { transform: translate(30px, 20px) scale(1.05); }
-  }
+  .stats-mini { display:flex; flex-direction:column; gap:12px; }
+  .smi-row { display:flex; align-items:center; gap:14px; padding:14px 18px; background:var(--gray); border:1px solid var(--border); border-radius:10px; }
+  .smi-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .smi-num { font-size:16px; font-weight:600; }
+  .smi-lbl { font-size:11px; color:var(--muted); margin-top:1px; }
+  .bdg { font-size:10px; padding:3px 8px; border-radius:100px; background:rgba(34,197,94,0.12); color:#22c55e; margin-left:auto; white-space:nowrap; }
 
-  /* GRID LINES */
-  .bg-scene::after {
-    content: '';
-    position: absolute; inset: 0;
-    background-image:
-      linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
-    background-size: 48px 48px;
-  }
+  .form-card { background:var(--gray); border:1px solid var(--border); border-radius:16px; padding:40px; }
+  .form-title { font-size:22px; font-weight:600; letter-spacing:-0.5px; margin-bottom:6px; }
+  .form-sub { font-size:13px; color:var(--muted); margin-bottom:28px; }
+  .form-sub a { color:var(--accent); text-decoration:none; }
 
-  /* CARD WRAPPER */
-  .auth-wrapper {
-    position: relative; z-index: 1;
-    width: 100%; max-width: 440px;
-    padding: 24px;
-    animation: slideUp 0.6s ease both;
-  }
+  .flash { padding:12px 16px; border-radius:8px; font-size:13px; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+  .flash-error { background:rgba(255,77,77,0.1); border:1px solid rgba(255,77,77,0.2); color:#ff7070; }
+  .flash-success { background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.2); color:#4ade80; }
 
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(28px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  .form-group { margin-bottom:18px; }
+  .form-label { font-size:12px; color:var(--muted); margin-bottom:7px; display:block; font-weight:500; }
+  .form-input { width:100%; padding:12px 16px; background:var(--black); border:1px solid var(--border); border-radius:8px; color:var(--white); font-size:14px; font-family:'Inter',sans-serif; transition:all .2s; outline:none; }
+  .form-input::placeholder { color:#444; }
+  .form-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(200,240,77,0.08); }
 
-  /* CARD */
-  .auth-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 44px 40px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 32px 80px rgba(0,0,0,0.5);
-  }
-  .auth-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--grad);
-  }
-  .auth-card::after {
-    content: '';
-    position: absolute; top: -80px; right: -80px;
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 70%);
-    pointer-events: none;
-  }
+  .input-wrap { position:relative; }
+  .eye-btn { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#444; font-size:14px; cursor:pointer; background:none; border:none; transition:color .2s; }
+  .eye-btn:hover { color:var(--muted); }
 
-  /* LOGO */
-  .auth-logo {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 32px;
-    text-decoration: none;
-  }
-  .logo-icon {
-    width: 40px; height: 40px;
-    background: var(--grad);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 17px; color: #fff;
-    flex-shrink: 0;
-  }
-  .logo-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px; font-weight: 800;
-    color: var(--white);
-    letter-spacing: -0.3px;
-  }
-  .logo-name span { color: var(--accent); }
+  .form-options { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+  .remember { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); cursor:pointer; }
+  .remember input { width:15px; height:15px; accent-color:var(--accent); cursor:pointer; }
+  .forgot { font-size:13px; color:var(--muted); text-decoration:none; }
+  .forgot:hover { color:var(--accent); }
 
-  /* HEADING */
-  .auth-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 26px; font-weight: 800;
-    color: var(--white);
-    letter-spacing: -0.6px;
-    margin-bottom: 6px;
-  }
-  .auth-subtitle {
-    font-size: 14px; color: var(--muted);
-    margin-bottom: 28px;
-  }
+  .btn-submit { width:100%; padding:14px; background:var(--accent); color:#000; font-size:14px; font-weight:600; cursor:pointer; border:none; border-radius:8px; font-family:'Inter',sans-serif; transition:all .2s; }
+  .btn-submit:hover { background:#d6f55e; }
 
-  /* ALERT */
-  .alert {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 13px; font-weight: 500;
-    margin-bottom: 20px;
-    animation: fadeIn 0.3s ease;
-  }
-  .alert-danger, .alert-error {
-    background: rgba(248,113,113,0.1);
-    border: 1px solid rgba(248,113,113,0.25);
-    color: var(--err);
-  }
-  .alert-success {
-    background: rgba(52,211,153,0.1);
-    border: 1px solid rgba(52,211,153,0.25);
-    color: var(--ok);
-  }
-  .alert-info {
-    background: rgba(56,189,248,0.1);
-    border: 1px solid rgba(56,189,248,0.25);
-    color: var(--accent);
-  }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+  .divider { display:flex; align-items:center; gap:14px; margin:22px 0; }
+  .divider-line { flex:1; height:1px; background:var(--border); }
+  .divider-text { font-size:12px; color:var(--muted); }
 
-  /* FORM */
-  .form-group { margin-bottom: 18px; }
-  .form-label {
-    display: block;
-    font-size: 12px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.8px;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
+  .btn-google { width:100%; padding:12px; background:transparent; color:var(--white); font-size:14px; font-weight:500; cursor:pointer; border:1px solid var(--border); border-radius:8px; font-family:'Inter',sans-serif; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:10px; }
+  .btn-google:hover { border-color:#555; }
 
-  .input-wrap {
-    position: relative;
-  }
-  .input-icon {
-    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-    color: var(--muted); font-size: 14px;
-    pointer-events: none;
-    transition: color 0.2s;
-  }
-  .form-control {
-    width: 100%;
-    padding: 13px 16px 13px 40px;
-    background: var(--card2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
-  }
-  .form-control::placeholder { color: #3a4a62; }
-  .form-control:focus {
-    border-color: rgba(56,189,248,0.5);
-    box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
-    background: #0f1c33;
-  }
-  .form-control:focus + .input-icon,
-  .input-wrap:focus-within .input-icon { color: var(--accent); }
-
-  /* PASSWORD TOGGLE */
-  .pw-toggle {
-    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; cursor: pointer;
-    color: var(--muted); font-size: 14px;
-    transition: color 0.2s; padding: 4px;
-  }
-  .pw-toggle:hover { color: var(--accent); }
-
-  /* SUBMIT */
-  .btn-submit {
-    width: 100%;
-    padding: 14px;
-    background: var(--grad);
-    border: none; border-radius: 12px;
-    color: #fff;
-    font-family: 'Syne', sans-serif;
-    font-size: 15px; font-weight: 700;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    box-shadow: 0 0 24px rgba(56,189,248,0.25);
-    transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
-    margin-top: 8px;
-    letter-spacing: 0.2px;
-  }
-  .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 32px rgba(56,189,248,0.4); }
-  .btn-submit:active { transform: translateY(0); }
-
-  /* DIVIDER */
-  .divider {
-    display: flex; align-items: center; gap: 12px;
-    margin: 24px 0;
-  }
-  .divider::before, .divider::after {
-    content: ''; flex: 1;
-    height: 1px; background: var(--border);
-  }
-  .divider span { font-size: 12px; color: var(--muted); white-space: nowrap; }
-
-  /* FOOTER */
-  .auth-footer {
-    text-align: center;
-    font-size: 14px; color: var(--muted);
-    margin-top: 24px;
-  }
-  .auth-footer a {
-    color: var(--accent);
-    text-decoration: none;
-    font-weight: 600;
-    transition: opacity 0.2s;
-  }
-  .auth-footer a:hover { opacity: 0.8; text-decoration: underline; }
-
-  /* BACK LINK */
-  .back-link {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 13px; color: var(--muted);
-    text-decoration: none;
-    margin-bottom: 20px;
-    transition: color 0.2s;
-  }
-  .back-link:hover { color: var(--accent); }
-
-  @media (max-width: 480px) {
-    .auth-card { padding: 32px 24px; border-radius: 20px; }
+  @media (max-width:768px) {
+    main { grid-template-columns:1fr; padding:40px 24px; gap:0; }
+    .left-side { display:none; }
+    nav { padding:0 24px; }
   }
 </style>
 </head>
 <body>
 
-<div class="bg-scene">
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
-</div>
+<nav>
+  <a href="/" class="nav-logo"><div class="logo-dot"></div>SMMZONE</a>
+  <div class="nav-right">Akkaunt yo'qmi? <a href="/register">Ro'yxatdan o'ting</a></div>
+</nav>
 
-<div class="auth-wrapper">
-  <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Bosh sahifaga qaytish</a>
+<main>
+  <div class="left-side">
+    <div class="left-tag">Xush kelibsiz</div>
+    <h1 class="left-title">Hisobingizga<br><em>kiring</em></h1>
+    <p class="left-desc">Platformamizda 500+ mijoz muvaffaqiyatli ishlayapti. Siz ham qo'shiling!</p>
+    <div class="stats-mini">
+      <div class="smi-row">
+        <div class="smi-icon" style="background:rgba(225,48,108,0.1);color:#E1306C"><i class="fab fa-instagram"></i></div>
+        <div><div class="smi-num">12.8K</div><div class="smi-lbl">O'rtacha Instagram o'sish</div></div>
+        <span class="bdg">↑ 24%</span>
+      </div>
+      <div class="smi-row">
+        <div class="smi-icon" style="background:rgba(0,136,204,0.1);color:#0088cc"><i class="fab fa-telegram"></i></div>
+        <div><div class="smi-num">8.4K</div><div class="smi-lbl">O'rtacha Telegram obunachi</div></div>
+        <span class="bdg">↑ 18%</span>
+      </div>
+      <div class="smi-row">
+        <div class="smi-icon" style="background:rgba(255,255,255,0.05)"><i class="fab fa-tiktok"></i></div>
+        <div><div class="smi-num">320K</div><div class="smi-lbl">O'rtacha TikTok ko'rishlar</div></div>
+        <span class="bdg">↑ 41%</span>
+      </div>
+    </div>
+  </div>
 
-  <div class="auth-card">
-    <a href="/" class="auth-logo">
-      <div class="logo-icon"><i class="fas fa-bolt"></i></div>
-      <div class="logo-name">SMM<span>Zone</span>.uz</div>
-    </a>
+  <div class="form-card">
+    <div class="form-title">Kirish</div>
+    <div class="form-sub">Akkaunt yo'qmi? <a href="/register">Ro'yxatdan o'ting →</a></div>
 
-    <h2 class="auth-title">Xush kelibsiz 👋</h2>
-    <p class="auth-subtitle">Akkauntingizga kiring</p>
-
-    {% with msgs = get_flashed_messages(with_categories=true) %}
-      {% for cat, msg in msgs %}
-        <div class="alert alert-{{ cat }}">
-          <i class="fas fa-{{ 'check-circle' if cat == 'success' else 'exclamation-circle' }}"></i>
-          {{ msg }}
-        </div>
-      {% endfor %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ 'error' if category == 'error' else 'success' }}">
+            <i class="fas fa-{{ 'circle-exclamation' if category == 'error' else 'circle-check' }}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
     {% endwith %}
 
-    <form method="POST" action="/login" autocomplete="on">
+    <form method="POST" action="/login">
       <div class="form-group">
-        <label class="form-label">Email yoki Username</label>
-        <div class="input-wrap">
-          <input
-            type="text"
-            name="login"
-            class="form-control"
-            placeholder="email@example.com"
-            autocomplete="username"
-            required
-          >
-          <i class="fas fa-user input-icon"></i>
-        </div>
+        <label class="form-label">Email yoki username</label>
+        <input type="text" name="login" class="form-input" placeholder="email@gmail.com yoki username" required autocomplete="username">
       </div>
 
       <div class="form-group">
         <label class="form-label">Parol</label>
         <div class="input-wrap">
-          <input
-            type="password"
-            name="password"
-            id="pw-field"
-            class="form-control"
-            placeholder="••••••••"
-            autocomplete="current-password"
-            required
-          >
-          <i class="fas fa-lock input-icon"></i>
-          <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Parolni ko'rsatish">
-            <i class="fas fa-eye" id="pw-eye"></i>
-          </button>
+          <input type="password" name="password" class="form-input" id="pwdField" placeholder="Parolni kiriting" required autocomplete="current-password">
+          <button type="button" class="eye-btn" onclick="togglePwd()"><i class="fas fa-eye" id="eyeIcon"></i></button>
         </div>
       </div>
 
-      <button type="submit" class="btn-submit">
-        <i class="fas fa-sign-in-alt"></i> Kirish
-      </button>
+      <div class="form-options">
+        <label class="remember"><input type="checkbox" name="remember"> Eslab qolish</label>
+        <a href="#" class="forgot">Parolni unutdingizmi?</a>
+      </div>
+
+      <button type="submit" class="btn-submit">Kirish →</button>
     </form>
 
-    <div class="divider"><span>yoki</span></div>
+    <div class="divider"><div class="divider-line"></div><span class="divider-text">yoki</span><div class="divider-line"></div></div>
 
-    <div class="auth-footer">
-      Akkaunt yo'qmi? <a href="/register">Ro'yxatdan o'ting →</a>
-    </div>
+    <button class="btn-google">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Google bilan kirish
+    </button>
   </div>
-</div>
+</main>
 
 <script>
-  const toggle = document.getElementById('pw-toggle');
-  const field  = document.getElementById('pw-field');
-  const eye    = document.getElementById('pw-eye');
-  toggle.addEventListener('click', () => {
-    const visible = field.type === 'text';
-    field.type = visible ? 'password' : 'text';
-    eye.className = visible ? 'fas fa-eye' : 'fas fa-eye-slash';
-  });
+  function togglePwd() {
+    const f = document.getElementById('pwdField'), i = document.getElementById('eyeIcon');
+    f.type = f.type === 'password' ? 'text' : 'password';
+    i.className = f.type === 'text' ? 'fas fa-eye-slash' : 'fas fa-eye';
+  }
 </script>
 </body>
 </html>
-{% endblock %}

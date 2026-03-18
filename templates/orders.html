@@ -3,114 +3,223 @@
 {% block content %}
 
 <style>
-  /* PAGE HEADER */
-  .page-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
-    animation: fadeUp 0.5s ease both;
-  }
-  .page-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 24px; font-weight: 800;
-    color: var(--white); letter-spacing: -0.5px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .page-title-icon {
-    width: 40px; height: 40px;
-    background: var(--grad);
-    border-radius: 11px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; color: #fff;
-  }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  *, *::before, *::after { box-sizing: border-box; }
 
-  /* CARD */
-  .orders-card {
+  :root {
+    --bg:      #050a14;
+    --card:    #0d1628;
+    --card2:   #111d35;
+    --border:  rgba(99,179,237,0.12);
+    --border2: rgba(99,179,237,0.22);
+    --accent:  #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --text:    #e2eaf8;
+    --muted:   #7a8fad;
+    --white:   #ffffff;
+    --grad:    linear-gradient(135deg, #38bdf8, #818cf8);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes shimmer  { from{background-position:-200% 0} to{background-position:200% 0} }
+  @keyframes spin     { to{transform:rotate(360deg)} }
+  @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* PAGE HEADER */
+  .ord-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
+    animation: fadeUp 0.45s ease both;
+  }
+  .ord-header-left { display: flex; align-items: center; gap: 14px; }
+  .ord-header-icon {
+    width: 44px; height: 44px;
+    background: var(--grad);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+    box-shadow: 0 0 22px rgba(56,189,248,0.3);
+    flex-shrink: 0;
+  }
+  .ord-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    color: var(--white); letter-spacing: -0.5px;
+  }
+  .ord-subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* STATS ROW */
+  .ord-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 14px; margin-bottom: 20px;
+    animation: fadeUp 0.45s 0.05s ease both;
+  }
+  .ord-stat-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 24px;
-    animation: fadeUp 0.5s 0.1s ease both;
+    border-radius: 14px; padding: 16px 18px;
+    position: relative; overflow: hidden;
+    transition: border-color .2s, transform .2s;
+  }
+  .ord-stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .ord-stat-card::before {
+    content: ''; position: absolute; top:0; left:0; right:0;
+    height: 1px; opacity: 0.6;
+  }
+  .ord-stat-card.s-all::before    { background: linear-gradient(90deg, var(--muted), transparent); }
+  .ord-stat-card.s-pending::before { background: linear-gradient(90deg, #fbbf24, transparent); }
+  .ord-stat-card.s-process::before { background: linear-gradient(90deg, #818cf8, transparent); }
+  .ord-stat-card.s-done::before    { background: linear-gradient(90deg, #34d399, transparent); }
+
+  .ord-stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px; font-weight: 800; letter-spacing: -1px;
+    line-height: 1; margin-bottom: 4px;
+  }
+  .ord-stat-card.s-all    .ord-stat-num { color: var(--white); }
+  .ord-stat-card.s-pending .ord-stat-num { color: #fbbf24; }
+  .ord-stat-card.s-process .ord-stat-num { color: #818cf8; }
+  .ord-stat-card.s-done    .ord-stat-num { color: #34d399; }
+
+  .ord-stat-lbl { font-size: 11px; color: var(--muted); letter-spacing: 0.3px; }
+  .ord-stat-icon {
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    font-size: 28px; opacity: 0.06;
   }
 
-  /* FILTER BAR */
-  .filter-bar {
+  /* MAIN CARD */
+  .ord-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 24px;
+    animation: fadeUp 0.45s 0.1s ease both;
+    position: relative; overflow: hidden;
+  }
+  .ord-card::before {
+    content: ''; position: absolute; top:0; left:0; right:0;
+    height: 1px; background: var(--grad); opacity: 0.4;
+  }
+
+  /* TOOLBAR */
+  .ord-toolbar {
     display: flex; align-items: center;
     gap: 8px; flex-wrap: wrap;
-    margin-bottom: 22px;
-    padding-bottom: 20px;
+    margin-bottom: 22px; padding-bottom: 20px;
     border-bottom: 1px solid var(--border);
   }
 
-  .filter-btn {
-    display: inline-flex; align-items: center; gap: 6px;
+  .flt-btn {
+    display: inline-flex; align-items: center; gap: 7px;
     padding: 7px 14px; border-radius: 100px;
-    font-size: 13px; font-weight: 600;
+    font-size: 12px; font-weight: 600;
     text-decoration: none; cursor: pointer;
     border: 1px solid var(--border);
     background: var(--card2); color: var(--muted);
-    transition: all 0.2s ease;
-    white-space: nowrap;
+    transition: all 0.2s; white-space: nowrap;
   }
-  .filter-btn:hover { border-color: rgba(56,189,248,0.3); color: var(--white); }
-  .filter-btn.active {
-    background: rgba(56,189,248,0.12);
-    border-color: rgba(56,189,248,0.4);
+  .flt-btn:hover { border-color: var(--border2); color: var(--white); }
+  .flt-btn.active {
+    background: rgba(56,189,248,0.1);
+    border-color: rgba(56,189,248,0.35);
     color: var(--accent);
   }
-  .filter-btn .dot {
-    width: 6px; height: 6px; border-radius: 50%;
+  .flt-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .flt-count {
+    font-size: 10px; padding: 1px 6px;
+    border-radius: 100px; background: rgba(255,255,255,0.07);
+    color: var(--muted);
   }
-  .dot-all      { background: var(--muted); }
-  .dot-pending  { background: #fbbf24; }
-  .dot-process  { background: #818cf8; }
-  .dot-complete { background: #34d399; }
-  .dot-failed   { background: #f87171; }
+  .flt-btn.active .flt-count { background: rgba(56,189,248,0.15); color: var(--accent); }
+
+  .ord-search {
+    position: relative; margin-left: auto;
+  }
+  .ord-search input {
+    padding: 7px 14px 7px 34px;
+    background: var(--card2); border: 1px solid var(--border);
+    border-radius: 100px; color: var(--white);
+    font-size: 13px; outline: none;
+    width: 190px; transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .ord-search input::placeholder { color: #3a4a62; }
+  .ord-search input:focus { border-color: rgba(56,189,248,0.4); width: 220px; }
+  .ord-search i {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    font-size: 12px; color: var(--muted); pointer-events: none;
+  }
 
   .sync-btn {
-    margin-left: auto;
     display: inline-flex; align-items: center; gap: 7px;
     padding: 7px 16px; border-radius: 100px;
-    font-size: 13px; font-weight: 600;
+    font-size: 12px; font-weight: 600;
     background: var(--card2); color: var(--muted);
     border: 1px solid var(--border);
     cursor: pointer; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
   }
-  .sync-btn:hover { color: var(--white); border-color: rgba(56,189,248,0.3); }
-  .sync-btn i { font-size: 12px; }
+  .sync-btn:hover { color: var(--accent); border-color: rgba(56,189,248,0.3); }
+  .sync-btn.spinning i { animation: spin 1s linear infinite; }
 
   /* TABLE */
-  .table-wrap { overflow-x: auto; margin: 0 -4px; }
-  .orders-table { width: 100%; border-collapse: collapse; min-width: 760px; }
+  .ord-table-wrap { overflow-x: auto; margin: 0 -4px; }
+  .ord-table {
+    width: 100%; border-collapse: collapse; min-width: 800px;
+  }
 
-  .orders-table thead th {
-    font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.7px;
+  .ord-table thead th {
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.8px;
     color: var(--muted); padding: 0 14px 14px;
     text-align: left; border-bottom: 1px solid var(--border);
     white-space: nowrap;
   }
-  .orders-table tbody tr {
-    border-bottom: 1px solid rgba(99,179,237,0.06);
-    transition: background 0.15s;
-  }
-  .orders-table tbody tr:last-child { border-bottom: none; }
-  .orders-table tbody tr:hover { background: rgba(56,189,248,0.03); }
-  .orders-table tbody td {
-    padding: 13px 14px;
-    font-size: 13px; color: var(--text);
-    vertical-align: middle;
-  }
+  .ord-table thead th:first-child { padding-left: 4px; }
 
-  .td-id    { color: var(--muted); font-size: 12px; font-weight: 700; }
-  .td-svc   { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
-  .td-link  { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .td-link a { color: var(--accent); text-decoration: none; font-size: 12px; }
+  .ord-table tbody tr {
+    border-bottom: 1px solid rgba(99,179,237,0.05);
+    transition: background .15s;
+    animation: fadeUp .4s ease both;
+  }
+  .ord-table tbody tr:last-child { border-bottom: none; }
+  .ord-table tbody tr:hover { background: rgba(56,189,248,0.03); }
+
+  .ord-table tbody td {
+    padding: 13px 14px; font-size: 13px;
+    color: var(--text); vertical-align: middle;
+  }
+  .ord-table tbody td:first-child { padding-left: 4px; }
+
+  /* COLUMN STYLES */
+  .td-id {
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); font-family: monospace;
+    white-space: nowrap;
+  }
+  .td-svc {
+    max-width: 170px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+    font-weight: 500; color: var(--white);
+  }
+  .td-link { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .td-link a {
+    color: var(--accent); text-decoration: none; font-size: 12px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
   .td-link a:hover { text-decoration: underline; }
-  .td-num   { font-weight: 600; color: var(--white); }
-  .td-price { font-weight: 700; color: #34d399; }
-  .td-date  { font-size: 12px; color: var(--muted); white-space: nowrap; }
-  .td-stat  { color: var(--muted); font-size: 13px; }
+  .td-qty { font-weight: 700; color: var(--white); }
+  .td-num { font-size: 12px; color: var(--muted); }
+  .td-price { font-weight: 700; color: var(--accent3); white-space: nowrap; }
+  .td-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  /* PROGRESS BAR in row */
+  .ord-progress { margin-top: 4px; }
+  .ord-progress-bar {
+    height: 2px; background: rgba(255,255,255,0.06);
+    border-radius: 2px; overflow: hidden; width: 80px;
+  }
+  .ord-progress-fill { height: 100%; border-radius: 2px; background: var(--grad); }
 
   /* BADGES */
   .badge {
@@ -118,83 +227,149 @@
     padding: 4px 10px; border-radius: 100px;
     font-size: 11px; font-weight: 700; white-space: nowrap;
   }
-  .badge-green  { background: rgba(52,211,153,0.12);  color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
-  .badge-blue   { background: rgba(129,140,248,0.12); color: #818cf8; border: 1px solid rgba(129,140,248,0.2); }
-  .badge-yellow { background: rgba(251,191,36,0.12);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
-  .badge-red    { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
-  .badge-gray   { background: rgba(122,143,173,0.12); color: var(--muted); border: 1px solid rgba(122,143,173,0.2); }
+  .badge i { font-size: 9px; }
+  .badge-green  { background:rgba(52,211,153,0.1);  color:#34d399; border:1px solid rgba(52,211,153,0.2); }
+  .badge-blue   { background:rgba(129,140,248,0.1); color:#818cf8; border:1px solid rgba(129,140,248,0.2); }
+  .badge-yellow { background:rgba(251,191,36,0.1);  color:#fbbf24; border:1px solid rgba(251,191,36,0.2); }
+  .badge-red    { background:rgba(248,113,113,0.1); color:#f87171; border:1px solid rgba(248,113,113,0.2); }
+  .badge-gray   { background:rgba(122,143,173,0.1); color:var(--muted); border:1px solid rgba(122,143,173,0.2); }
 
-  /* EMPTY */
-  .empty-state {
-    text-align: center; padding: 56px 20px; color: var(--muted);
+  .badge-blue i { animation: spin 1.4s linear infinite; }
+
+  /* EMPTY STATE */
+  .ord-empty {
+    text-align: center; padding: 64px 20px;
   }
-  .empty-state i { font-size: 42px; margin-bottom: 14px; display: block; opacity: 0.3; }
-  .empty-state p { font-size: 15px; margin-bottom: 6px; color: var(--text); font-weight: 500; }
-  .empty-state small { font-size: 13px; }
+  .ord-empty-icon {
+    width: 72px; height: 72px;
+    background: rgba(56,189,248,0.07);
+    border: 1px solid rgba(56,189,248,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: var(--muted);
+    margin: 0 auto 20px;
+  }
+  .ord-empty h3 { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+  .ord-empty p  { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+  .ord-empty-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px; border-radius: 10px;
+    background: var(--grad); color: #fff;
+    font-size: 13px; font-weight: 700;
+    text-decoration: none; transition: all .2s;
+  }
+  .ord-empty-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 
   /* PAGINATION */
-  .pagination {
+  .ord-pagination {
     display: flex; align-items: center; gap: 6px;
     justify-content: center; flex-wrap: wrap;
     margin-top: 24px; padding-top: 20px;
     border-top: 1px solid var(--border);
   }
-  .page-btn {
+  .pg-btn {
     display: inline-flex; align-items: center; justify-content: center;
-    width: 36px; height: 36px; border-radius: 10px;
+    min-width: 36px; height: 36px; border-radius: 10px; padding: 0 10px;
     font-size: 13px; font-weight: 600;
     text-decoration: none; color: var(--muted);
     background: var(--card2); border: 1px solid var(--border);
     transition: all 0.2s;
   }
-  .page-btn:hover { color: var(--white); border-color: rgba(56,189,248,0.3); }
-  .page-btn.active {
+  .pg-btn:hover { color: var(--white); border-color: var(--border2); }
+  .pg-btn.active {
     background: rgba(56,189,248,0.12);
     border-color: rgba(56,189,248,0.4);
     color: var(--accent);
+    box-shadow: 0 0 12px rgba(56,189,248,0.15);
+  }
+  .pg-info { font-size: 12px; color: var(--muted); margin: 0 8px; white-space: nowrap; }
+
+  @media (max-width: 900px) {
+    .ord-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .ord-stats { grid-template-columns: 1fr 1fr; }
+    .ord-search { display: none; }
+    .ord-header { flex-direction: column; align-items: flex-start; }
   }
 </style>
 
-<!-- PAGE HEADER -->
-<div class="page-header">
-  <h1 class="page-title">
-    <div class="page-title-icon"><i class="fas fa-list"></i></div>
-    Orderlarim
-  </h1>
+<!-- HEADER -->
+<div class="ord-header">
+  <div class="ord-header-left">
+    <div class="ord-header-icon"><i class="fas fa-list-check"></i></div>
+    <div>
+      <div class="ord-title">Orderlarim</div>
+      <div class="ord-subtitle">Barcha buyurtmalaringiz tarixi va holati</div>
+    </div>
+  </div>
+  <a href="/new-order" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--grad);border-radius:11px;color:#fff;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 0 20px rgba(56,189,248,0.2);transition:all .2s"
+     onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+    <i class="fas fa-plus"></i> Yangi Order
+  </a>
 </div>
 
-<!-- ORDERS CARD -->
-<div class="orders-card">
+<!-- STATS -->
+<div class="ord-stats">
+  <div class="ord-stat-card s-all">
+    <div class="ord-stat-num">{{ orders | length }}</div>
+    <div class="ord-stat-lbl">Jami orderlar</div>
+    <i class="fas fa-layer-group ord-stat-icon"></i>
+  </div>
+  <div class="ord-stat-card s-pending">
+    <div class="ord-stat-num">{{ orders | selectattr('status','equalto','Pending') | list | length }}</div>
+    <div class="ord-stat-lbl">Kutilmoqda</div>
+    <i class="fas fa-clock ord-stat-icon"></i>
+  </div>
+  <div class="ord-stat-card s-process">
+    <div class="ord-stat-num">{{ orders | selectattr('status','equalto','Processing') | list | length }}</div>
+    <div class="ord-stat-lbl">Jarayonda</div>
+    <i class="fas fa-spinner ord-stat-icon"></i>
+  </div>
+  <div class="ord-stat-card s-done">
+    <div class="ord-stat-num">{{ orders | selectattr('status','equalto','Completed') | list | length }}</div>
+    <div class="ord-stat-lbl">Bajarildi</div>
+    <i class="fas fa-check-circle ord-stat-icon"></i>
+  </div>
+</div>
 
-  <!-- FILTER BAR -->
-  <div class="filter-bar">
-    {% for st, label, dot in [
-      ('',           'Barchasi',   'dot-all'),
-      ('Pending',    'Kutilmoqda', 'dot-pending'),
-      ('Processing', 'Jarayonda',  'dot-process'),
-      ('Completed',  'Bajarildi',  'dot-complete'),
-      ('Failed',     'Xatolik',    'dot-failed')
+<!-- MAIN CARD -->
+<div class="ord-card">
+
+  <!-- TOOLBAR -->
+  <div class="ord-toolbar">
+    {% for st, label, dot_color in [
+      ('',           'Barchasi',   '#7a8fad'),
+      ('Pending',    'Kutilmoqda', '#fbbf24'),
+      ('Processing', 'Jarayonda',  '#818cf8'),
+      ('Completed',  'Bajarildi',  '#34d399'),
+      ('Failed',     'Xatolik',    '#f87171')
     ] %}
     <a href="/orders?status={{ st }}"
-       class="filter-btn {% if status == st %}active{% endif %}">
-      <span class="dot {{ dot }}"></span>
+       class="flt-btn {% if status == st %}active{% endif %}">
+      <span class="flt-dot" style="background:{{ dot_color }}"></span>
       {{ label }}
     </a>
     {% endfor %}
 
-    <form method="POST" action="/api/sync-orders" style="margin-left:auto">
-      <button type="submit" class="sync-btn">
-        <i class="fas fa-sync"></i> Yangilash
+    <div class="ord-search">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Order qidirish..." id="ord-search-inp" oninput="searchOrders(this.value)">
+    </div>
+
+    <form method="POST" action="/api/sync-orders" id="sync-form">
+      <button type="submit" class="sync-btn" id="sync-btn" onclick="startSync(event)">
+        <i class="fas fa-rotate-right"></i> Yangilash
       </button>
     </form>
   </div>
 
   <!-- TABLE -->
-  <div class="table-wrap">
-    <table class="orders-table">
+  <div class="ord-table-wrap">
+    <table class="ord-table" id="ord-table">
       <thead>
         <tr>
-          <th>#</th>
+          <th>#ID</th>
           <th>Xizmat</th>
           <th>Link</th>
           <th>Miqdor</th>
@@ -205,40 +380,68 @@
           <th>Sana</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="ord-tbody">
         {% for o in orders %}
-        <tr>
+        <tr style="animation-delay:{{ loop.index0 * 0.04 }}s">
           <td class="td-id">#{{ o.id }}</td>
+
           <td class="td-svc" title="{{ o.svc_name }}">{{ o.svc_name }}</td>
+
           <td class="td-link">
-            <a href="{{ o.link }}" target="_blank" rel="noopener">{{ o.link }}</a>
+            <a href="{{ o.link }}" target="_blank" rel="noopener" title="{{ o.link }}">
+              <i class="fas fa-arrow-up-right-from-square" style="font-size:9px;opacity:.6"></i>
+              {{ o.link | truncate(28, True, '…') }}
+            </a>
           </td>
-          <td class="td-num">{{ "{:,}".format(o.quantity) }}</td>
-          <td class="td-stat">{{ o.start_count }}</td>
-          <td class="td-stat">{{ o.remains }}</td>
+
+          <td class="td-qty">
+            {{ "{:,}".format(o.quantity) }}
+            {% if o.start_count and o.quantity %}
+            <div class="ord-progress">
+              <div class="ord-progress-bar">
+                <div class="ord-progress-fill"
+                     style="width:{{ [(o.quantity - (o.remains or 0)) / o.quantity * 100, 100] | min | int }}%"></div>
+              </div>
+            </div>
+            {% endif %}
+          </td>
+
+          <td class="td-num">{{ o.start_count or '—' }}</td>
+          <td class="td-num">{{ o.remains or '—' }}</td>
+
           <td class="td-price">{{ "{:,.0f}".format(o.price) }} so'm</td>
+
           <td>
             {% if o.status == 'Completed' %}
               <span class="badge badge-green"><i class="fas fa-check"></i> Bajarildi</span>
             {% elif o.status == 'Processing' %}
-              <span class="badge badge-blue"><i class="fas fa-spinner fa-spin"></i> Jarayonda</span>
+              <span class="badge badge-blue"><i class="fas fa-spinner"></i> Jarayonda</span>
             {% elif o.status == 'Pending' %}
               <span class="badge badge-yellow"><i class="fas fa-clock"></i> Kutilmoqda</span>
             {% elif o.status == 'Failed' %}
-              <span class="badge badge-red"><i class="fas fa-times"></i> Xatolik</span>
+              <span class="badge badge-red"><i class="fas fa-xmark"></i> Xatolik</span>
+            {% elif o.status == 'Partial' %}
+              <span class="badge badge-yellow"><i class="fas fa-circle-half-stroke"></i> Qisman</span>
+            {% elif o.status == 'Cancelled' %}
+              <span class="badge badge-gray"><i class="fas fa-ban"></i> Bekor</span>
             {% else %}
               <span class="badge badge-gray">{{ o.status }}</span>
             {% endif %}
           </td>
-          <td class="td-date">{{ o.created_at[:16] }}</td>
+
+          <td class="td-date">
+            <div>{{ o.created_at[:10] }}</div>
+            <div style="font-size:10px;opacity:.5;margin-top:1px">{{ o.created_at[11:16] }}</div>
+          </td>
         </tr>
         {% else %}
-        <tr>
+        <tr id="empty-row">
           <td colspan="9">
-            <div class="empty-state">
-              <i class="fas fa-inbox"></i>
-              <p>Orderlar topilmadi</p>
-              <small>Hali birorta order berilmagan yoki filtr bo'yicha natija yo'q</small>
+            <div class="ord-empty">
+              <div class="ord-empty-icon"><i class="fas fa-inbox"></i></div>
+              <h3>Orderlar topilmadi</h3>
+              <p>Hali birorta order berilmagan yoki filtr bo'yicha natija yo'q</p>
+              <a href="/new-order" class="ord-empty-btn"><i class="fas fa-plus"></i> Birinchi orderni bering</a>
             </div>
           </td>
         </tr>
@@ -249,26 +452,64 @@
 
   <!-- PAGINATION -->
   {% if total > limit %}
-  <div class="pagination">
+  <div class="ord-pagination">
     {% if page > 1 %}
-    <a href="/orders?page={{ page-1 }}&status={{ status }}" class="page-btn">
-      <i class="fas fa-chevron-left"></i>
+    <a href="/orders?page={{ page-1 }}&status={{ status }}" class="pg-btn">
+      <i class="fas fa-chevron-left" style="font-size:11px"></i>
     </a>
     {% endif %}
 
-    {% for p in range(1, (total // limit) + 2) %}
-    <a href="/orders?page={{ p }}&status={{ status }}"
-       class="page-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+    {% set total_pages = (total // limit) + (1 if total % limit else 0) %}
+    {% for p in range(1, total_pages + 1) %}
+      {% if p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+        <a href="/orders?page={{ p }}&status={{ status }}"
+           class="pg-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+      {% elif p == page - 3 or p == page + 3 %}
+        <span class="pg-info">…</span>
+      {% endif %}
     {% endfor %}
 
-    {% if page < (total // limit) + 1 %}
-    <a href="/orders?page={{ page+1 }}&status={{ status }}" class="page-btn">
-      <i class="fas fa-chevron-right"></i>
+    {% if page < total_pages %}
+    <a href="/orders?page={{ page+1 }}&status={{ status }}" class="pg-btn">
+      <i class="fas fa-chevron-right" style="font-size:11px"></i>
     </a>
     {% endif %}
+
+    <span class="pg-info">{{ page }} / {{ total_pages }}</span>
   </div>
   {% endif %}
 
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Sync button animation
+  function startSync(e) {
+    const btn = document.getElementById('sync-btn');
+    btn.classList.add('spinning');
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.classList.remove('spinning');
+      btn.disabled = false;
+    }, 2000);
+  }
+
+  // Client-side search filter
+  function searchOrders(q) {
+    const rows = document.querySelectorAll('#ord-tbody tr:not(#empty-row)');
+    const query = q.toLowerCase().trim();
+    let found = 0;
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      const show = !query || text.includes(query);
+      row.style.display = show ? '' : 'none';
+      if (show) found++;
+    });
+    // Show empty if nothing
+    const emptyRow = document.getElementById('empty-row');
+    if (emptyRow) emptyRow.style.display = found === 0 && rows.length > 0 ? '' : 'none';
+  }
+</script>
 {% endblock %}

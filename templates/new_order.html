@@ -1,428 +1,545 @@
 {% extends "base.html" %}
-{% block title %}Yangi Order — UzSMM.uz{% endblock %}
+{% block title %}Yangi Order — SMMZone.uz{% endblock %}
 
 {% block content %}
 <style>
-  .no-order-wrap *,
-  .no-order-wrap *::before,
-  .no-order-wrap *::after { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .no-order-wrap {
-    --g1: #0ea472;
-    --g1h: #0b8a5f;
-    --g1l: #e6f7f1;
-    --g2: #d97706;
-    --g2l: #fef3c7;
-    --red: #ef4444;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-    --bg: #f3f4f6;
-    --card: #ffffff;
-    --text: #111827;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    color: var(--text);
+  :root {
+    --bg:      #050a14;
+    --card:    #0d1628;
+    --card2:   #111d35;
+    --card3:   #0a1220;
+    --border:  rgba(99,179,237,0.12);
+    --border2: rgba(99,179,237,0.2);
+    --accent:  #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --accent4: #fb923c;
+    --text:    #e2eaf8;
+    --muted:   #7a8fad;
+    --white:   #ffffff;
+    --grad:    linear-gradient(135deg, #38bdf8, #818cf8);
+    --grad-g:  linear-gradient(135deg, #34d399, #059669);
+    --err:     #f87171;
+    --ok:      #34d399;
+    --warn:    #fb923c;
   }
 
+  .no-wrap {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    padding: 8px 0 40px;
+  }
+
+  /* PAGE HEADER */
   .no-page-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
   }
-
-  .no-page-header h1 {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-    margin: 0;
-  }
-
-  .no-icon-wrap {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--g1l);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--g1);
-    font-size: 16px;
+  .no-page-header-left { display: flex; align-items: center; gap: 12px; }
+  .no-header-icon {
+    width: 42px; height: 42px;
+    background: var(--grad);
+    border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; color: #fff;
+    box-shadow: 0 0 20px rgba(56,189,248,0.3);
     flex-shrink: 0;
   }
+  .no-header-title { font-size: 22px; font-weight: 700; color: var(--white); letter-spacing: -0.5px; }
+  .no-header-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
 
+  /* LAYOUT */
   .no-layout {
     display: grid;
-    grid-template-columns: 1fr 290px;
+    grid-template-columns: 1fr 300px;
     gap: 20px;
     align-items: start;
   }
 
+  /* CARD */
   .no-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 22px;
+    border-radius: 20px;
+    padding: 26px;
+    position: relative;
+    overflow: hidden;
   }
-
-  .no-card + .no-card { margin-top: 14px; }
+  .no-card::before {
+    content: ''; position: absolute; top:0; left:0; right:0;
+    height: 1px; background: var(--grad); opacity: 0.5;
+  }
+  .no-card + .no-card { margin-top: 16px; }
 
   .no-card-title {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 0 0 14px 0;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 18px 0;
+    display: flex; align-items: center; gap: 8px;
   }
+  .no-card-title i { color: var(--accent); font-size: 11px; }
 
-  .no-form-group { margin-bottom: 16px; }
+  /* SECTION DIVIDER */
+  .no-section-title {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin: 22px 0 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .no-section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+  .no-section-title i { color: var(--accent); }
 
+  /* FORM GROUP */
+  .no-form-group { margin-bottom: 18px; }
   .no-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 6px;
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--muted); margin-bottom: 8px;
+    letter-spacing: 0.3px;
   }
+  .no-label .req { color: var(--err); margin-left: 2px; }
+  .no-label .opt { color: #3a4a62; font-weight: 400; font-size: 11px; margin-left: 4px; }
 
-  .no-label .req { color: var(--red); margin-left: 2px; }
+  /* INPUTS */
+  .no-input-wrap { position: relative; }
+  .no-input-icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); font-size: 13px; pointer-events: none;
+    transition: color 0.2s;
+  }
+  .no-input-wrap:focus-within .no-input-icon { color: var(--accent); }
 
   .no-input {
     width: 100%;
-    padding: 9px 12px;
+    padding: 12px 14px 12px 38px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
     font-size: 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 9px;
-    background: #fff;
-    color: var(--text);
     outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    font-family: inherit;
-    appearance: none;
-    -webkit-appearance: none;
+    transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+    appearance: none; -webkit-appearance: none;
   }
+  .no-input::placeholder { color: #3a4a62; }
+  .no-input:focus {
+    border-color: rgba(56,189,248,0.5);
+    box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
+    background: #0f1c33;
+  }
+  .no-input.valid   { border-color: rgba(52,211,153,0.4); }
+  .no-input.invalid { border-color: rgba(248,113,113,0.4); }
 
   select.no-input {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%237a8fad' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 32px;
+    background-position: right 12px center;
+    padding-right: 34px;
     cursor: pointer;
   }
 
-  .no-input:focus {
-    border-color: var(--g1);
-    box-shadow: 0 0 0 3px rgba(14,164,114,0.13);
-  }
+  select.no-input option { background: #0d1628; color: var(--white); }
 
+  .no-hint { font-size: 12px; color: var(--muted); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+  .no-hint i { color: var(--accent); font-size: 10px; }
+
+  /* SERVICE INFO PANEL */
   .no-svc-info {
     display: none;
-    margin-top: 10px;
-    padding: 13px;
-    background: var(--g1l);
-    border: 1px solid rgba(14,164,114,0.25);
-    border-radius: 9px;
+    margin-top: 12px;
+    padding: 16px;
+    background: rgba(52,211,153,0.05);
+    border: 1px solid rgba(52,211,153,0.2);
+    border-radius: 12px;
+    animation: fadeIn .3s ease;
   }
-
   .no-svc-info.show { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
 
   .no-svc-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+    margin-bottom: 12px;
   }
-
-  .no-svc-stat .lbl { font-size: 11px; color: #0b8a5f; margin-bottom: 2px; }
-  .no-svc-stat .val { font-size: 13px; font-weight: 700; color: #065f46; }
+  .no-svc-stat { }
+  .no-svc-stat .s-lbl { font-size: 10px; color: var(--ok); opacity: 0.7; margin-bottom: 3px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .no-svc-stat .s-val { font-size: 14px; font-weight: 700; color: var(--ok); }
 
   .no-svc-desc {
-    margin-top: 9px;
-    padding-top: 9px;
-    border-top: 1px solid rgba(14,164,114,0.2);
-    font-size: 12px;
-    color: #0b8a5f;
-    line-height: 1.5;
+    padding-top: 10px;
+    border-top: 1px solid rgba(52,211,153,0.15);
+    font-size: 12px; color: rgba(52,211,153,0.7); line-height: 1.6;
   }
 
-  .no-hint {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 5px;
-  }
-
+  /* PRICE BOX */
   .no-price-box {
     display: none;
-    border: 1.5px solid var(--border);
-    border-radius: 11px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
     overflow: hidden;
-    margin-top: 4px;
+    margin-top: 6px;
+    animation: fadeIn .3s ease;
   }
-
   .no-price-head {
-    padding: 9px 14px;
-    background: var(--bg);
+    padding: 10px 16px;
     border-bottom: 1px solid var(--border);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--muted);
+    display: flex; align-items: center; gap: 7px;
   }
-
-  .no-price-body { padding: 13px 14px; }
-
+  .no-price-head i { color: var(--accent); }
+  .no-price-body { padding: 14px 16px; }
   .no-price-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    padding: 3px 0;
+    display: flex; justify-content: space-between;
+    font-size: 13px; padding: 4px 0;
   }
-
-  .no-price-row .lbl { color: var(--muted); }
-  .no-price-row .fee { color: var(--g2); font-weight: 600; }
-
-  .no-price-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 10px 0;
-  }
-
+  .no-price-row .pl { color: var(--muted); }
+  .no-price-row .pv { color: var(--text); font-weight: 500; }
+  .no-price-row .pfee { color: var(--warn); font-weight: 600; }
+  .no-price-divider { height: 1px; background: var(--border); margin: 10px 0; }
   .no-price-total {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0 2px;
+  }
+  .no-price-total .tl { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .no-price-total .tv {
+    font-size: 24px; font-weight: 800;
+    background: var(--grad-g); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
   }
 
-  .no-price-total .lbl { font-size: 15px; font-weight: 700; color: var(--text); }
-  .no-price-total .total { font-size: 22px; font-weight: 800; color: var(--g1); }
-
-  .no-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 11px 20px;
-    border-radius: 9px;
-    font-size: 14px;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    border: none;
-    text-decoration: none;
-    transition: all 0.15s;
-  }
-
-  .no-btn-primary {
-    background: var(--g1);
+  /* SUBMIT BUTTON */
+  .no-btn-submit {
+    width: 100%; padding: 14px;
+    background: var(--grad);
+    border: none; border-radius: 12px;
     color: #fff;
-    width: 100%;
-    margin-top: 18px;
-    font-size: 15px;
-    padding: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 0 24px rgba(56,189,248,0.2);
+    transition: all 0.2s;
+    margin-top: 20px;
+    letter-spacing: -0.2px;
   }
+  .no-btn-submit:hover:not(:disabled) {
+    opacity: 0.9; transform: translateY(-1px);
+    box-shadow: 0 6px 32px rgba(56,189,248,0.35);
+  }
+  .no-btn-submit:active:not(:disabled) { transform: translateY(0); }
+  .no-btn-submit:disabled {
+    background: var(--card2); color: #3a4a62;
+    border: 1px solid var(--border);
+    box-shadow: none; cursor: not-allowed; transform: none;
+  }
+  .no-btn-submit:disabled i { opacity: 0.3; }
 
-  .no-btn-primary:hover:not(:disabled) {
-    background: var(--g1h);
-    box-shadow: 0 4px 12px rgba(14,164,114,0.28);
+  /* SIDEBAR CARDS */
+  .no-balance-wrap {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+  }
+  .no-balance-amount {
+    font-size: 32px; font-weight: 800; letter-spacing: -1.5px;
+    background: var(--grad-g); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .no-balance-cur { font-size: 13px; color: var(--muted); margin-left: 4px; font-weight: 400; -webkit-text-fill-color: var(--muted); }
+  .no-balance-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .no-btn-topup {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 16px;
+    background: rgba(52,211,153,0.1);
+    border: 1px solid rgba(52,211,153,0.25);
+    border-radius: 9px;
+    color: var(--ok); font-size: 13px; font-weight: 600;
+    text-decoration: none; cursor: pointer;
+    transition: all 0.2s; margin-top: 14px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .no-btn-topup:hover {
+    background: rgba(52,211,153,0.18);
     transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(52,211,153,0.2);
   }
 
-  .no-btn-primary:active:not(:disabled) { transform: translateY(0); }
-
-  .no-btn-primary:disabled {
-    background: #d1d5db;
-    color: #9ca3af;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
+  /* BALANCE WARNING */
+  .no-balance-warn {
+    display: none;
+    margin-top: 12px; padding: 10px 14px;
+    background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.2);
+    border-radius: 9px; font-size: 12px; color: var(--err);
+    display: flex; align-items: center; gap: 8px;
   }
+  .no-balance-warn.hidden { display: none !important; }
 
-  .no-btn-green {
-    background: var(--g1l);
-    color: var(--g1h);
-    border: 1px solid rgba(14,164,114,0.3);
-    font-size: 13px;
-    padding: 8px 14px;
-    margin-top: 12px;
-  }
-
-  .no-btn-green:hover { background: #d1fae5; }
-
-  .no-balance-num {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--g1);
-    line-height: 1.1;
-  }
-
-  .no-balance-cur {
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--muted);
-    margin-left: 3px;
-  }
-
-  .no-steps { list-style: none; counter-reset: s; padding: 0; margin: 0; }
-
+  /* STEPS */
+  .no-steps { list-style: none; counter-reset: s; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
   .no-steps li {
     counter-increment: s;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 13px;
-    color: var(--muted);
-    padding: 5px 0;
-    line-height: 1.5;
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 13px; color: var(--muted); line-height: 1.5;
   }
-
   .no-steps li::before {
     content: counter(s);
-    min-width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--g1l);
-    color: var(--g1h);
-    font-size: 11px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: 1px;
+    min-width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(56,189,248,0.1);
+    border: 1px solid rgba(56,189,248,0.2);
+    color: var(--accent); font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
   }
 
+  /* WARN CARD */
   .no-warn-card {
-    background: var(--g2l);
-    border-color: rgba(217,119,6,0.25) !important;
+    background: rgba(251,146,60,0.05) !important;
+    border-color: rgba(251,146,60,0.15) !important;
   }
+  .no-warn-card .no-card-title { color: var(--warn) !important; }
+  .no-warn-card .no-card-title i { color: var(--warn) !important; }
+  .no-warn-card p { font-size: 13px; color: rgba(251,146,60,0.8); line-height: 1.7; margin: 0; }
+  .no-warn-card strong { color: var(--warn); }
 
-  .no-warn-card .no-card-title { color: var(--g2); }
-  .no-warn-card p { font-size: 13px; color: #78350f; line-height: 1.7; margin: 0; }
+  /* ACTIVE ORDERS BADGE */
+  .no-active-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px;
+    background: rgba(56,189,248,0.1);
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 100px;
+    font-size: 11px; font-weight: 600; color: var(--accent);
+  }
+  .no-active-dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
 
-  @media (max-width: 768px) {
+  /* PROGRESS INDICATOR */
+  .no-progress {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 28px;
+  }
+  .no-step-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--muted); font-weight: 500;
+  }
+  .no-step-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--card2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    transition: all .3s;
+  }
+  .no-step-item.active .no-step-num { background: var(--grad); border-color: transparent; color: #fff; box-shadow: 0 0 12px rgba(56,189,248,0.4); }
+  .no-step-item.active { color: var(--accent); }
+  .no-step-item.done .no-step-num { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.3); color: var(--ok); }
+  .no-step-line { flex: 1; height: 1px; background: var(--border); margin: 0 8px; min-width: 20px; }
+
+  @media (max-width: 900px) {
     .no-layout { grid-template-columns: 1fr; }
+    .no-progress { display: none; }
+  }
+  @media (max-width: 500px) {
+    .no-svc-grid { grid-template-columns: 1fr 1fr; }
   }
 </style>
 
-<div class="no-order-wrap">
+<div class="no-wrap">
+
+  <!-- HEADER -->
   <div class="no-page-header">
-    <div class="no-icon-wrap"><i class="fas fa-plus-circle"></i></div>
-    <h1>Yangi Order</h1>
+    <div class="no-page-header-left">
+      <div class="no-header-icon"><i class="fas fa-bolt"></i></div>
+      <div>
+        <div class="no-header-title">Yangi Order</div>
+        <div class="no-header-sub">Xizmat tanlang va linkni kiriting</div>
+      </div>
+    </div>
+    <div class="no-active-badge">
+      <span class="no-active-dot"></span>
+      Panel faol
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="no-progress">
+    <div class="no-step-item active" id="step1">
+      <div class="no-step-num">1</div> Xizmat
+    </div>
+    <div class="no-step-line"></div>
+    <div class="no-step-item" id="step2">
+      <div class="no-step-num">2</div> Link
+    </div>
+    <div class="no-step-line"></div>
+    <div class="no-step-item" id="step3">
+      <div class="no-step-num">3</div> Miqdor
+    </div>
+    <div class="no-step-line"></div>
+    <div class="no-step-item" id="step4">
+      <div class="no-step-num">4</div> Tasdiqlash
+    </div>
   </div>
 
   <div class="no-layout">
+
+    <!-- MAIN FORM CARD -->
     <div class="no-card">
-      <form method="POST" action="/new-order" id="order-form">
+      <div class="no-card-title"><i class="fas fa-shopping-cart"></i> Order tafsilotlari</div>
+
+      <form method="POST" action="/new-order" id="order-form" autocomplete="off">
+
+        <!-- CATEGORY + SERVICE -->
+        <div class="no-section-title"><i class="fas fa-layer-group"></i> Xizmat tanlash</div>
 
         <div class="no-form-group">
-          <label class="no-label">Kategoriya</label>
-          <select class="no-input" id="cat-select" onchange="filterServices()">
-            <option value="">— Barchasi —</option>
-            {% for c in categories %}
-            <option value="{{ c.id }}">{{ c.name }}</option>
-            {% endfor %}
-          </select>
+          <label class="no-label">Kategoriya <span class="opt">(filterlash uchun)</span></label>
+          <div class="no-input-wrap">
+            <i class="fas fa-th-large no-input-icon"></i>
+            <select class="no-input" id="cat-select" onchange="filterServices()">
+              <option value="">— Barcha kategoriyalar —</option>
+              {% for c in categories %}
+              <option value="{{ c.id }}">{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
 
         <div class="no-form-group">
           <label class="no-label">Xizmat <span class="req">*</span></label>
-          <select class="no-input" name="service_id" id="service-select" required onchange="onServiceChange(this)">
-            <option value="">— Xizmatni tanlang —</option>
-            {% for s in services %}
-            <option value="{{ s.id }}"
-              data-cat="{{ s.category_id }}"
-              data-min="{{ s.min_order }}"
-              data-max="{{ s.max_order }}"
-              data-price="{{ s.price_per_1000 }}"
-              data-desc="{{ s.description or '' }}"
-              data-type="{{ s.type }}">
-              {{ s.cat_name }} — {{ s.name }}
-            </option>
-            {% endfor %}
-          </select>
+          <div class="no-input-wrap">
+            <i class="fas fa-magic no-input-icon"></i>
+            <select class="no-input" name="service_id" id="service-select" required onchange="onServiceChange(this)">
+              <option value="">— Xizmatni tanlang —</option>
+              {% for s in services %}
+              <option value="{{ s.id }}"
+                data-cat="{{ s.category_id }}"
+                data-min="{{ s.min_order }}"
+                data-max="{{ s.max_order }}"
+                data-price="{{ s.price_per_1000 }}"
+                data-desc="{{ s.description or '' }}"
+                data-type="{{ s.type }}">
+                {{ s.cat_name }} — {{ s.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
 
+          <!-- Service info -->
           <div class="no-svc-info" id="svc-info">
             <div class="no-svc-grid">
               <div class="no-svc-stat">
-                <div class="lbl">Min miqdor</div>
-                <div class="val" id="svc-min">—</div>
+                <div class="s-lbl">Min</div>
+                <div class="s-val" id="svc-min">—</div>
               </div>
               <div class="no-svc-stat">
-                <div class="lbl">Max miqdor</div>
-                <div class="val" id="svc-max">—</div>
+                <div class="s-lbl">Max</div>
+                <div class="s-val" id="svc-max">—</div>
               </div>
               <div class="no-svc-stat">
-                <div class="lbl">Tur</div>
-                <div class="val" id="svc-type">—</div>
+                <div class="s-lbl">Tur</div>
+                <div class="s-val" id="svc-type">—</div>
               </div>
             </div>
             <div class="no-svc-desc" id="svc-desc"></div>
           </div>
         </div>
 
+        <!-- LINK + QUANTITY -->
+        <div class="no-section-title"><i class="fas fa-link"></i> Link va miqdor</div>
+
         <div class="no-form-group">
           <label class="no-label">Link <span class="req">*</span></label>
-          <input type="url" name="link" class="no-input" placeholder="https://instagram.com/..." required>
+          <div class="no-input-wrap">
+            <i class="fas fa-globe no-input-icon"></i>
+            <input type="url" name="link" id="link-input" class="no-input"
+                   placeholder="https://instagram.com/p/..." required
+                   oninput="validateLink(this)">
+          </div>
+          <div class="no-hint"><i class="fas fa-info-circle"></i> To'liq URL kiriting (https:// bilan)</div>
         </div>
 
         <div class="no-form-group">
           <label class="no-label">Miqdor <span class="req">*</span></label>
-          <input type="number" name="quantity" id="qty-input" class="no-input"
-                 placeholder="100" min="1" required oninput="updatePrice()">
-          <div class="no-hint" id="qty-hint"></div>
+          <div class="no-input-wrap">
+            <i class="fas fa-sort-amount-up no-input-icon"></i>
+            <input type="number" name="quantity" id="qty-input" class="no-input"
+                   placeholder="100" min="1" required oninput="updatePrice()">
+          </div>
+          <div class="no-hint" id="qty-hint"><i class="fas fa-arrows-alt-h"></i> Avval xizmatni tanlang</div>
         </div>
 
+        <!-- PRICE -->
         <div class="no-price-box" id="price-box">
-          <div class="no-price-head">Hisob-kitob</div>
+          <div class="no-price-head"><i class="fas fa-receipt"></i> Hisob-kitob</div>
           <div class="no-price-body">
             <div class="no-price-row">
-              <span class="lbl">Asosiy narx</span>
-              <span id="price-base">—</span>
+              <span class="pl">Asosiy narx</span>
+              <span class="pv" id="price-base">—</span>
             </div>
             <div class="no-price-row">
-              <span class="lbl">Xizmat to'lovi (1%)</span>
-              <span class="fee" id="price-fee">—</span>
+              <span class="pl">Xizmat to'lovi (1%)</span>
+              <span class="pfee" id="price-fee">—</span>
             </div>
             <div class="no-price-divider"></div>
             <div class="no-price-total">
-              <span class="lbl">Jami:</span>
-              <span class="total" id="price-val">—</span>
+              <span class="tl">Jami to'lov:</span>
+              <span class="tv" id="price-val">—</span>
             </div>
           </div>
         </div>
 
-        <button type="submit" class="no-btn no-btn-primary" id="submit-btn" disabled>
+        <button type="submit" class="no-btn-submit" id="submit-btn" disabled>
           <i class="fas fa-paper-plane"></i> Orderni Joylash
         </button>
+
       </form>
     </div>
 
+    <!-- SIDEBAR -->
     <div>
+
+      <!-- BALANCE CARD -->
       <div class="no-card">
-        <div class="no-card-title">Balansingiz</div>
-        <div>
-          <span class="no-balance-num">{{ "{:,.0f}".format(user.balance) }}</span>
-          <span class="no-balance-cur">so'm</span>
+        <div class="no-card-title"><i class="fas fa-wallet"></i> Balansingiz</div>
+        <div class="no-balance-wrap">
+          <div>
+            <div class="no-balance-amount">
+              {{ "{:,.0f}".format(user.balance) }}<span class="no-balance-cur">so'm</span>
+            </div>
+            <div class="no-balance-label">Mavjud mablag'</div>
+          </div>
         </div>
-        <a href="/add-funds" class="no-btn no-btn-green">
-          <i class="fas fa-plus"></i> To'ldirish
+        <div class="no-balance-warn hidden" id="balance-warn">
+          <i class="fas fa-exclamation-triangle"></i>
+          Balans yetarli emas. To'ldiring!
+        </div>
+        <a href="/add-funds" class="no-btn-topup">
+          <i class="fas fa-plus"></i> Balansni to'ldirish
         </a>
       </div>
 
+      <!-- GUIDE -->
       <div class="no-card">
-        <div class="no-card-title">Qo'llanma</div>
+        <div class="no-card-title"><i class="fas fa-compass"></i> Qo'llanma</div>
         <ol class="no-steps">
           <li>Xizmat kategoriyasini tanlang</li>
+          <li>Kerakli xizmatni belgilang</li>
           <li>Post yoki sahifa linkini kiriting</li>
           <li>Kerakli miqdorni belgilang</li>
           <li>Orderni joylang va kuting</li>
         </ol>
       </div>
 
+      <!-- WARNING -->
       <div class="no-card no-warn-card">
-        <div class="no-card-title">To'lov haqida</div>
-        <p>Har bir buyurtmaga <strong>1% xizmat to'lovi</strong> qo'shiladi. Narx miqdor kiritilganda avtomatik hisoblanadi.</p>
+        <div class="no-card-title"><i class="fas fa-triangle-exclamation"></i> Muhim</div>
+        <p>Har bir buyurtmaga <strong>1% xizmat to'lovi</strong> qo'shiladi. Narx miqdor kiritilganda avtomatik hisoblanadi. Noto'g'ri link kiritilsa buyurtma bajarilmaydi.</p>
       </div>
+
     </div>
   </div>
 </div>
@@ -430,68 +547,106 @@
 
 {% block scripts %}
 <script>
-const MARGIN = 1;
-const svcs = document.querySelectorAll('#service-select option[data-min]');
+  const MARGIN = 1;
+  const USER_BALANCE = {{ user.balance | default(0) }};
+  const svcs = document.querySelectorAll('#service-select option[data-min]');
 
-function filterServices() {
-  const cat = document.getElementById('cat-select').value;
-  svcs.forEach(o => {
-    o.style.display = (!cat || o.dataset.cat == cat) ? '' : 'none';
-  });
-  document.getElementById('service-select').value = '';
-  onServiceChange(document.getElementById('service-select'));
-}
-
-function onServiceChange(sel) {
-  const opt  = sel.options[sel.selectedIndex];
-  const info = document.getElementById('svc-info');
-  const qty  = document.getElementById('qty-input');
-
-  if (!opt.dataset.min) {
-    info.classList.remove('show');
-    document.getElementById('price-box').style.display = 'none';
-    document.getElementById('submit-btn').disabled = true;
-    return;
+  // Progress stepper
+  function updateSteps(n) {
+    for (let i = 1; i <= 4; i++) {
+      const el = document.getElementById('step' + i);
+      el.classList.remove('active', 'done');
+      if (i < n) el.classList.add('done');
+      else if (i === n) el.classList.add('active');
+    }
   }
 
-  document.getElementById('svc-min').textContent  = parseInt(opt.dataset.min).toLocaleString('uz-UZ');
-  document.getElementById('svc-max').textContent  = parseInt(opt.dataset.max).toLocaleString('uz-UZ');
-  document.getElementById('svc-type').textContent = opt.dataset.type;
-  document.getElementById('svc-desc').textContent = opt.dataset.desc;
-  document.getElementById('qty-hint').textContent =
-    'Min: ' + parseInt(opt.dataset.min).toLocaleString('uz-UZ') +
-    ' / Max: ' + parseInt(opt.dataset.max).toLocaleString('uz-UZ');
-
-  qty.min = opt.dataset.min;
-  qty.max = opt.dataset.max;
-  info.classList.add('show');
-  updatePrice();
-}
-
-function updatePrice() {
-  const sel = document.getElementById('service-select');
-  const opt = sel.options[sel.selectedIndex];
-  const qty = parseInt(document.getElementById('qty-input').value || 0);
-
-  if (!opt.dataset.price || !qty) {
-    document.getElementById('price-box').style.display = 'none';
-    document.getElementById('submit-btn').disabled = true;
-    return;
+  function filterServices() {
+    const cat = document.getElementById('cat-select').value;
+    svcs.forEach(o => {
+      o.style.display = (!cat || o.dataset.cat == cat) ? '' : 'none';
+    });
+    document.getElementById('service-select').value = '';
+    onServiceChange(document.getElementById('service-select'));
   }
 
-  const basePrice = Math.round((parseFloat(opt.dataset.price) / 1000) * qty);
-  const fee       = Math.round(basePrice * MARGIN / 100);
-  const total     = basePrice + fee;
+  function onServiceChange(sel) {
+    const opt  = sel.options[sel.selectedIndex];
+    const info = document.getElementById('svc-info');
+    const hint = document.getElementById('qty-hint');
 
-  document.getElementById('price-base').textContent = basePrice.toLocaleString('uz-UZ') + ' so\'m';
-  document.getElementById('price-fee').textContent  = fee.toLocaleString('uz-UZ') + ' so\'m';
-  document.getElementById('price-val').textContent  = total.toLocaleString('uz-UZ') + ' so\'m';
+    if (!opt.dataset.min) {
+      info.classList.remove('show');
+      document.getElementById('price-box').style.display = 'none';
+      document.getElementById('submit-btn').disabled = true;
+      hint.innerHTML = '<i class="fas fa-arrows-alt-h"></i> Avval xizmatni tanlang';
+      updateSteps(1);
+      return;
+    }
 
-  document.getElementById('price-box').style.display = 'block';
+    const minF = parseInt(opt.dataset.min).toLocaleString('uz-UZ');
+    const maxF = parseInt(opt.dataset.max).toLocaleString('uz-UZ');
 
-  const min = parseInt(opt.dataset.min);
-  const max = parseInt(opt.dataset.max);
-  document.getElementById('submit-btn').disabled = (qty < min || qty > max);
-}
+    document.getElementById('svc-min').textContent  = minF;
+    document.getElementById('svc-max').textContent  = maxF;
+    document.getElementById('svc-type').textContent = opt.dataset.type;
+    document.getElementById('svc-desc').textContent = opt.dataset.desc;
+
+    hint.innerHTML = `<i class="fas fa-arrows-alt-h"></i> Min: <b style="color:var(--accent)">${minF}</b> — Max: <b style="color:var(--accent)">${maxF}</b>`;
+
+    document.getElementById('qty-input').min = opt.dataset.min;
+    document.getElementById('qty-input').max = opt.dataset.max;
+    info.classList.add('show');
+    updateSteps(2);
+    updatePrice();
+  }
+
+  function validateLink(inp) {
+    const ok = inp.value.startsWith('http');
+    inp.classList.toggle('valid', ok && inp.value.length > 10);
+    inp.classList.toggle('invalid', inp.value.length > 5 && !ok);
+    updateSteps(ok ? 3 : 2);
+    updatePrice();
+  }
+
+  function updatePrice() {
+    const sel   = document.getElementById('service-select');
+    const opt   = sel.options[sel.selectedIndex];
+    const qty   = parseInt(document.getElementById('qty-input').value || 0);
+    const link  = document.getElementById('link-input').value;
+    const btn   = document.getElementById('submit-btn');
+    const warn  = document.getElementById('balance-warn');
+
+    if (!opt.dataset.price || !qty) {
+      document.getElementById('price-box').style.display = 'none';
+      btn.disabled = true;
+      return;
+    }
+
+    const basePrice = Math.round((parseFloat(opt.dataset.price) / 1000) * qty);
+    const fee       = Math.round(basePrice * MARGIN / 100);
+    const total     = basePrice + fee;
+
+    document.getElementById('price-base').textContent = basePrice.toLocaleString('uz-UZ') + ' so\'m';
+    document.getElementById('price-fee').textContent  = fee.toLocaleString('uz-UZ') + ' so\'m';
+    document.getElementById('price-val').textContent  = total.toLocaleString('uz-UZ') + ' so\'m';
+    document.getElementById('price-box').style.display = 'block';
+
+    const min      = parseInt(opt.dataset.min);
+    const max      = parseInt(opt.dataset.max);
+    const qtyOk    = qty >= min && qty <= max;
+    const linkOk   = link.startsWith('http') && link.length > 10;
+    const balOk    = total <= USER_BALANCE;
+
+    warn.classList.toggle('hidden', balOk || !qtyOk);
+
+    btn.disabled = !(qtyOk && linkOk && balOk);
+    if (qtyOk && linkOk) updateSteps(balOk ? 4 : 3);
+
+    // Qty field validation
+    const qtyInp = document.getElementById('qty-input');
+    qtyInp.classList.toggle('valid',   qtyOk);
+    qtyInp.classList.toggle('invalid', !qtyOk && qty > 0);
+  }
 </script>
 {% endblock %}

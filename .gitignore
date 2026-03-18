@@ -1,0 +1,25 @@
+# Database
+smm_panel.db
+
+# Logs
+*.log
+smm.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+
+# Secrets (agar bo'lsa)
+.env
+config_local.py
+
+# Bo'sh fayl
+requirements

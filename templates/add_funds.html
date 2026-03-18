@@ -1,431 +1,539 @@
 {% extends "base.html" %}
-{% block title %}Balans To'ldirish — UzSMM.uz{% endblock %}
+{% block title %}Balans To'ldirish — SMMZone.uz{% endblock %}
 
 {% block content %}
 <style>
-  .af-wrap *,
-  .af-wrap *::before,
-  .af-wrap *::after { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; }
 
-  .af-wrap {
-    --g1: #0ea472;
-    --g1h: #0b8a5f;
-    --g1l: #e6f7f1;
-    --tg: #229ED9;
-    --tgl: #e8f5fd;
-    --tgh: #1a7fb0;
-    --red: #ef4444;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-    --bg: #f3f4f6;
-    --card: #ffffff;
-    --text: #111827;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    color: var(--text);
+  :root {
+    --bg:      #050a14;
+    --card:    #0d1628;
+    --card2:   #111d35;
+    --border:  rgba(99,179,237,0.12);
+    --border2: rgba(99,179,237,0.22);
+    --accent:  #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --text:    #e2eaf8;
+    --muted:   #7a8fad;
+    --white:   #ffffff;
+    --grad:    linear-gradient(135deg, #38bdf8, #818cf8);
+    --grad-g:  linear-gradient(135deg, #34d399, #059669);
+    --tg:      #229ED9;
   }
 
-  .af-page-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 24px;
-  }
+  @keyframes fadeUp  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  @keyframes selectPop { 0%{transform:scale(.96)} 60%{transform:scale(1.03)} 100%{transform:scale(1)} }
 
-  .af-page-header h1 {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-    margin: 0;
+  /* ── HEADER ── */
+  .af-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
+    animation: fadeUp .45s ease both;
   }
-
-  .af-icon-wrap {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--tgl);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--tg);
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-
-  .af-layout {
-    display: grid;
-    grid-template-columns: 1fr 290px;
-    gap: 20px;
-    align-items: start;
-  }
-
-  .af-card {
-    background: var(--card);
-    border: 1px solid var(--border);
+  .af-header-left { display: flex; align-items: center; gap: 14px; }
+  .af-header-icon {
+    width: 44px; height: 44px; background: var(--grad);
     border-radius: 14px;
-    padding: 22px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff;
+    box-shadow: 0 0 22px rgba(56,189,248,.3); flex-shrink: 0;
   }
+  .af-title    { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--white); letter-spacing:-.5px; }
+  .af-subtitle { font-size:13px; color:var(--muted); margin-top:2px; }
 
-  .af-card + .af-card { margin-top: 14px; }
+  /* ── LAYOUT ── */
+  .af-layout {
+    display: grid; grid-template-columns: 1fr 300px;
+    gap: 20px; align-items: start;
+    animation: fadeUp .45s .07s ease both;
+  }
+  .af-left  { display: flex; flex-direction: column; gap: 18px; }
+  .af-right { display: flex; flex-direction: column; gap: 18px; }
 
+  /* ── CARD ── */
+  .af-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 26px;
+    position: relative; overflow: hidden;
+  }
+  .af-card::before {
+    content:''; position:absolute; top:0; left:0; right:0;
+    height:1px; background:var(--grad); opacity:.4;
+  }
   .af-card-title {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 0 0 16px 0;
+    font-size:10px; font-weight:700;
+    letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 20px;
+    display:flex; align-items:center; gap:8px;
   }
+  .af-card-title i { color:var(--accent); font-size:11px; }
 
-  /* amount input */
-  .af-form-group { margin-bottom: 18px; }
-
-  .af-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 6px;
+  /* ── AMOUNT INPUT ── */
+  .af-amount-wrap { margin-bottom: 24px; }
+  .af-amount-label {
+    font-size:12px; font-weight:600; color:var(--muted);
+    letter-spacing:.3px; margin-bottom:8px; display:block;
   }
-
-  .af-input {
-    width: 100%;
-    padding: 10px 14px;
-    font-size: 15px;
-    font-weight: 600;
-    border: 1.5px solid var(--border);
-    border-radius: 9px;
-    background: #fff;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    font-family: inherit;
+  .af-amount-input-wrap { position: relative; }
+  .af-amount-input-wrap .cur {
+    position:absolute; left:16px; top:50%; transform:translateY(-50%);
+    font-size:18px; font-weight:700; color:var(--muted);
+    pointer-events:none;
   }
-
-  .af-input:focus {
-    border-color: var(--tg);
-    box-shadow: 0 0 0 3px rgba(34,158,217,0.13);
+  .af-amount-input {
+    width:100%; padding:14px 14px 14px 48px;
+    background:var(--card2); border:1px solid var(--border);
+    border-radius:12px; color:var(--white);
+    font-family:'Syne',sans-serif;
+    font-size:22px; font-weight:700; outline:none;
+    transition:all .25s; letter-spacing:-.5px;
   }
-
-  .af-input.error {
-    border-color: var(--red);
-    box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+  .af-amount-input::placeholder { color:#2a3a55; font-weight:400; font-size:18px; }
+  .af-amount-input:focus {
+    border-color:rgba(56,189,248,.5);
+    box-shadow:0 0 0 3px rgba(56,189,248,.08);
+    background:#0f1c33;
   }
+  .af-amount-input.err { border-color:rgba(248,113,113,.5); box-shadow:0 0 0 3px rgba(248,113,113,.08); }
+  .af-amount-hint { font-size:12px; color:var(--muted); margin-top:7px; display:flex; align-items:center; gap:6px; }
+  .af-amount-hint i { color:var(--accent); font-size:10px; }
 
-  .af-hint {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 5px;
+  /* Quick amounts */
+  .af-quick-btns { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .af-quick-btn {
+    padding:6px 14px; border-radius:100px;
+    background:var(--card2); border:1px solid var(--border);
+    font-size:12px; font-weight:600; color:var(--muted);
+    cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif;
   }
+  .af-quick-btn:hover { border-color:rgba(56,189,248,.3); color:var(--accent); }
+  .af-quick-btn.active { background:rgba(56,189,248,.1); border-color:rgba(56,189,248,.35); color:var(--accent); }
 
-  /* payment method cards */
-  .af-methods {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 6px;
+  /* ── PAYMENT METHODS ── */
+  .af-methods-label {
+    font-size:12px; font-weight:600; color:var(--muted);
+    letter-spacing:.3px; margin-bottom:12px; display:block;
   }
+  .af-methods { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:4px; }
 
   .af-pay-card {
-    border: 1.5px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.15s;
-    background: #fff;
-    user-select: none;
+    border:1.5px solid var(--border);
+    border-radius:14px; padding:16px 12px;
+    text-align:center; cursor:pointer;
+    transition:all .22s; background:var(--card2);
+    position:relative; overflow:hidden;
   }
-
-  .af-pay-card:hover {
-    border-color: var(--tg);
-    background: var(--tgl);
-  }
-
+  .af-pay-card:hover { border-color:var(--border2); background:#131f38; }
   .af-pay-card.selected {
-    border-color: var(--tg);
-    background: var(--tgl);
-    box-shadow: 0 0 0 3px rgba(34,158,217,0.12);
+    border-color:rgba(56,189,248,.5);
+    background:rgba(56,189,248,.07);
+    box-shadow:0 0 0 3px rgba(56,189,248,.08);
+    animation:selectPop .28s ease;
   }
-
+  .af-pay-card.selected .af-pay-check { opacity:1; }
+  .af-pay-check {
+    position:absolute; top:9px; right:9px;
+    width:18px; height:18px; border-radius:50%;
+    background:var(--accent); color:#000;
+    display:flex; align-items:center; justify-content:center;
+    font-size:9px; opacity:0; transition:opacity .2s;
+  }
   .af-pay-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 8px;
-    font-size: 20px;
+    width:48px; height:48px; border-radius:13px;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 10px; font-size:22px;
   }
+  .af-pay-name { font-size:13px; font-weight:700; color:var(--white); margin:0 0 3px; }
+  .af-pay-sub  { font-size:11px; color:var(--muted); }
 
-  .af-pay-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    margin: 0 0 2px 0;
+  /* ── TELEGRAM BUTTON ── */
+  .af-tg-btn {
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    width:100%; padding:15px;
+    border-radius:13px; border:none;
+    background:linear-gradient(135deg, #229ED9, #1a7fb0);
+    color:#fff; font-size:15px; font-weight:700;
+    font-family:'Syne',sans-serif;
+    cursor:pointer; text-decoration:none;
+    box-shadow:0 0 24px rgba(34,158,217,.3);
+    transition:all .22s; margin-top:22px;
+    letter-spacing:-.2px;
   }
-
-  .af-pay-sub {
-    font-size: 11px;
-    color: var(--muted);
+  .af-tg-btn:hover {
+    opacity:.92; transform:translateY(-2px);
+    box-shadow:0 6px 32px rgba(34,158,217,.45);
   }
+  .af-tg-btn:active { transform:translateY(0); }
+  .af-tg-btn .tg-icon { font-size:20px; }
 
-  /* telegram CTA button */
-  .af-btn-tg {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    background: var(--tg);
-    color: #fff;
-    font-size: 15px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.15s;
-    margin-top: 20px;
-  }
-
-  .af-btn-tg:hover {
-    background: var(--tgh);
-    box-shadow: 0 4px 14px rgba(34,158,217,0.35);
-    transform: translateY(-1px);
-  }
-
-  .af-btn-tg:active { transform: translateY(0); }
-
-  .af-btn-tg svg {
-    width: 22px;
-    height: 22px;
-    flex-shrink: 0;
-  }
-
-  /* telegram info box */
+  /* ── TG INFO BOX ── */
   .af-tg-info {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 14px;
-    background: var(--tgl);
-    border: 1px solid rgba(34,158,217,0.25);
-    border-radius: 10px;
-    margin-top: 14px;
+    display:flex; align-items:flex-start; gap:12px;
+    padding:14px 16px;
+    background:rgba(34,158,217,.07);
+    border:1px solid rgba(34,158,217,.18);
+    border-radius:13px; margin-top:14px;
   }
-
   .af-tg-info-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--tg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: 1px;
+    width:34px; height:34px; border-radius:50%;
+    background:var(--tg);
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; color:#fff; flex-shrink:0; margin-top:1px;
   }
-
-  .af-tg-info-icon svg {
-    width: 16px;
-    height: 16px;
+  .af-tg-info p { font-size:13px; color:rgba(56,189,248,.75); line-height:1.65; margin:0; }
+  .af-tg-info strong { color:var(--accent); }
+  .af-tg-username {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:2px 10px; border-radius:100px;
+    background:rgba(56,189,248,.12); border:1px solid rgba(56,189,248,.2);
+    color:var(--accent); font-size:12px; font-weight:700;
+    text-decoration:none; margin:0 2px;
+    transition:all .2s;
   }
+  .af-tg-username:hover { background:rgba(56,189,248,.2); }
 
-  .af-tg-info p {
-    font-size: 13px;
-    color: #1a5f7a;
-    line-height: 1.6;
-    margin: 0;
+  /* ── STEPS ── */
+  .af-steps { display:flex; flex-direction:column; gap:0; }
+  .af-step {
+    display:flex; align-items:flex-start; gap:14px;
+    padding:12px 0; position:relative;
   }
+  .af-step:not(:last-child)::after {
+    content:''; position:absolute; left:15px; top:40px; bottom:0;
+    width:1px; background:var(--border);
+  }
+  .af-step-num {
+    width:30px; height:30px; border-radius:50%; flex-shrink:0;
+    background:rgba(56,189,248,.1); border:1px solid rgba(56,189,248,.2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; color:var(--accent);
+    position:relative; z-index:1;
+  }
+  .af-step-title { font-size:13px; font-weight:600; color:var(--white); margin-bottom:3px; }
+  .af-step-desc  { font-size:12px; color:var(--muted); line-height:1.5; }
 
-  .af-tg-info strong { color: var(--tgh); }
-
-  /* history */
+  /* ── HISTORY ── */
+  .af-history-list { display:flex; flex-direction:column; gap:0; }
   .af-history-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:13px 0; border-bottom:1px solid rgba(99,179,237,.06);
   }
-
-  .af-history-item:last-child { border-bottom: none; }
-
-  .af-history-method { font-weight: 600; color: var(--text); }
-  .af-history-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-  .af-history-amount {
-    font-weight: 700;
-    color: var(--g1);
-    text-align: right;
+  .af-history-item:last-child { border-bottom:none; }
+  .af-history-icon {
+    width:34px; height:34px; border-radius:9px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; flex-shrink:0; margin-right:12px;
+    background:rgba(34,158,217,.1); color:var(--tg);
   }
-
+  .af-history-left { display:flex; align-items:center; }
+  .af-history-method { font-size:13px; font-weight:600; color:var(--white); }
+  .af-history-date   { font-size:11px; color:var(--muted); margin-top:2px; }
+  .af-history-right  { text-align:right; }
+  .af-history-amount { font-size:14px; font-weight:700; color:var(--accent3); }
   .af-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    margin-top: 3px;
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 9px; border-radius:100px;
+    font-size:10px; font-weight:700; margin-top:3px;
   }
+  .af-badge-ok  { background:rgba(52,211,153,.1);  color:#34d399; border:1px solid rgba(52,211,153,.2); }
+  .af-badge-wait { background:rgba(251,191,36,.1);  color:#fbbf24; border:1px solid rgba(251,191,36,.2); }
 
-  .af-badge-green { background: #d1fae5; color: #065f46; }
-  .af-badge-yellow { background: #fef3c7; color: #92400e; }
-
+  /* Empty */
   .af-empty {
-    text-align: center;
-    padding: 28px 0;
-    color: var(--muted);
+    text-align:center; padding:40px 20px;
   }
-
-  .af-empty-icon { font-size: 32px; margin-bottom: 8px; }
-  .af-empty p { font-size: 13px; margin: 0; }
-
-  @media (max-width: 768px) {
-    .af-layout { grid-template-columns: 1fr; }
+  .af-empty-icon {
+    width:60px; height:60px; border-radius:50%;
+    background:rgba(56,189,248,.06); border:1px solid rgba(56,189,248,.12);
+    display:flex; align-items:center; justify-content:center;
+    font-size:24px; color:var(--muted); margin:0 auto 16px;
   }
+  .af-empty h4 { font-size:14px; font-weight:600; color:var(--white); margin-bottom:5px; }
+  .af-empty p  { font-size:12px; color:var(--muted); }
+
+  /* ── BALANCE DISPLAY ── */
+  .af-balance-card {
+    background:linear-gradient(135deg, #0d1f3c, #0a1628);
+    border:1px solid rgba(56,189,248,.18);
+    border-radius:18px; padding:22px;
+    position:relative; overflow:hidden;
+  }
+  .af-balance-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--grad); }
+  .af-bal-glow {
+    position:absolute; top:-50px; right:-50px; width:180px; height:180px;
+    background:radial-gradient(circle, rgba(56,189,248,.1), transparent 70%);
+    pointer-events:none;
+  }
+  .af-bal-label { font-size:11px; color:var(--muted); letter-spacing:.5px; text-transform:uppercase; margin-bottom:8px; }
+  .af-bal-amount {
+    font-family:'Syne',sans-serif;
+    font-size:32px; font-weight:800; letter-spacing:-1.5px;
+    background:var(--grad-g); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    line-height:1; margin-bottom:4px;
+  }
+  .af-bal-cur { font-size:14px; color:var(--muted); -webkit-text-fill-color:var(--muted); }
+  .af-bal-sub { font-size:12px; color:var(--muted); margin-top:4px; }
+
+  @media (max-width:900px) { .af-layout { grid-template-columns:1fr; } }
+  @media (max-width:500px) { .af-methods { grid-template-columns:1fr 1fr; } }
 </style>
 
-<div class="af-wrap">
-  <div class="af-page-header">
-    <div class="af-icon-wrap"><i class="fas fa-wallet"></i></div>
-    <h1>Balans To'ldirish</h1>
+<!-- HEADER -->
+<div class="af-header">
+  <div class="af-header-left">
+    <div class="af-header-icon"><i class="fas fa-wallet"></i></div>
+    <div>
+      <div class="af-title">Balans To'ldirish</div>
+      <div class="af-subtitle">Qulay usulni tanlang va to'lovni amalga oshiring</div>
+    </div>
   </div>
+</div>
 
-  <div class="af-layout">
-    <!-- LEFT: FORM -->
+<div class="af-layout">
+
+  <!-- LEFT -->
+  <div class="af-left">
+
+    <!-- MAIN FORM CARD -->
     <div class="af-card">
-      <div class="af-card-title">To'lov Usulini Tanlang</div>
+      <div class="af-card-title"><i class="fas fa-credit-card"></i> To'lov tafsilotlari</div>
 
-      <div class="af-form-group">
-        <label class="af-label">Summa (so'm)</label>
-        <input type="number" id="af-amount" class="af-input"
-               placeholder="10 000" min="5000">
-        <div class="af-hint">Minimal: 5,000 so'm</div>
-      </div>
-
-      <div class="af-form-group">
-        <label class="af-label">To'lov usuli</label>
-        <div class="af-methods">
-
-          <div class="af-pay-card selected" onclick="afSelect(this,'Payme')">
-            <div class="af-pay-icon" style="background:#e6f7ff">
-              <i class="fas fa-mobile-alt" style="color:#00B2FF"></i>
-            </div>
-            <p class="af-pay-name">Payme</p>
-            <div class="af-pay-sub">Karta orqali</div>
-          </div>
-
-          <div class="af-pay-card" onclick="afSelect(this,'Click')">
-            <div class="af-pay-icon" style="background:#fff3eb">
-              <i class="fas fa-bolt" style="color:#FF6B1A"></i>
-            </div>
-            <p class="af-pay-name">Click</p>
-            <div class="af-pay-sub">Karta orqali</div>
-          </div>
-
-          <div class="af-pay-card" onclick="afSelect(this,'TonKeeper')">
-            <div class="af-pay-icon" style="background:#e8f5fd">
-              <span>💎</span>
-            </div>
-            <p class="af-pay-name">TonKeeper</p>
-            <div class="af-pay-sub">TON / USDT</div>
-          </div>
-
-          <div class="af-pay-card" onclick="afSelect(this,'USDT')">
-            <div class="af-pay-icon" style="background:#e6f7f1">
-              <i class="fab fa-bitcoin" style="color:#26A17B"></i>
-            </div>
-            <p class="af-pay-name">USDT TRC-20</p>
-            <div class="af-pay-sub">Kripto</div>
-          </div>
-
+      <!-- AMOUNT -->
+      <div class="af-amount-wrap">
+        <label class="af-amount-label">To'lov summasi</label>
+        <div class="af-amount-input-wrap">
+          <span class="cur">₩</span>
+          <input type="number" id="af-amount" class="af-amount-input"
+                 placeholder="50 000" min="5000" oninput="onAmountInput()">
+        </div>
+        <div class="af-amount-hint"><i class="fas fa-info-circle"></i> Minimal: 5,000 so'm</div>
+        <div class="af-quick-btns" id="af-quick">
+          <button class="af-quick-btn" onclick="setAmount(10000)">10,000</button>
+          <button class="af-quick-btn" onclick="setAmount(25000)">25,000</button>
+          <button class="af-quick-btn" onclick="setAmount(50000)">50,000</button>
+          <button class="af-quick-btn" onclick="setAmount(100000)">100,000</button>
+          <button class="af-quick-btn" onclick="setAmount(250000)">250,000</button>
         </div>
       </div>
 
-      <!-- Telegram CTA -->
-      <a id="af-tg-btn" href="https://t.me/hguefg" target="_blank" class="af-btn-tg" onclick="return afGo()">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M21.9 4.5L18.6 19.2C18.4 20 17.9 20.2 17.2 19.8L12.5 16.4L10.2 18.6C10 18.8 9.7 18.9 9.4 18.9L9.7 14.1L18.1 6.6C18.5 6.3 18 6.1 17.4 6.4L6.9 13L2.3 11.6C1.4 11.3 1.4 10.7 2.5 10.3L20.6 3.1C21.4 2.8 22.1 3.3 21.9 4.5Z" fill="white"/>
-        </svg>
-        Telegram orqali to'lash
+      <!-- PAYMENT METHODS -->
+      <label class="af-methods-label">To'lov usuli</label>
+      <div class="af-methods">
+
+        <div class="af-pay-card selected" onclick="afSelect(this,'Payme')" id="pay-payme">
+          <div class="af-pay-check"><i class="fas fa-check"></i></div>
+          <div class="af-pay-icon" style="background:rgba(0,178,255,.1)">
+            <i class="fas fa-mobile-screen-button" style="color:#00B2FF"></i>
+          </div>
+          <div class="af-pay-name">Payme</div>
+          <div class="af-pay-sub">Karta orqali</div>
+        </div>
+
+        <div class="af-pay-card" onclick="afSelect(this,'Click')" id="pay-click">
+          <div class="af-pay-check"><i class="fas fa-check"></i></div>
+          <div class="af-pay-icon" style="background:rgba(255,107,26,.1)">
+            <i class="fas fa-bolt" style="color:#FF6B1A"></i>
+          </div>
+          <div class="af-pay-name">Click</div>
+          <div class="af-pay-sub">Karta orqali</div>
+        </div>
+
+        <div class="af-pay-card" onclick="afSelect(this,'TonKeeper')" id="pay-ton">
+          <div class="af-pay-check"><i class="fas fa-check"></i></div>
+          <div class="af-pay-icon" style="background:rgba(56,189,248,.1)">
+            <i class="fas fa-gem" style="color:#38bdf8"></i>
+          </div>
+          <div class="af-pay-name">TonKeeper</div>
+          <div class="af-pay-sub">TON / USDT</div>
+        </div>
+
+        <div class="af-pay-card" onclick="afSelect(this,'USDT')" id="pay-usdt">
+          <div class="af-pay-check"><i class="fas fa-check"></i></div>
+          <div class="af-pay-icon" style="background:rgba(38,161,123,.1)">
+            <i class="fab fa-bitcoin" style="color:#26A17B"></i>
+          </div>
+          <div class="af-pay-name">USDT TRC-20</div>
+          <div class="af-pay-sub">Kripto to'lov</div>
+        </div>
+
+      </div>
+
+      <!-- TELEGRAM BUTTON -->
+      <a id="af-tg-btn" href="https://t.me/yakkavazir" target="_blank"
+         class="af-tg-btn" onclick="return afGo()">
+        <span class="tg-icon"><i class="fab fa-telegram"></i></span>
+        @yakkavazir orqali to'lash
+        <i class="fas fa-arrow-right" style="font-size:13px;margin-left:auto;opacity:.7"></i>
       </a>
 
+      <!-- INFO BOX -->
       <div class="af-tg-info">
-        <div class="af-tg-info-icon">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21.9 4.5L18.6 19.2C18.4 20 17.9 20.2 17.2 19.8L12.5 16.4L10.2 18.6C10 18.8 9.7 18.9 9.4 18.9L9.7 14.1L18.1 6.6C18.5 6.3 18 6.1 17.4 6.4L6.9 13L2.3 11.6C1.4 11.3 1.4 10.7 2.5 10.3L20.6 3.1C21.4 2.8 22.1 3.3 21.9 4.5Z" fill="white"/>
-          </svg>
-        </div>
+        <div class="af-tg-info-icon"><i class="fab fa-telegram"></i></div>
         <p>
-          Tugmani bosing — <strong>@hguefg</strong> botiga o'tasiz.
-          U yerda to'lov yo'riqnomasi va barcha kerakli ma'lumotlar beriladi.
+          Tugmani bosing —
+          <a href="https://t.me/yakkavazir" target="_blank" class="af-tg-username">
+            <i class="fab fa-telegram" style="font-size:11px"></i> @yakkavazir
+          </a>
+          ga o'tasiz. Bot to'lov usuli va summa bo'yicha yo'riqnoma beradi.
+          <br><br>
+          <strong>Diqqat:</strong> To'lovdan keyin skreenshot yuboring, balans 5-10 daqiqada qo'shiladi.
         </p>
       </div>
     </div>
 
-    <!-- RIGHT: HISTORY -->
-    <div>
-      <div class="af-card">
-        <div class="af-card-title">Balans Tarixi</div>
-        {% if history %}
-          {% for h in history %}
-          <div class="af-history-item">
+    <!-- HOW TO PAY -->
+    <div class="af-card">
+      <div class="af-card-title"><i class="fas fa-compass"></i> Qanday to'lash kerak?</div>
+      <div class="af-steps">
+        <div class="af-step">
+          <div class="af-step-num">1</div>
+          <div>
+            <div class="af-step-title">Summa kiriting</div>
+            <div class="af-step-desc">Yuqoridagi maydonga to'ldirmoqchi bo'lgan summani kiriting (min 5,000 so'm)</div>
+          </div>
+        </div>
+        <div class="af-step">
+          <div class="af-step-num">2</div>
+          <div>
+            <div class="af-step-title">To'lov usulini tanlang</div>
+            <div class="af-step-desc">Payme, Click, TonKeeper yoki USDT — qulayngizni belgilang</div>
+          </div>
+        </div>
+        <div class="af-step">
+          <div class="af-step-num">3</div>
+          <div>
+            <div class="af-step-title">@yakkavazir ga o'ting</div>
+            <div class="af-step-desc">Telegram tugmasini bosing, bot to'liq yo'riqnoma beradi</div>
+          </div>
+        </div>
+        <div class="af-step">
+          <div class="af-step-num">4</div>
+          <div>
+            <div class="af-step-title">Balans qo'shiladi</div>
+            <div class="af-step-desc">To'lovdan so'ng 5-10 daqiqa ichida balansga o'tadi</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="af-right">
+
+    <!-- CURRENT BALANCE -->
+    <div class="af-balance-card">
+      <div class="af-bal-glow"></div>
+      <div class="af-bal-label">Joriy Balans</div>
+      <div>
+        <span class="af-bal-amount">{{ "{:,.0f}".format(user.balance) }}</span>
+        <span class="af-bal-cur">so'm</span>
+      </div>
+      <div class="af-bal-sub">Mavjud mablag'ingiz</div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="af-card">
+      <div class="af-card-title"><i class="fas fa-clock-rotate-left"></i> To'lov Tarixi</div>
+
+      {% if history %}
+      <div class="af-history-list">
+        {% for h in history %}
+        <div class="af-history-item">
+          <div class="af-history-left">
+            <div class="af-history-icon">
+              {% if h.method == 'Payme' %}<i class="fas fa-mobile-screen-button"></i>
+              {% elif h.method == 'Click' %}<i class="fas fa-bolt"></i>
+              {% elif 'USDT' in h.method or 'Ton' in h.method %}<i class="fas fa-gem"></i>
+              {% else %}<i class="fab fa-telegram"></i>{% endif %}
+            </div>
             <div>
               <div class="af-history-method">{{ h.method }}</div>
               <div class="af-history-date">{{ h.created_at[:16] }}</div>
             </div>
-            <div>
-              <div class="af-history-amount">+{{ "{:,.0f}".format(h.amount) }} so'm</div>
-              {% if h.status == 'completed' %}
-                <span class="af-badge af-badge-green">✓ Tasdiqlandi</span>
-              {% else %}
-                <span class="af-badge af-badge-yellow">⏳ Kutilmoqda</span>
-              {% endif %}
-            </div>
           </div>
-          {% endfor %}
-        {% else %}
-          <div class="af-empty">
-            <div class="af-empty-icon">💳</div>
-            <p>Hali to'lovlar yo'q</p>
+          <div class="af-history-right">
+            <div class="af-history-amount">+{{ "{:,.0f}".format(h.amount) }} so'm</div>
+            {% if h.status == 'completed' %}
+              <span class="af-badge af-badge-ok"><i class="fas fa-check" style="font-size:8px"></i> Tasdiqlandi</span>
+            {% else %}
+              <span class="af-badge af-badge-wait"><i class="fas fa-clock" style="font-size:8px"></i> Kutilmoqda</span>
+            {% endif %}
           </div>
-        {% endif %}
+        </div>
+        {% endfor %}
       </div>
+      {% else %}
+      <div class="af-empty">
+        <div class="af-empty-icon"><i class="fas fa-receipt"></i></div>
+        <h4>Hali to'lovlar yo'q</h4>
+        <p>Birinchi to'lovingizni amalga oshiring</p>
+      </div>
+      {% endif %}
     </div>
+
+    <!-- SUPPORT -->
+    <div class="af-card" style="background:rgba(34,158,217,.05);border-color:rgba(34,158,217,.15)">
+      <div class="af-card-title" style="color:rgba(34,158,217,.7)"><i class="fab fa-telegram" style="color:#229ED9"></i> Yordam kerakmi?</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px">
+        To'lov bilan bog'liq muammo bo'lsa yoki savol bo'lsa, Telegram orqali bog'laning.
+      </p>
+      <a href="https://t.me/yakkavazir" target="_blank"
+         style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(34,158,217,.1);border:1px solid rgba(34,158,217,.2);border-radius:10px;color:#38bdf8;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s"
+         onmouseover="this.style.background='rgba(34,158,217,.18)'"
+         onmouseout="this.style.background='rgba(34,158,217,.1)'">
+        <i class="fab fa-telegram"></i> @yakkavazir bilan bog'lanish
+        <i class="fas fa-arrow-right" style="margin-left:auto;font-size:11px;opacity:.6"></i>
+      </a>
+    </div>
+
   </div>
 </div>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
-let afMethod = 'Payme';
+  let afMethod = 'Payme';
 
-function afSelect(el, val) {
-  document.querySelectorAll('.af-pay-card').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  afMethod = val;
-}
-
-function afGo() {
-  const amountEl = document.getElementById('af-amount');
-  const amount   = parseInt(amountEl.value || 0);
-
-  if (!amount || amount < 5000) {
-    amountEl.classList.add('error');
-    amountEl.focus();
-    setTimeout(() => amountEl.classList.remove('error'), 2000);
-    return false; /* link ochilmasin */
+  function afSelect(el, val) {
+    document.querySelectorAll('.af-pay-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    afMethod = val;
   }
 
-  /* Amount va usulni Telegram botga parametr sifatida yuborish (ixtiyoriy) */
-  const btn = document.getElementById('af-tg-btn');
-  btn.href = 'https://t.me/smmzone_uzbot?start=pay_' + amount + '_' + afMethod;
-  return true; /* linkni ochamiz */
-}
+  function setAmount(val) {
+    document.getElementById('af-amount').value = val;
+    document.querySelectorAll('.af-quick-btn').forEach(b => {
+      b.classList.toggle('active', parseInt(b.textContent.replace(/,/g,'')) === val);
+    });
+  }
+
+  function onAmountInput() {
+    const v = parseInt(document.getElementById('af-amount').value || 0);
+    document.querySelectorAll('.af-quick-btn').forEach(b => {
+      b.classList.toggle('active', parseInt(b.textContent.replace(/,/g,'')) === v);
+    });
+  }
+
+  function afGo() {
+    const amountEl = document.getElementById('af-amount');
+    const amount   = parseInt(amountEl.value || 0);
+
+    if (!amount || amount < 5000) {
+      amountEl.classList.add('err');
+      amountEl.focus();
+      setTimeout(() => amountEl.classList.remove('err'), 2000);
+      return false;
+    }
+
+    const btn  = document.getElementById('af-tg-btn');
+    const text = `pay_${amount}_${afMethod}`;
+    btn.href   = `https://t.me/yakkavazir?start=${text}`;
+    return true;
+  }
 </script>
 {% endblock %}

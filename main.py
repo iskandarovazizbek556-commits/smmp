@@ -22,16 +22,18 @@ app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=7)
 app.teardown_appcontext(close_db)
 
 # ─── Blueprints ───────────────────────────────
-from auth.login          import auth_bp
-from services.user_service  import user_bp
-from services.admin_service import admin_bp
-from api.routes          import api_bp
+from auth.login               import auth_bp
+from services.user_service    import user_bp
+from services.admin_service   import admin_bp
+from api.routes               import api_bp
+from support_service          import support_bp
 from services.payment_service import payme_webhook, click_prepare, click_complete
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(api_bp)
+app.register_blueprint(support_bp)
 
 # ─── Payment webhooks ─────────────────────────
 from flask import request, jsonify, render_template
@@ -82,18 +84,14 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class ProviderApi:
-    """1xPanel (yoki boshqa SMM panel) bilan ishlash uchun API klient."""
-
     api_url: str = "https://1xpanel.com/api/v2"
     api_key: str = ""
 
     def __init__(self, api_url: str = None, api_key: str = None):
         if api_url:
             self.api_url = api_url
-        # Config dan avtomatik olish
         self.api_key = api_key or getattr(Config, "PROVIDER_KEY", "")
 
-    # ── ichki so'rov ─────────────────────────────────────────
     def _connect(self, post: dict):
         try:
             resp = _requests.post(
@@ -112,89 +110,38 @@ class ProviderApi:
             log.error("ProviderApi JSON xatosi: %s", e)
             return None
 
-    # ── Xizmatlar ────────────────────────────────────────────
     def services(self):
-        """Barcha xizmatlar ro'yxatini qaytaradi."""
         return self._connect({"key": self.api_key, "action": "services"})
 
-    # ── Balans ───────────────────────────────────────────────
     def balance(self):
-        """Foydalanuvchi balansini qaytaradi."""
         return self._connect({"key": self.api_key, "action": "balance"})
 
-    # ── Buyurtma qo'shish ────────────────────────────────────
     def order(self, data: dict):
-        """
-        Yangi buyurtma qo'shish.
-
-        Misol:
-            api.order({'service': 1, 'link': 'http://...', 'quantity': 100})
-        """
         post = {"key": self.api_key, "action": "add", **data}
         return self._connect(post)
 
-    # ── Buyurtma holati ──────────────────────────────────────
     def status(self, order_id: int):
-        """Bitta buyurtma holatini qaytaradi."""
-        return self._connect({
-            "key": self.api_key,
-            "action": "status",
-            "order": order_id,
-        })
+        return self._connect({"key": self.api_key, "action": "status", "order": order_id})
 
     def multi_status(self, order_ids: list):
-        """Bir nechta buyurtma holatini qaytaradi."""
-        return self._connect({
-            "key": self.api_key,
-            "action": "status",
-            "orders": ",".join(map(str, order_ids)),
-        })
+        return self._connect({"key": self.api_key, "action": "status", "orders": ",".join(map(str, order_ids))})
 
-    # ── Refill ───────────────────────────────────────────────
     def refill(self, order_id: int):
-        """Bitta buyurtmani refill qiladi."""
-        return self._connect({
-            "key": self.api_key,
-            "action": "refill",
-            "order": order_id,
-        })
+        return self._connect({"key": self.api_key, "action": "refill", "order": order_id})
 
     def multi_refill(self, order_ids: list):
-        """Bir nechta buyurtmani refill qiladi."""
-        return self._connect({
-            "key": self.api_key,
-            "action": "refill",
-            "orders": ",".join(map(str, order_ids)),
-        })
+        return self._connect({"key": self.api_key, "action": "refill", "orders": ",".join(map(str, order_ids))})
 
-    # ── Refill holati ────────────────────────────────────────
     def refill_status(self, refill_id: int):
-        """Bitta refill holatini qaytaradi."""
-        return self._connect({
-            "key": self.api_key,
-            "action": "refill_status",
-            "refill": refill_id,
-        })
+        return self._connect({"key": self.api_key, "action": "refill_status", "refill": refill_id})
 
     def multi_refill_status(self, refill_ids: list):
-        """Bir nechta refill holatini qaytaradi."""
-        return self._connect({
-            "key": self.api_key,
-            "action": "refill_status",
-            "refills": ",".join(map(str, refill_ids)),
-        })
+        return self._connect({"key": self.api_key, "action": "refill_status", "refills": ",".join(map(str, refill_ids))})
 
-    # ── Bekor qilish ─────────────────────────────────────────
     def cancel(self, order_ids: list):
-        """Buyurtmalarni bekor qiladi."""
-        return self._connect({
-            "key": self.api_key,
-            "action": "cancel",
-            "orders": ",".join(map(str, order_ids)),
-        })
+        return self._connect({"key": self.api_key, "action": "cancel", "orders": ",".join(map(str, order_ids))})
 
 
-# Global instance — butun loyihada ishlatish uchun
 provider_api = ProviderApi(
     api_url=getattr(Config, "PROVIDER_URL", "https://1xpanel.com/api/v2"),
     api_key=getattr(Config, "PROVIDER_KEY", ""),
@@ -206,7 +153,7 @@ def start_auto_sync():
     import threading, time
     def _loop():
         while True:
-            time.sleep(300)  # har 5 daqiqada
+            time.sleep(300)
             try:
                 from services.order_service import sync_all_active
                 sync_all_active()

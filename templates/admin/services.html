@@ -15,6 +15,8 @@
     --redl: #fef2f2;
     --yellow: #f59e0b;
     --yellowl: #fef3c7;
+    --orange: #f97316;
+    --orangel: #fff7ed;
     --muted: #6b7280;
     --border: #e5e7eb;
     --bg: #f3f4f6;
@@ -28,29 +30,57 @@
   .as-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
   }
 
+  .as-header-left { display: flex; align-items: center; gap: 12px; }
+
   .as-header-icon {
-    width: 40px;
-    height: 40px;
+    width: 40px; height: 40px;
     border-radius: 10px;
     background: var(--p1l);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--p1);
-    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--p1); font-size: 18px;
   }
 
   .as-header h1 { font-size: 20px; font-weight: 700; margin: 0; color: var(--text); }
   .as-header-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
 
+  /* TABS */
+  .as-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 20px;
+  }
+
+  .as-tab {
+    padding: 7px 16px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: inherit;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .as-tab.active { background: #fff; color: var(--p1); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .as-tab:hover:not(.active) { color: var(--text); }
+
   /* LAYOUT */
   .as-layout {
     display: grid;
-    grid-template-columns: 1fr 300px;
+    grid-template-columns: 1fr 320px;
     gap: 20px;
     align-items: start;
   }
@@ -70,61 +100,96 @@
     padding: 14px 18px;
     border-bottom: 1px solid var(--border);
     background: var(--bg);
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .as-card-title { font-size: 13px; font-weight: 700; color: var(--text); }
 
   .as-count {
-    font-size: 11px;
-    font-weight: 700;
-    background: var(--p1l);
-    color: var(--p1);
-    padding: 3px 10px;
-    border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+    background: var(--p1l); color: var(--p1);
+    padding: 3px 10px; border-radius: 20px;
   }
 
-  /* IMPORT BUTTON */
-  .as-import-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 14px;
+  .as-count-rec {
+    font-size: 11px; font-weight: 700;
+    background: var(--yellowl); color: #92400e;
+    padding: 3px 10px; border-radius: 20px;
+  }
+
+  /* SEARCH BAR */
+  .as-search-bar {
+    display: flex; gap: 8px; align-items: center;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    background: #fafafa;
+  }
+
+  .as-search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .as-search-input:focus { border-color: var(--p1); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+
+  .as-search-btn {
+    padding: 8px 16px;
     border-radius: 8px;
     background: var(--p1);
     color: #fff;
     border: none;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 600;
     font-family: inherit;
     cursor: pointer;
+    display: flex; align-items: center; gap: 5px;
     transition: all 0.15s;
   }
 
-  .as-import-btn:hover {
-    background: var(--p1h);
-    box-shadow: 0 3px 10px rgba(99,102,241,0.3);
+  .as-search-btn:hover { background: var(--p1h); }
+
+  .as-filter-input {
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    min-width: 140px;
+    transition: border-color 0.15s;
   }
+
+  .as-filter-input:focus { border-color: var(--p1); }
+
+  /* IMPORT BTN */
+  .as-import-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 8px;
+    background: var(--p1); color: #fff; border: none;
+    font-size: 12px; font-weight: 700; font-family: inherit;
+    cursor: pointer; transition: all 0.15s;
+  }
+
+  .as-import-btn:hover { background: var(--p1h); box-shadow: 0 3px 10px rgba(99,102,241,0.3); }
 
   /* TABLE */
   .as-table-wrap { overflow-x: auto; }
 
-  .as-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-
+  .as-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .as-table thead tr { background: var(--bg); }
 
   .as-table th {
-    padding: 10px 14px;
-    text-align: left;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    white-space: nowrap;
+    padding: 10px 14px; text-align: left;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); white-space: nowrap;
     border-bottom: 1px solid var(--border);
   }
 
@@ -138,41 +203,86 @@
   .as-table tbody tr:hover { background: #fafafa; }
 
   .as-id { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .as-pid {
+    display: inline-block;
+    font-size: 11px; font-weight: 700;
+    background: #f1f5f9; color: #475569;
+    padding: 2px 8px; border-radius: 5px;
+  }
+
   .as-name {
-    max-width: 180px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: 600;
-    color: var(--text);
-    display: block;
+    max-width: 160px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-weight: 600; color: var(--text); display: block;
+  }
+
+  .as-name-uz {
+    max-width: 160px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font-size: 11px; color: var(--muted); display: block; margin-top: 2px;
   }
 
   .as-cat {
-    display: inline-block;
-    padding: 3px 9px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    background: var(--p1l);
-    color: var(--p1);
+    display: inline-block; padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+    background: var(--p1l); color: var(--p1);
   }
 
   .as-price { font-weight: 700; color: var(--green); }
   .as-minmax { font-size: 12px; color: var(--muted); }
 
   .as-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700;
   }
 
   .as-badge.active   { background: var(--greenl); color: #065f46; }
   .as-badge.inactive { background: var(--redl);   color: #991b1b; }
+
+  /* RECOMMEND STAR */
+  .as-star-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 16px; padding: 2px 4px;
+    transition: transform 0.15s;
+    line-height: 1;
+  }
+
+  .as-star-btn:hover { transform: scale(1.3); }
+  .as-star-btn.starred { filter: none; }
+  .as-star-btn.unstarred { opacity: 0.3; }
+
+  /* RECOMMENDED SECTION */
+  .as-rec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .as-rec-card {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    background: #fff;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .as-rec-card:hover { border-color: var(--p1); box-shadow: 0 4px 12px rgba(99,102,241,0.1); }
+
+  .as-rec-badge {
+    position: absolute; top: -8px; right: 12px;
+    background: var(--yellow); color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px;
+  }
+
+  .as-rec-cat { font-size: 10px; color: var(--muted); margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .as-rec-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; line-height: 1.3; }
+  .as-rec-name-uz { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .as-rec-price { font-size: 14px; font-weight: 800; color: var(--green); }
+  .as-rec-minmax { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
   /* FORM CARD */
   .as-form-card {
@@ -183,103 +293,124 @@
   }
 
   .as-form-head {
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    background: var(--bg); font-size: 13px; font-weight: 700;
+    color: var(--text); display: flex; align-items: center; gap: 8px;
   }
 
   .as-form-head-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 7px;
-    background: var(--p1l);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--p1);
-    font-size: 12px;
+    width: 28px; height: 28px; border-radius: 7px;
+    background: var(--p1l); display: flex; align-items: center;
+    justify-content: center; color: var(--p1); font-size: 12px;
   }
 
   .as-form-body { padding: 18px; }
+  .as-form-group { margin-bottom: 12px; }
 
-  .as-form-group { margin-bottom: 14px; }
-
-  .as-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 5px;
-  }
+  .as-label { display: block; font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .as-label-hint { font-weight: 400; color: var(--muted); font-size: 11px; }
 
   .as-input {
-    width: 100%;
-    padding: 8px 11px;
-    font-size: 13px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    background: #fff;
-    color: var(--text);
-    outline: none;
+    width: 100%; padding: 8px 11px; font-size: 13px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    background: #fff; color: var(--text); outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
-    font-family: inherit;
-    appearance: none;
-    -webkit-appearance: none;
+    font-family: inherit; appearance: none; -webkit-appearance: none;
   }
 
   select.as-input {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%236b7280' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 9px center;
-    padding-right: 28px;
-    cursor: pointer;
+    background-repeat: no-repeat; background-position: right 9px center;
+    padding-right: 28px; cursor: pointer;
   }
 
-  textarea.as-input { resize: vertical; min-height: 64px; }
+  textarea.as-input { resize: vertical; min-height: 56px; }
 
-  .as-input:focus {
-    border-color: var(--p1);
-    box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+  .as-input:focus { border-color: var(--p1); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+  .as-input.autofilled { border-color: var(--green); background: #f0fdf4; }
+
+  .as-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* ID Search Box */
+  .as-id-search {
+    background: var(--p1l);
+    border: 1.5px dashed var(--p1);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 14px;
   }
 
-  .as-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+  .as-id-search-title {
+    font-size: 12px; font-weight: 700; color: var(--p1);
+    margin-bottom: 8px; display: flex; align-items: center; gap: 5px;
   }
+
+  .as-id-search-row { display: flex; gap: 6px; }
+
+  .as-id-input {
+    flex: 1; padding: 7px 10px; font-size: 13px;
+    border: 1.5px solid #c7d2fe; border-radius: 7px;
+    background: #fff; outline: none; font-family: inherit;
+    transition: border-color 0.15s;
+  }
+
+  .as-id-input:focus { border-color: var(--p1); }
+
+  .as-id-fetch-btn {
+    padding: 7px 12px; border-radius: 7px;
+    background: var(--p1); color: #fff; border: none;
+    font-size: 12px; font-weight: 700; font-family: inherit;
+    cursor: pointer; display: flex; align-items: center; gap: 4px;
+    white-space: nowrap; transition: all 0.15s;
+  }
+
+  .as-id-fetch-btn:hover { background: var(--p1h); }
+
+  .as-id-result {
+    margin-top: 8px; font-size: 12px; padding: 8px 10px;
+    border-radius: 7px; display: none;
+  }
+
+  .as-id-result.ok   { background: var(--greenl); color: #065f46; }
+  .as-id-result.err  { background: var(--redl);   color: #991b1b; }
+
+  /* Checkbox */
+  .as-checkbox-row { display: flex; align-items: center; gap: 8px; }
+  .as-checkbox {
+    width: 16px; height: 16px; cursor: pointer;
+    accent-color: var(--yellow);
+  }
+  .as-checkbox-label { font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; }
 
   .as-submit-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    width: 100%;
-    padding: 11px;
-    border-radius: 9px;
-    background: var(--p1);
-    color: #fff;
-    border: none;
-    font-size: 14px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.15s;
-    margin-top: 4px;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    width: 100%; padding: 11px; border-radius: 9px;
+    background: var(--p1); color: #fff; border: none;
+    font-size: 14px; font-weight: 700; font-family: inherit;
+    cursor: pointer; transition: all 0.15s; margin-top: 4px;
   }
 
-  .as-submit-btn:hover {
-    background: var(--p1h);
-    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
-    transform: translateY(-1px);
-  }
-
+  .as-submit-btn:hover { background: var(--p1h); box-shadow: 0 4px 12px rgba(99,102,241,0.3); transform: translateY(-1px); }
   .as-submit-btn:active { transform: translateY(0); }
+
+  /* SPINNER */
+  .as-spinner {
+    display: inline-block; width: 12px; height: 12px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* EMPTY */
+  .as-empty {
+    text-align: center; padding: 40px 20px; color: var(--muted);
+  }
+
+  .as-empty-icon { font-size: 32px; margin-bottom: 8px; }
+  .as-empty-text { font-size: 14px; font-weight: 600; }
+  .as-empty-sub  { font-size: 12px; margin-top: 4px; }
 
   @media (max-width: 900px) {
     .as-layout { grid-template-columns: 1fr; }
@@ -288,49 +419,86 @@
 
 <div class="as-wrap">
 
+  <!-- HEADER -->
   <div class="as-header">
-    <div class="as-header-icon"><i class="fas fa-list"></i></div>
-    <div>
-      <h1>Xizmatlar</h1>
-      <div class="as-header-sub">Barcha mavjud xizmatlar</div>
+    <div class="as-header-left">
+      <div class="as-header-icon"><i class="fas fa-list"></i></div>
+      <div>
+        <h1>Xizmatlar</h1>
+        <div class="as-header-sub">Barcha mavjud xizmatlar boshqaruvi</div>
+      </div>
     </div>
+    <form method="POST" action="/admin/services/import">
+      <button class="as-import-btn">
+        <i class="fas fa-cloud-download-alt"></i> Provayderdan Import
+      </button>
+    </form>
   </div>
 
-  <div class="as-layout">
+  <!-- TABS -->
+  <div class="as-tabs">
+    <button class="as-tab active" onclick="showTab('all', this)">
+      <i class="fas fa-th-list"></i> Barcha Xizmatlar
+      <span class="as-count" style="margin-left:2px">{{ services|length }}</span>
+    </button>
+    <button class="as-tab" onclick="showTab('recommended', this)">
+      <i class="fas fa-star"></i> Tavsiya Etilganlar
+      <span class="as-count-rec" style="margin-left:2px">{{ services|selectattr('is_recommended')|list|length }}</span>
+    </button>
+  </div>
+
+  <!-- ───────── ALL SERVICES TAB ───────── -->
+  <div id="tab-all" class="as-layout">
 
     <!-- TABLE -->
     <div class="as-card">
       <div class="as-card-head">
         <div style="display:flex;align-items:center;gap:10px">
-          <span class="as-card-title">Barcha Xizmatlar</span>
+          <span class="as-card-title">Xizmatlar Jadvali</span>
           <span class="as-count">{{ services|length }} ta</span>
         </div>
-        <form method="POST" action="/admin/services/import">
-          <button class="as-import-btn">
-            <i class="fas fa-download"></i> 1xPanel Import
-          </button>
-        </form>
+      </div>
+
+      <!-- SEARCH / FILTER -->
+      <div class="as-search-bar">
+        <input class="as-search-input" id="tableSearch"
+               placeholder="🔍  Nomi yoki ID bo'yicha qidirish..."
+               oninput="filterTable(this.value)">
+        <select class="as-filter-input" id="catFilter" onchange="filterTable(document.getElementById('tableSearch').value)">
+          <option value="">Barcha kategoriyalar</option>
+          {% for c in categories %}
+          <option value="{{ c.name }}">{{ c.name }}</option>
+          {% endfor %}
+        </select>
       </div>
 
       <div class="as-table-wrap">
-        <table class="as-table">
+        <table class="as-table" id="svcTable">
           <thead>
             <tr>
-              <th>#</th>
+              <th>ID</th>
+              <th>P-ID</th>
               <th>Nomi</th>
               <th>Kategoriya</th>
-              <th>1000 narxi</th>
+              <th>Narx (1000)</th>
               <th>Min / Max</th>
               <th>Status</th>
+              <th>⭐</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="svcBody">
           {% for s in services %}
-          <tr>
+          <tr data-name="{{ s.name|lower }}" data-id="{{ s.id }}" data-pid="{{ s.provider_id or '' }}" data-cat="{{ s.cat_name }}">
             <td><span class="as-id">{{ s.id }}</span></td>
-            <td><span class="as-name" title="{{ s.name }}">{{ s.name }}</span></td>
+            <td><span class="as-pid">{{ s.provider_id or '—' }}</span></td>
+            <td>
+              <span class="as-name" title="{{ s.name }}">{{ s.name }}</span>
+              {% if s.name_uz %}
+              <span class="as-name-uz">🇺🇿 {{ s.name_uz }}</span>
+              {% endif %}
+            </td>
             <td><span class="as-cat">{{ s.cat_name }}</span></td>
-            <td><span class="as-price">{{ "{:,.0f}".format(s.price_per_1000) }}</span></td>
+            <td><span class="as-price">{{ "{:,.0f}".format(s.price_per_1000) }} so'm</span></td>
             <td><span class="as-minmax">{{ s.min_order }} — {{ s.max_order }}</span></td>
             <td>
               {% if s.is_active %}
@@ -339,10 +507,22 @@
               <span class="as-badge inactive"><i class="fas fa-circle" style="font-size:6px"></i> Nofaol</span>
               {% endif %}
             </td>
+            <td>
+              <button class="as-star-btn {{ 'starred' if s.is_recommended else 'unstarred' }}"
+                      onclick="toggleRecommend({{ s.id }}, this)"
+                      title="{{ 'Tavsiyadan olib tashlash' if s.is_recommended else 'Tavsiya etilganga qo\\'shish' }}">
+                ⭐
+              </button>
+            </td>
           </tr>
           {% endfor %}
           </tbody>
         </table>
+        <div id="noResults" class="as-empty" style="display:none">
+          <div class="as-empty-icon">🔍</div>
+          <div class="as-empty-text">Hech narsa topilmadi</div>
+          <div class="as-empty-sub">Boshqa kalit so'z bilan qidiring</div>
+        </div>
       </div>
     </div>
 
@@ -353,11 +533,28 @@
         Yangi Xizmat Qo'shish
       </div>
       <div class="as-form-body">
+
+        <!-- ID SEARCH BOX -->
+        <div class="as-id-search">
+          <div class="as-id-search-title">
+            <i class="fas fa-search"></i> Provider ID bo'yicha qidirish
+          </div>
+          <div class="as-id-search-row">
+            <input class="as-id-input" id="pidSearch" type="number"
+                   placeholder="Masalan: 1234"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();fetchById()}">
+            <button class="as-id-fetch-btn" onclick="fetchById()" id="fetchBtn">
+              <i class="fas fa-search"></i> Topish
+            </button>
+          </div>
+          <div class="as-id-result" id="idResult"></div>
+        </div>
+
         <form method="POST" action="/admin/services/add">
 
           <div class="as-form-group">
             <label class="as-label">Kategoriya</label>
-            <select name="category_id" class="as-input" required>
+            <select name="category_id" id="f_cat" class="as-input" required>
               {% for c in categories %}
               <option value="{{ c.id }}">{{ c.name }}</option>
               {% endfor %}
@@ -365,23 +562,35 @@
           </div>
 
           <div class="as-form-group">
-            <label class="as-label">Xizmat nomi</label>
-            <input name="name" class="as-input" placeholder="Instagram Followers HQ" required>
+            <label class="as-label">Provider ID <span class="as-label-hint">(avtomatik to'ldiriladi)</span></label>
+            <input name="provider_id" id="f_pid" class="as-input" type="number" placeholder="1234">
           </div>
 
           <div class="as-form-group">
-            <label class="as-label">Provider ID (1xPanel)</label>
-            <input name="provider_id" class="as-input" type="number" placeholder="1234">
+            <label class="as-label">Xizmat nomi (Inglizcha)</label>
+            <input name="name" id="f_name" class="as-input" placeholder="Instagram Followers HQ" required>
+          </div>
+
+          <div class="as-form-group">
+            <label class="as-label">Xizmat nomi (O'zbekcha) <span class="as-label-hint">ixtiyoriy</span></label>
+            <input name="name_uz" id="f_name_uz" class="as-input" placeholder="Instagram Obunachilari HQ">
+          </div>
+
+          <div class="as-form-group">
+            <label class="as-label">Tavsif (O'zbekcha)</label>
+            <textarea name="description_uz" id="f_desc_uz" class="as-input"
+                      placeholder="Yuqori sifatli, tez yetkazib beriladi..."></textarea>
           </div>
 
           <div class="as-row">
             <div class="as-form-group">
               <label class="as-label">Narx (1000 ta)</label>
-              <input name="price_per_1000" class="as-input" type="number" step="0.01" placeholder="500" required>
+              <input name="price_per_1000" id="f_price" class="as-input" type="number"
+                     step="0.01" placeholder="500" required>
             </div>
             <div class="as-form-group">
               <label class="as-label">Tur</label>
-              <select name="type" class="as-input">
+              <select name="type" id="f_type" class="as-input">
                 <option>Default</option>
                 <option>Drip-feed</option>
                 <option>Custom Comments</option>
@@ -392,17 +601,20 @@
           <div class="as-row">
             <div class="as-form-group">
               <label class="as-label">Min</label>
-              <input name="min_order" class="as-input" type="number" value="10" required>
+              <input name="min_order" id="f_min" class="as-input" type="number" value="10" required>
             </div>
             <div class="as-form-group">
               <label class="as-label">Max</label>
-              <input name="max_order" class="as-input" type="number" value="100000" required>
+              <input name="max_order" id="f_max" class="as-input" type="number" value="100000" required>
             </div>
           </div>
 
+          <!-- TAVSIYA ETILGAN -->
           <div class="as-form-group">
-            <label class="as-label">Tavsif</label>
-            <textarea name="description" class="as-input" placeholder="Qo'shimcha ma'lumot..."></textarea>
+            <div class="as-checkbox-row">
+              <input type="checkbox" name="is_recommended" id="f_rec" value="1" class="as-checkbox">
+              <label for="f_rec" class="as-checkbox-label">⭐ Tavsiya etilganlarga qo'shish</label>
+            </div>
           </div>
 
           <button type="submit" class="as-submit-btn">
@@ -411,8 +623,169 @@
         </form>
       </div>
     </div>
-
   </div>
-</div>
 
+  <!-- ───────── RECOMMENDED TAB ───────── -->
+  <div id="tab-recommended" style="display:none">
+    <div class="as-card">
+      <div class="as-card-head">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="as-card-title">⭐ Tavsiya Etilgan Xizmatlar</span>
+          <span class="as-count-rec">{{ services|selectattr('is_recommended')|list|length }} ta</span>
+        </div>
+        <span style="font-size:12px;color:var(--muted)">Foydalanuvchilarga ko'rsatiladi</span>
+      </div>
+
+      {% set rec_svcs = services|selectattr('is_recommended')|list %}
+      {% if rec_svcs %}
+      <div class="as-rec-grid">
+        {% for s in rec_svcs %}
+        <div class="as-rec-card">
+          <span class="as-rec-badge">⭐ Tavsiya</span>
+          <div class="as-rec-cat">{{ s.cat_name }}</div>
+          <div class="as-rec-name">{{ s.name_uz or s.name }}</div>
+          {% if s.name_uz and s.name_uz != s.name %}
+          <div class="as-rec-name-uz">{{ s.name }}</div>
+          {% endif %}
+          <div class="as-rec-price">{{ "{:,.0f}".format(s.price_per_1000) }} so'm</div>
+          <div class="as-rec-minmax">Min: {{ s.min_order }} | Max: {{ s.max_order }}</div>
+          <div style="margin-top:8px">
+            {% if s.is_active %}
+            <span class="as-badge active" style="font-size:10px"><i class="fas fa-circle" style="font-size:5px"></i> Faol</span>
+            {% else %}
+            <span class="as-badge inactive" style="font-size:10px"><i class="fas fa-circle" style="font-size:5px"></i> Nofaol</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="as-empty">
+        <div class="as-empty-icon">⭐</div>
+        <div class="as-empty-text">Tavsiya etilgan xizmatlar yo'q</div>
+        <div class="as-empty-sub">Xizmat qatoridagi ⭐ tugmasini bosib qo'shing</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div><!-- end as-wrap -->
+
+<script>
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function showTab(name, btn) {
+  document.getElementById('tab-all').style.display         = name === 'all' ? '' : 'none';
+  document.getElementById('tab-recommended').style.display = name === 'recommended' ? '' : 'none';
+  document.querySelectorAll('.as-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── TABLE FILTER ──────────────────────────────────────────────────────────────
+function filterTable(q) {
+  const cat    = document.getElementById('catFilter').value.toLowerCase();
+  const search = q.toLowerCase();
+  const rows   = document.querySelectorAll('#svcBody tr');
+  let   shown  = 0;
+
+  rows.forEach(row => {
+    const name = row.dataset.name || '';
+    const id   = row.dataset.id   || '';
+    const pid  = row.dataset.pid  || '';
+    const rowCat = (row.dataset.cat || '').toLowerCase();
+
+    const matchSearch = !search || name.includes(search) || id.includes(search) || pid.includes(search);
+    const matchCat    = !cat    || rowCat.includes(cat);
+
+    if (matchSearch && matchCat) {
+      row.style.display = '';
+      shown++;
+    } else {
+      row.style.display = 'none';
+    }
+  });
+
+  document.getElementById('noResults').style.display = shown === 0 ? '' : 'none';
+}
+
+// ── ID BO'YICHA QIDIRISH VA AVTO TO'LDIRISH ───────────────────────────────────
+async function fetchById() {
+  const pid    = document.getElementById('pidSearch').value.trim();
+  const resBox = document.getElementById('idResult');
+  const btn    = document.getElementById('fetchBtn');
+
+  if (!pid) {
+    showResult('err', '⚠️ Provider ID kiriting');
+    return;
+  }
+
+  btn.innerHTML = '<span class="as-spinner"></span>';
+  btn.disabled  = true;
+
+  try {
+    const r    = await fetch(`/admin/services/search-by-id?provider_id=${pid}`);
+    const data = await r.json();
+
+    if (!data.ok) {
+      showResult('err', '❌ ' + data.message);
+      return;
+    }
+
+    const d = data.data;
+
+    // Formani to'ldirish
+    setField('f_pid',   d.provider_id);
+    setField('f_name',  d.name);
+    setField('f_price', d.price_per_1000);
+    setField('f_min',   d.min_order);
+    setField('f_max',   d.max_order);
+
+    // Type ni tanlash
+    const typeEl = document.getElementById('f_type');
+    for (let opt of typeEl.options) {
+      if (opt.value === d.type) { opt.selected = true; break; }
+    }
+
+    showResult('ok',
+      `✅ <strong>${d.name}</strong> topildi! ` +
+      `Narx: <strong>${Number(d.price_per_1000).toLocaleString('uz')} so'm</strong> | ` +
+      `Kategoriya: ${d.category}`
+    );
+
+  } catch (e) {
+    showResult('err', '❌ Tarmoq xatosi: ' + e.message);
+  } finally {
+    btn.innerHTML = '<i class="fas fa-search"></i> Topish';
+    btn.disabled  = false;
+  }
+}
+
+function setField(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.value = val;
+  el.classList.add('autofilled');
+  setTimeout(() => el.classList.remove('autofilled'), 2000);
+}
+
+function showResult(type, html) {
+  const box = document.getElementById('idResult');
+  box.className  = 'as-id-result ' + type;
+  box.innerHTML  = html;
+  box.style.display = '';
+}
+
+// ── TAVSIYA TOGGLE ────────────────────────────────────────────────────────────
+async function toggleRecommend(sid, btn) {
+  try {
+    const r    = await fetch(`/admin/services/${sid}/recommend`, { method: 'POST' });
+    const data = await r.json();
+    if (data.ok) {
+      btn.className = 'as-star-btn ' + (data.is_recommended ? 'starred' : 'unstarred');
+      btn.title     = data.is_recommended ? 'Tavsiyadan olib tashlash' : "Tavsiya etilganga qo'shish";
+    }
+  } catch(e) {
+    console.error(e);
+  }
+}
+</script>
 {% endblock %}

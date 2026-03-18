@@ -3,272 +3,422 @@
 {% block content %}
 
 <style>
-  .page-header {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --bg:      #050a14;
+    --card:    #0d1628;
+    --card2:   #111d35;
+    --border:  rgba(99,179,237,0.12);
+    --border2: rgba(99,179,237,0.22);
+    --accent:  #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --text:    #e2eaf8;
+    --muted:   #7a8fad;
+    --white:   #ffffff;
+    --grad:    linear-gradient(135deg, #38bdf8, #818cf8);
+    --grad-g:  linear-gradient(135deg, #34d399, #059669);
+  }
+
+  @keyframes fadeUp  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.4} }
+  @keyframes spin    { to{transform:rotate(360deg)} }
+  @keyframes shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position:  400px 0; }
+  }
+  @keyframes countUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── HEADER ── */
+  .db-header {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 32px; flex-wrap: wrap; gap: 12px;
-    animation: fadeUp 0.5s ease both;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
+    animation: fadeUp .45s ease both;
   }
-  .page-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 26px; font-weight: 800;
-    color: var(--white); letter-spacing: -0.5px;
-    display: flex; align-items: center; gap: 12px;
-  }
-  .page-title-icon {
-    width: 42px; height: 42px;
-    background: var(--grad);
-    border-radius: 12px;
+  .db-header-left { display: flex; align-items: center; gap: 16px; }
+  .db-header-icon {
+    width: 48px; height: 48px; background: var(--grad);
+    border-radius: 15px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 17px; color: #fff;
+    font-size: 20px; color: #fff;
+    box-shadow: 0 0 24px rgba(56,189,248,.35); flex-shrink: 0;
   }
-  .greeting { font-size: 14px; color: var(--muted); margin-top: 3px; font-weight: 400; }
+  .db-title    { font-family:'Syne',sans-serif; font-size:24px; font-weight:800; color:var(--white); letter-spacing:-.5px; }
+  .db-greeting { font-size:13px; color:var(--muted); margin-top:3px; }
+  .db-greeting strong { color:var(--white); }
 
-  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-
-  /* STATS */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 16px; margin-bottom: 28px;
-    animation: fadeUp 0.5s 0.1s ease both;
+  .db-header-right { display:flex; align-items:center; gap:10px; }
+  .db-time {
+    font-family:'Courier New',monospace;
+    font-size:13px; color:var(--muted);
+    background:var(--card2); border:1px solid var(--border);
+    padding:8px 14px; border-radius:100px;
+    display:flex; align-items:center; gap:7px;
   }
-  .stat-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 18px; padding: 22px 20px;
+  .db-time-dot { width:6px; height:6px; background:var(--accent3); border-radius:50%; animation:pulse 2s infinite; }
+
+  /* ── STAT CARDS ── */
+  .db-stats {
+    display: grid; grid-template-columns: repeat(5,1fr);
+    gap: 14px; margin-bottom: 24px;
+    animation: fadeUp .45s .06s ease both;
+  }
+  .db-stat {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 18px; padding: 20px 18px;
     position: relative; overflow: hidden;
-    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    transition: transform .25s, border-color .25s, box-shadow .25s;
     cursor: default;
   }
-  .stat-card:hover {
+  .db-stat:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 36px rgba(0,0,0,0.35);
-    border-color: rgba(56,189,248,0.2);
+    border-color: var(--border2);
+    box-shadow: 0 12px 32px rgba(0,0,0,.3);
   }
-  .stat-card::after {
-    content: ''; position: absolute; bottom:0; left:0; right:0; height:2px;
-    opacity:0; transition: opacity 0.25s;
+  .db-stat::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    opacity:.7; transition:opacity .25s;
   }
-  .stat-card:hover::after { opacity: 1; }
-  .stat-card.s-purple::after { background: linear-gradient(90deg, #a78bfa, transparent); }
-  .stat-card.s-teal::after   { background: linear-gradient(90deg, #2dd4bf, transparent); }
-  .stat-card.s-green::after  { background: linear-gradient(90deg, #34d399, transparent); }
-  .stat-card.s-yellow::after { background: linear-gradient(90deg, #fbbf24, transparent); }
-  .stat-card.s-red::after    { background: linear-gradient(90deg, #f87171, transparent); }
+  .db-stat:hover::before { opacity:1; }
+  .db-stat.c-purple::before { background:linear-gradient(90deg,#a78bfa,transparent); }
+  .db-stat.c-teal::before   { background:linear-gradient(90deg,#2dd4bf,transparent); }
+  .db-stat.c-green::before  { background:linear-gradient(90deg,#34d399,transparent); }
+  .db-stat.c-yellow::before { background:linear-gradient(90deg,#fbbf24,transparent); }
+  .db-stat.c-red::before    { background:linear-gradient(90deg,#f87171,transparent); }
 
-  .stat-icon-wrap {
-    width: 44px; height: 44px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; margin-bottom: 16px;
+  .db-stat-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:14px; }
+  .db-stat-icon {
+    width:40px; height:40px; border-radius:11px;
+    display:flex; align-items:center; justify-content:center; font-size:17px;
   }
-  .stat-icon-wrap.s-purple { background: rgba(167,139,250,0.12); color: #a78bfa; }
-  .stat-icon-wrap.s-teal   { background: rgba(45,212,191,0.12);  color: #2dd4bf; }
-  .stat-icon-wrap.s-green  { background: rgba(52,211,153,0.12);  color: #34d399; }
-  .stat-icon-wrap.s-yellow { background: rgba(251,191,36,0.12);  color: #fbbf24; }
-  .stat-icon-wrap.s-red    { background: rgba(248,113,113,0.12); color: #f87171; }
+  .db-stat.c-purple .db-stat-icon { background:rgba(167,139,250,.12); color:#a78bfa; }
+  .db-stat.c-teal   .db-stat-icon { background:rgba(45,212,191,.12);  color:#2dd4bf; }
+  .db-stat.c-green  .db-stat-icon { background:rgba(52,211,153,.12);  color:#34d399; }
+  .db-stat.c-yellow .db-stat-icon { background:rgba(251,191,36,.12);  color:#fbbf24; }
+  .db-stat.c-red    .db-stat-icon { background:rgba(248,113,113,.12); color:#f87171; }
 
-  .stat-value {
-    font-family: 'Syne', sans-serif;
-    font-size: 24px; font-weight: 800;
-    color: var(--white); letter-spacing: -0.5px;
-    line-height: 1; margin-bottom: 6px;
+  .db-stat-trend {
+    font-size:10px; font-weight:700; padding:3px 7px;
+    border-radius:100px; display:flex; align-items:center; gap:3px;
   }
-  .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .trend-up   { background:rgba(52,211,153,.1);  color:#34d399; }
+  .trend-down { background:rgba(248,113,113,.1); color:#f87171; }
+  .trend-neu  { background:rgba(122,143,173,.1); color:var(--muted); }
 
-  /* MAIN GRID */
-  .main-grid {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 20px;
-    animation: fadeUp 0.5s 0.2s ease both;
+  .db-stat-val {
+    font-family:'Syne',sans-serif;
+    font-size:26px; font-weight:800; color:var(--white);
+    letter-spacing:-1px; line-height:1; margin-bottom:5px;
+    animation: countUp .5s ease both;
   }
+  .db-stat-lbl { font-size:11px; color:var(--muted); letter-spacing:.2px; }
 
-  /* CARD */
+  /* ── MAIN GRID ── */
+  .db-main {
+    display: grid; grid-template-columns: 1fr 300px;
+    gap: 20px; animation: fadeUp .45s .12s ease both;
+  }
+  .db-left  { display:flex; flex-direction:column; gap:18px; }
+  .db-right { display:flex; flex-direction:column; gap:18px; }
+
+  /* ── CARD ── */
   .db-card {
-    background: var(--card);
-    border: 1px solid var(--border);
+    background: var(--card); border: 1px solid var(--border);
     border-radius: 20px; padding: 24px;
-    margin-bottom: 16px;
+    position: relative; overflow: hidden;
   }
-  .db-card:last-child { margin-bottom: 0; }
-
-  .db-card-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 20px;
+  .db-card::before {
+    content:''; position:absolute; top:0; left:0; right:0;
+    height:1px; background:var(--grad); opacity:.35;
+  }
+  .db-card-head {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:20px;
   }
   .db-card-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 15px; font-weight: 700;
-    color: var(--white); letter-spacing: -0.2px;
-    display: flex; align-items: center; gap: 8px;
+    font-family:'Syne',sans-serif;
+    font-size:14px; font-weight:700; color:var(--white);
+    display:flex; align-items:center; gap:9px;
   }
-  .db-card-title i { color: var(--accent); font-size: 14px; }
+  .db-card-title-icon {
+    width:28px; height:28px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
   .db-card-link {
-    font-size: 12px; color: var(--accent); text-decoration: none; font-weight: 600;
-    transition: opacity 0.2s;
+    font-size:12px; color:var(--accent); text-decoration:none;
+    font-weight:600; transition:opacity .2s;
+    display:flex; align-items:center; gap:5px;
   }
-  .db-card-link:hover { opacity: 0.75; }
+  .db-card-link:hover { opacity:.7; }
 
-  /* TABLE */
-  .table-wrap { overflow-x: auto; }
-  .db-table { width: 100%; border-collapse: collapse; min-width: 540px; }
+  /* ── TABLE ── */
+  .db-table-wrap { overflow-x:auto; margin:0 -4px; }
+  .db-table { width:100%; border-collapse:collapse; min-width:520px; }
   .db-table thead th {
-    font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.7px;
-    color: var(--muted); padding: 0 12px 12px;
-    text-align: left; border-bottom: 1px solid var(--border);
+    font-size:10px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.8px; color:var(--muted);
+    padding:0 12px 13px; text-align:left;
+    border-bottom:1px solid var(--border); white-space:nowrap;
   }
   .db-table tbody tr {
-    border-bottom: 1px solid rgba(99,179,237,0.06);
-    transition: background 0.15s;
+    border-bottom:1px solid rgba(99,179,237,.05);
+    transition:background .15s;
+    animation:fadeUp .4s ease both;
   }
-  .db-table tbody tr:last-child { border-bottom: none; }
-  .db-table tbody tr:hover { background: rgba(56,189,248,0.03); }
-  .db-table tbody td {
-    padding: 13px 12px; font-size: 13px; color: var(--text); vertical-align: middle;
-  }
-  .td-id    { color: var(--muted); font-size: 12px; font-weight: 600; }
-  .td-svc   { font-weight: 500; }
-  .td-link  { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 12px; }
-  .td-qty   { font-weight: 600; color: var(--white); }
-  .td-price { font-weight: 600; color: #34d399; }
+  .db-table tbody tr:last-child { border-bottom:none; }
+  .db-table tbody tr:hover { background:rgba(56,189,248,.03); }
+  .db-table tbody td { padding:12px 12px; font-size:13px; color:var(--text); vertical-align:middle; }
 
-  /* BADGES */
+  .td-id    { font-size:11px; font-weight:700; color:var(--muted); font-family:monospace; }
+  .td-svc   { font-weight:500; color:var(--white); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .td-link  { max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; color:var(--muted); }
+  .td-qty   { font-weight:700; color:var(--white); }
+  .td-price { font-weight:700; color:var(--accent3); white-space:nowrap; }
+
+  /* ── BADGES ── */
   .badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 4px 10px; border-radius: 100px;
-    font-size: 11px; font-weight: 700; white-space: nowrap;
+    display:inline-flex; align-items:center; gap:5px;
+    padding:4px 10px; border-radius:100px;
+    font-size:11px; font-weight:700; white-space:nowrap;
   }
-  .badge-green  { background: rgba(52,211,153,0.12);  color: #34d399; border: 1px solid rgba(52,211,153,0.2); }
-  .badge-yellow { background: rgba(251,191,36,0.12);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
-  .badge-red    { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
-  .badge-gray   { background: rgba(122,143,173,0.12); color: var(--muted); border: 1px solid rgba(122,143,173,0.2); }
+  .badge i { font-size:9px; }
+  .badge-green  { background:rgba(52,211,153,.1);  color:#34d399; border:1px solid rgba(52,211,153,.2); }
+  .badge-blue   { background:rgba(129,140,248,.1); color:#818cf8; border:1px solid rgba(129,140,248,.2); }
+  .badge-yellow { background:rgba(251,191,36,.1);  color:#fbbf24; border:1px solid rgba(251,191,36,.2); }
+  .badge-red    { background:rgba(248,113,113,.1); color:#f87171; border:1px solid rgba(248,113,113,.2); }
+  .badge-gray   { background:rgba(122,143,173,.1); color:var(--muted); border:1px solid rgba(122,143,173,.2); }
+  .badge-blue i { animation:spin 1.4s linear infinite; }
 
-  /* EMPTY */
-  .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
-  .empty-state i { font-size: 40px; margin-bottom: 14px; display: block; opacity: 0.4; }
-  .empty-state p { font-size: 14px; margin-bottom: 16px; }
-  .empty-state a { color: var(--accent); text-decoration: none; font-weight: 600; }
-
-  /* QUICK LINKS */
-  .quick-links { display: flex; flex-direction: column; gap: 10px; }
-  .ql-btn {
-    display: flex; align-items: center; gap: 9px;
-    padding: 12px 18px; border-radius: 12px;
-    font-size: 14px; font-weight: 600;
-    text-decoration: none; transition: all 0.22s ease;
-    border: none; cursor: pointer; width: 100%;
+  /* ── EMPTY ── */
+  .db-empty { text-align:center; padding:52px 20px; }
+  .db-empty-icon {
+    width:64px; height:64px;
+    background:rgba(56,189,248,.06); border:1px solid rgba(56,189,248,.12);
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:26px; color:var(--muted); margin:0 auto 18px;
   }
-  .ql-btn i { font-size: 14px; width: 16px; text-align: center; }
-  .ql-primary  { background: var(--grad); color: #fff; box-shadow: 0 0 20px rgba(56,189,248,0.2); }
-  .ql-primary:hover  { opacity: 0.9; transform: translateY(-1px); }
-  .ql-success  { background: rgba(52,211,153,0.1); color: #34d399; border: 1px solid rgba(52,211,153,0.25); }
-  .ql-success:hover  { background: rgba(52,211,153,0.18); transform: translateY(-1px); }
-  .ql-secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
-  .ql-secondary:hover { border-color: rgba(56,189,248,0.3); color: var(--white); transform: translateY(-1px); }
-
-  /* API BOX */
-  .api-box {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 11px; padding: 13px 14px;
-    font-family: 'Courier New', monospace;
-    font-size: 12px; color: #34d399;
-    word-break: break-all; letter-spacing: 0.5px;
-    margin-bottom: 12px; line-height: 1.5;
-    user-select: all; cursor: text;
+  .db-empty h3 { font-size:15px; font-weight:700; color:var(--white); margin-bottom:7px; }
+  .db-empty p  { font-size:13px; color:var(--muted); margin-bottom:20px; }
+  .db-empty-cta {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 22px; border-radius:10px;
+    background:var(--grad); color:#fff;
+    font-size:13px; font-weight:700; text-decoration:none;
+    transition:all .2s;
   }
-  .copy-btn {
-    display: flex; align-items: center; justify-content: center; gap: 7px;
-    padding: 9px 16px; border-radius: 10px;
-    background: var(--card2); color: var(--text);
-    border: 1px solid var(--border);
-    font-size: 12px; font-weight: 600;
-    cursor: pointer; transition: all 0.2s; width: 100%;
-  }
-  .copy-btn:hover { border-color: rgba(56,189,248,0.3); color: var(--white); }
-  .copy-btn.copied { color: #34d399; border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.08); }
+  .db-empty-cta:hover { opacity:.88; transform:translateY(-1px); }
 
-  /* RESPONSIVE */
-  @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (max-width: 860px)  { .main-grid  { grid-template-columns: 1fr; } }
-  @media (max-width: 600px)  { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 380px)  { .stats-grid { grid-template-columns: 1fr; } }
+  /* ── BALANCE CARD ── */
+  .db-balance-card {
+    background: linear-gradient(135deg, #0d1f3c, #0a1628);
+    border: 1px solid rgba(56,189,248,.18);
+    border-radius: 18px; padding: 22px;
+    position: relative; overflow: hidden;
+  }
+  .db-balance-card::before {
+    content:''; position:absolute; top:0; left:0; right:0;
+    height:2px; background:var(--grad);
+  }
+  .db-bal-glow {
+    position:absolute; top:-40px; right:-40px; width:160px; height:160px;
+    background:radial-gradient(circle, rgba(56,189,248,.1), transparent 70%);
+    pointer-events:none;
+  }
+  .db-bal-label { font-size:11px; color:var(--muted); letter-spacing:.5px; text-transform:uppercase; margin-bottom:8px; }
+  .db-bal-amount {
+    font-family:'Syne',sans-serif;
+    font-size:34px; font-weight:800; letter-spacing:-1.5px;
+    background:var(--grad-g); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    line-height:1; margin-bottom:4px;
+  }
+  .db-bal-cur { font-size:14px; color:var(--muted); -webkit-text-fill-color:var(--muted); margin-left:4px; }
+  .db-bal-sub { font-size:12px; color:var(--muted); margin-bottom:18px; }
+  .db-bal-btn {
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:12px; border-radius:11px;
+    background:var(--grad); color:#fff;
+    font-size:13px; font-weight:700; text-decoration:none;
+    box-shadow:0 0 20px rgba(56,189,248,.2);
+    transition:all .2s;
+  }
+  .db-bal-btn:hover { opacity:.9; transform:translateY(-1px); box-shadow:0 4px 24px rgba(56,189,248,.35); }
+
+  /* ── QUICK LINKS ── */
+  .ql-list { display:flex; flex-direction:column; gap:9px; }
+  .ql-item {
+    display:flex; align-items:center; gap:12px;
+    padding:12px 16px; border-radius:12px;
+    font-size:13px; font-weight:600; text-decoration:none;
+    border:1px solid var(--border); color:var(--text);
+    background:var(--card2); transition:all .2s;
+  }
+  .ql-item:hover { border-color:var(--border2); color:var(--white); transform:translateX(3px); }
+  .ql-item-icon {
+    width:32px; height:32px; border-radius:9px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; flex-shrink:0;
+  }
+  .ql-item .ql-arrow { margin-left:auto; color:var(--muted); font-size:11px; transition:transform .2s; }
+  .ql-item:hover .ql-arrow { color:var(--accent); transform:translateX(3px); }
+
+  /* ── API KEY ── */
+  .db-api-box {
+    background:var(--bg); border:1px solid rgba(52,211,153,.15);
+    border-radius:11px; padding:13px 14px;
+    font-family:'Courier New',monospace;
+    font-size:11px; color:#34d399;
+    word-break:break-all; letter-spacing:.5px;
+    margin-bottom:12px; line-height:1.6;
+    user-select:all; cursor:text;
+  }
+  .db-copy-btn {
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    padding:9px; border-radius:10px;
+    background:var(--card2); color:var(--text);
+    border:1px solid var(--border);
+    font-size:12px; font-weight:600;
+    cursor:pointer; transition:all .2s; width:100%;
+    font-family:'DM Sans',sans-serif;
+  }
+  .db-copy-btn:hover { border-color:rgba(56,189,248,.3); color:var(--white); }
+  .db-copy-btn.copied { color:#34d399; border-color:rgba(52,211,153,.3); background:rgba(52,211,153,.07); }
+
+  /* ── ACTIVITY CHART ── */
+  .db-chart-wrap {
+    display: flex; align-items: flex-end; gap: 6px;
+    height: 60px; padding-top: 8px;
+  }
+  .db-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .db-bar {
+    width: 100%; border-radius: 4px 4px 0 0;
+    background: linear-gradient(to top, rgba(56,189,248,.3), rgba(56,189,248,.7));
+    transition: background .2s;
+    min-height: 4px;
+  }
+  .db-bar:hover { background: linear-gradient(to top, #38bdf8, #818cf8); }
+  .db-bar-lbl { font-size: 9px; color: var(--muted); }
+
+  @media (max-width:1100px) { .db-stats { grid-template-columns:repeat(3,1fr); } }
+  @media (max-width:900px)  { .db-main  { grid-template-columns:1fr; } }
+  @media (max-width:600px)  { .db-stats { grid-template-columns:repeat(2,1fr); } }
 </style>
 
-<!-- PAGE HEADER -->
-<div class="page-header">
-  <div>
-    <h1 class="page-title">
-      <div class="page-title-icon"><i class="fas fa-home"></i></div>
-      Dashboard
-    </h1>
-    <div class="greeting">Salom, <strong style="color:var(--white)">{{ user.username }}</strong> 👋 — bugun ham muvaffaqiyatli kun!</div>
+<!-- HEADER -->
+<div class="db-header">
+  <div class="db-header-left">
+    <div class="db-header-icon"><i class="fas fa-chart-line"></i></div>
+    <div>
+      <div class="db-title">Dashboard</div>
+      <div class="db-greeting">
+        Salom, <strong>{{ user.username }}</strong> 👋 — bugun ham muvaffaqiyatli kun!
+      </div>
+    </div>
+  </div>
+  <div class="db-header-right">
+    <div class="db-time">
+      <span class="db-time-dot"></span>
+      <span id="db-clock">--:--:--</span>
+    </div>
+    <a href="/new-order"
+       style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;background:var(--grad);border-radius:100px;color:#fff;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 0 18px rgba(56,189,248,.25);transition:all .2s"
+       onmouseover="this.style.opacity='.88';this.style.transform='translateY(-1px)'"
+       onmouseout="this.style.opacity='1';this.style.transform='none'">
+      <i class="fas fa-plus"></i> Yangi Order
+    </a>
   </div>
 </div>
 
 <!-- STATS -->
-<div class="stats-grid">
-  <div class="stat-card s-purple">
-    <div class="stat-icon-wrap s-purple"><i class="fas fa-wallet"></i></div>
-    <div class="stat-value">{{ "{:,.0f}".format(user.balance) }}</div>
-    <div class="stat-label">Balans (so'm)</div>
+<div class="db-stats">
+  <div class="db-stat c-purple">
+    <div class="db-stat-top">
+      <div class="db-stat-icon"><i class="fas fa-wallet"></i></div>
+      <span class="db-stat-trend trend-up"><i class="fas fa-arrow-up"></i></span>
+    </div>
+    <div class="db-stat-val">{{ "{:,.0f}".format(user.balance) }}</div>
+    <div class="db-stat-lbl">Balans (so'm)</div>
   </div>
-  <div class="stat-card s-teal">
-    <div class="stat-icon-wrap s-teal"><i class="fas fa-shopping-cart"></i></div>
-    <div class="stat-value">{{ stats.total_orders }}</div>
-    <div class="stat-label">Jami Orderlar</div>
+  <div class="db-stat c-teal">
+    <div class="db-stat-top">
+      <div class="db-stat-icon"><i class="fas fa-cart-shopping"></i></div>
+      <span class="db-stat-trend trend-neu"><i class="fas fa-minus"></i></span>
+    </div>
+    <div class="db-stat-val">{{ stats.total_orders }}</div>
+    <div class="db-stat-lbl">Jami Orderlar</div>
   </div>
-  <div class="stat-card s-green">
-    <div class="stat-icon-wrap s-green"><i class="fas fa-check-circle"></i></div>
-    <div class="stat-value">{{ stats.completed }}</div>
-    <div class="stat-label">Bajarilgan</div>
+  <div class="db-stat c-green">
+    <div class="db-stat-top">
+      <div class="db-stat-icon"><i class="fas fa-circle-check"></i></div>
+      <span class="db-stat-trend trend-up"><i class="fas fa-arrow-up"></i></span>
+    </div>
+    <div class="db-stat-val">{{ stats.completed }}</div>
+    <div class="db-stat-lbl">Bajarilgan</div>
   </div>
-  <div class="stat-card s-yellow">
-    <div class="stat-icon-wrap s-yellow"><i class="fas fa-clock"></i></div>
-    <div class="stat-value">{{ stats.pending }}</div>
-    <div class="stat-label">Jarayonda</div>
+  <div class="db-stat c-yellow">
+    <div class="db-stat-top">
+      <div class="db-stat-icon"><i class="fas fa-clock"></i></div>
+      <span class="db-stat-trend trend-neu"><i class="fas fa-minus"></i></span>
+    </div>
+    <div class="db-stat-val">{{ stats.pending }}</div>
+    <div class="db-stat-lbl">Jarayonda</div>
   </div>
-  <div class="stat-card s-red">
-    <div class="stat-icon-wrap s-red"><i class="fas fa-coins"></i></div>
-    <div class="stat-value">{{ "{:,.0f}".format(stats.total_spent) }}</div>
-    <div class="stat-label">Jami Sarflangan</div>
+  <div class="db-stat c-red">
+    <div class="db-stat-top">
+      <div class="db-stat-icon"><i class="fas fa-coins"></i></div>
+      <span class="db-stat-trend trend-down"><i class="fas fa-arrow-down"></i></span>
+    </div>
+    <div class="db-stat-val">{{ "{:,.0f}".format(stats.total_spent) }}</div>
+    <div class="db-stat-lbl">Sarflangan so'm</div>
   </div>
 </div>
 
-<!-- MAIN GRID -->
-<div class="main-grid">
+<!-- MAIN -->
+<div class="db-main">
 
-  <!-- RECENT ORDERS -->
-  <div>
+  <!-- LEFT -->
+  <div class="db-left">
+
+    <!-- RECENT ORDERS TABLE -->
     <div class="db-card">
-      <div class="db-card-header">
-        <div class="db-card-title"><i class="fas fa-receipt"></i> So'nggi Orderlar</div>
-        <a href="/orders" class="db-card-link">Barchasi →</a>
+      <div class="db-card-head">
+        <div class="db-card-title">
+          <div class="db-card-title-icon" style="background:rgba(56,189,248,.1);color:var(--accent)">
+            <i class="fas fa-receipt"></i>
+          </div>
+          So'nggi Orderlar
+        </div>
+        <a href="/orders" class="db-card-link">Barchasi <i class="fas fa-arrow-right" style="font-size:10px"></i></a>
       </div>
+
       {% if recent %}
-      <div class="table-wrap">
+      <div class="db-table-wrap">
         <table class="db-table">
           <thead>
             <tr>
-              <th>#</th><th>Xizmat</th><th>Link</th><th>Miqdor</th><th>Narx</th><th>Status</th>
+              <th>#ID</th><th>Xizmat</th><th>Link</th>
+              <th>Miqdor</th><th>Narx</th><th>Status</th>
             </tr>
           </thead>
           <tbody>
             {% for o in recent %}
-            <tr>
+            <tr style="animation-delay:{{ loop.index0 * 0.05 }}s">
               <td class="td-id">#{{ o.id }}</td>
-              <td class="td-svc">{{ o.svc_name[:30] }}{% if o.svc_name|length > 30 %}…{% endif %}</td>
+              <td class="td-svc" title="{{ o.svc_name }}">
+                {{ o.svc_name[:28] }}{% if o.svc_name|length > 28 %}…{% endif %}
+              </td>
               <td class="td-link" title="{{ o.link }}">{{ o.link }}</td>
-              <td class="td-qty">{{ o.quantity }}</td>
+              <td class="td-qty">{{ "{:,}".format(o.quantity) }}</td>
               <td class="td-price">{{ "{:,.0f}".format(o.price) }} so'm</td>
               <td>
                 {% if o.status == 'Completed' %}
                   <span class="badge badge-green"><i class="fas fa-check"></i> Bajarildi</span>
-                {% elif o.status in ['Pending', 'Processing'] %}
-                  <span class="badge badge-yellow"><i class="fas fa-spinner fa-spin"></i> {{ o.status }}</span>
+                {% elif o.status == 'Processing' %}
+                  <span class="badge badge-blue"><i class="fas fa-spinner"></i> Jarayonda</span>
+                {% elif o.status == 'Pending' %}
+                  <span class="badge badge-yellow"><i class="fas fa-clock"></i> Kutilmoqda</span>
                 {% elif o.status == 'Failed' %}
-                  <span class="badge badge-red"><i class="fas fa-times"></i> Xato</span>
+                  <span class="badge badge-red"><i class="fas fa-xmark"></i> Xato</span>
                 {% else %}
                   <span class="badge badge-gray">{{ o.status }}</span>
                 {% endif %}
@@ -279,47 +429,117 @@
         </table>
       </div>
       {% else %}
-      <div class="empty-state">
-        <i class="fas fa-box-open"></i>
-        <p>Hali orderlar yo'q.</p>
-        <a href="/new-order"><i class="fas fa-plus"></i> Birinchi orderni bering</a>
+      <div class="db-empty">
+        <div class="db-empty-icon"><i class="fas fa-box-open"></i></div>
+        <h3>Hali orderlar yo'q</h3>
+        <p>Birinchi orderni bering va natijani kuzating</p>
+        <a href="/new-order" class="db-empty-cta"><i class="fas fa-plus"></i> Yangi Order</a>
       </div>
       {% endif %}
     </div>
+
+    <!-- MINI CHART -->
+    <div class="db-card">
+      <div class="db-card-head">
+        <div class="db-card-title">
+          <div class="db-card-title-icon" style="background:rgba(129,140,248,.1);color:#818cf8">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          Haftalik Faollik
+        </div>
+      </div>
+      <div class="db-chart-wrap" id="db-chart"></div>
+    </div>
+
   </div>
 
-  <!-- SIDEBAR -->
-  <div>
-    <div class="db-card">
-      <div class="db-card-header">
-        <div class="db-card-title"><i class="fas fa-bolt"></i> Tezkor Havolalar</div>
+  <!-- RIGHT -->
+  <div class="db-right">
+
+    <!-- BALANCE -->
+    <div class="db-balance-card">
+      <div class="db-bal-glow"></div>
+      <div class="db-bal-label">Joriy Balans</div>
+      <div>
+        <span class="db-bal-amount">{{ "{:,.0f}".format(user.balance) }}</span>
+        <span class="db-bal-cur">so'm</span>
       </div>
-      <div class="quick-links">
-        <a href="/new-order" class="ql-btn ql-primary"><i class="fas fa-plus"></i> Yangi Order</a>
-        <a href="/add-funds" class="ql-btn ql-success"><i class="fas fa-wallet"></i> Balans To'ldirish</a>
-        <a href="/orders"    class="ql-btn ql-secondary"><i class="fas fa-list"></i> Barcha Orderlar</a>
-        <a href="/api-docs"  class="ql-btn ql-secondary"><i class="fas fa-code"></i> API Hujjatlari</a>
+      <div class="db-bal-sub">Mavjud mablag'ingiz</div>
+      <a href="/add-funds" class="db-bal-btn">
+        <i class="fas fa-plus"></i> Balansni To'ldirish
+      </a>
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="db-card">
+      <div class="db-card-head">
+        <div class="db-card-title">
+          <div class="db-card-title-icon" style="background:rgba(56,189,248,.1);color:var(--accent)">
+            <i class="fas fa-bolt"></i>
+          </div>
+          Tezkor Havolalar
+        </div>
+      </div>
+      <div class="ql-list">
+        <a href="/new-order" class="ql-item">
+          <div class="ql-item-icon" style="background:rgba(56,189,248,.1);color:var(--accent)"><i class="fas fa-plus"></i></div>
+          Yangi Order
+          <i class="fas fa-chevron-right ql-arrow"></i>
+        </a>
+        <a href="/orders" class="ql-item">
+          <div class="ql-item-icon" style="background:rgba(129,140,248,.1);color:#818cf8"><i class="fas fa-list"></i></div>
+          Barcha Orderlar
+          <i class="fas fa-chevron-right ql-arrow"></i>
+        </a>
+        <a href="/profile" class="ql-item">
+          <div class="ql-item-icon" style="background:rgba(52,211,153,.1);color:#34d399"><i class="fas fa-user"></i></div>
+          Profil
+          <i class="fas fa-chevron-right ql-arrow"></i>
+        </a>
+        <a href="/api-docs" class="ql-item">
+          <div class="ql-item-icon" style="background:rgba(251,146,60,.1);color:#fb923c"><i class="fas fa-code"></i></div>
+          API Hujjatlari
+          <i class="fas fa-chevron-right ql-arrow"></i>
+        </a>
       </div>
     </div>
 
+    <!-- API KEY -->
     <div class="db-card">
-      <div class="db-card-header">
-        <div class="db-card-title"><i class="fas fa-key"></i> API Kalit</div>
+      <div class="db-card-head">
+        <div class="db-card-title">
+          <div class="db-card-title-icon" style="background:rgba(52,211,153,.1);color:#34d399">
+            <i class="fas fa-terminal"></i>
+          </div>
+          API Kalit
+        </div>
       </div>
-      <div class="api-box" id="api-key-box">{{ user.api_key }}</div>
-      <button class="copy-btn" id="copy-btn" onclick="copyKey()">
+      <div class="db-api-box" id="api-key-box">{{ user.api_key }}</div>
+      <button class="db-copy-btn" id="copy-btn" onclick="copyKey()">
         <i class="fas fa-copy"></i> Nusxalash
       </button>
     </div>
-  </div>
 
+  </div>
 </div>
 
+{% endblock %}
+{% block scripts %}
 <script>
+  // Live clock
+  function tick() {
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    document.getElementById('db-clock').textContent =
+      pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+  }
+  tick(); setInterval(tick, 1000);
+
+  // Copy API key
   function copyKey() {
     const key = document.getElementById('api-key-box').textContent.trim();
+    const btn = document.getElementById('copy-btn');
     navigator.clipboard.writeText(key).then(() => {
-      const btn = document.getElementById('copy-btn');
       btn.classList.add('copied');
       btn.innerHTML = '<i class="fas fa-check"></i> Nusxalandi!';
       setTimeout(() => {
@@ -328,6 +548,24 @@
       }, 2200);
     });
   }
-</script>
 
+  // Mini chart — random demo bars (replace with real data if available)
+  const days  = ['Du','Se','Ch','Pa','Ju','Sh','Ya'];
+  const chart = document.getElementById('db-chart');
+  const maxH  = 52;
+  const vals  = [
+    {{ stats.total_orders or 0 }},
+    {% for _ in range(6) %}Math.floor(Math.random()*10+2),{% endfor %}
+  ];
+  // normalize
+  const peak = Math.max(...vals, 1);
+  days.forEach((d, i) => {
+    const h = Math.max(4, Math.round((vals[i] / peak) * maxH));
+    chart.innerHTML += `
+      <div class="db-bar-col">
+        <div class="db-bar" style="height:${h}px;animation:fadeUp .4s ${i*0.06}s ease both"></div>
+        <div class="db-bar-lbl">${d}</div>
+      </div>`;
+  });
+</script>
 {% endblock %}
