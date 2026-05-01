@@ -1,0 +1,60 @@
+import sqlite3
+import random
+from datetime import datetime, timedelta
+
+conn = sqlite3.connect('smm_panel.db')
+cur = conn.cursor()
+
+methods  = ['click', 'payme', 'uzcard', 'humo', 'crypto']
+statuses = ['completed', 'completed', 'completed', 'pending', 'failed']
+descs    = ['Hisob to\'ldirish', 'Balans yuklash', 'To\'lov', 'Depozit', 'Refill']
+types    = ['deposit', 'deposit', 'deposit', 'withdrawal', 'refund']
+
+def rand_date():
+    days = random.randint(1, 365)
+    dt = datetime.now() - timedelta(days=days)
+    return dt.strftime('%Y-%m-%d %H:%M:%S')
+
+def rand_amount():
+    return round(random.choice([
+        5000, 10000, 15000, 20000, 25000,
+        50000, 75000, 100000, 150000, 200000,
+        500000, 1000000
+    ]) * random.uniform(0.8, 1.2), 2)
+
+# 600ta deposit
+for i in range(600):
+    user_id = random.randint(1, 5)  # mavjud user idlariga qarab o'zgartiring
+    amount  = rand_amount()
+    method  = random.choice(methods)
+    status  = random.choice(statuses)
+    date    = rand_date()
+    tx_hash = f"TX{random.randint(100000, 999999)}"
+
+    cur.execute("""
+        INSERT INTO deposits (user_id, amount, method, status, tx_hash, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (user_id, amount, method, status, tx_hash, date))
+
+# 600ta transaction
+for i in range(600):
+    user_id = random.randint(1, 5)
+    amount  = rand_amount()
+    t_type  = random.choice(types)
+    desc    = random.choice(descs)
+    status  = random.choice(statuses)
+    date    = rand_date()
+    ref_id  = f"REF{random.randint(10000, 99999)}"
+
+    cur.execute("""
+        INSERT INTO transactions (user_id, type, amount, description, ref_id, status, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (user_id, t_type, amount, desc, ref_id, status, date))
+
+conn.commit()
+conn.close()
+print("✅ 600ta deposit + 600ta transaction qo'shildi!")
+
+python3 seed.py
+
+

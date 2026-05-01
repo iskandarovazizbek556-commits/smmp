@@ -91,35 +91,51 @@ def orders():
 def add_funds():
     db = get_db()
     u  = current_user()
+
     if request.method == "POST":
-        method = request.form.get("method", "Payme")
-        amount = int(request.form.get("amount", 0))
+        import os, time
+        method     = request.form.get("method", "Karta")
+        amount_str = request.form.get("amount", "0").replace(",", "").replace(" ", "")
+        try:
+            amount = int(float(amount_str))
+        except:
+            flash("Summa noto'g'ri", "error")
+            return redirect(url_for("user.add_funds"))
+
         if amount < Config.MIN_DEPOSIT:
             flash(f"Minimal: {Config.MIN_DEPOSIT:,} so'm", "error")
             return redirect(url_for("user.add_funds"))
-        cur    = db.execute(
-            "INSERT INTO deposits (user_id,amount,method,status) VALUES (?,?,?,?)",
-            (u["id"], amount, method, "pending")
+
+        check_file = request.files.get("check_file")
+        if not check_file or check_file.filename == "":
+            flash("Iltimos, to'lov chekini yuklang", "warning")
+            return redirect(url_for("user.add_funds"))
+
+        # Faylni saqlash
+        UPLOAD_FOLDER = os.path.join("static", "uploads", "checks")
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        ext      = check_file.filename.rsplit(".", 1)[-1].lower()
+        filename = f"check_{u['id']}_{int(time.time())}.{ext}"
+        check_file.save(os.path.join(UPLOAD_FOLDER, filename))
+        check_url = f"/static/uploads/checks/{filename}"
+
+        # DB ga saqlash
+        cur = db.execute(
+            "INSERT INTO deposits (user_id, amount, method, status, tx_hash) VALUES (?,?,?,?,?)",
+            (u["id"], amount, method, "pending", check_url)
         )
-        dep_id = cur.lastrowid
         db.commit()
-        if method == "Payme":
-            r = payme_create(dep_id, amount)
-            return redirect(r["url"])
-        if method == "USDT":
-            r = usdt_create(dep_id, amount)
-            if r.get("ok"):
-                db.execute("UPDATE deposits SET external_id=? WHERE id=?",
-                           (f"usdt_{r['amount_usdt']}", dep_id))
-                db.commit()
-                return render_template("add_funds.html", user=r2d(u), usdt=r, dep_id=dep_id)
-            flash("USDT xizmati vaqtincha mavjud emas", "error")
+
+        flash(f"✅ Chek qabul qilindi! Admin 5-15 daqiqa ichida tasdiqlaydi.", "success")
+        return redirect(url_for("user.add_funds"))
+
     history = r2l(db.execute(
         "SELECT * FROM deposits WHERE user_id=? ORDER BY created_at DESC LIMIT 20",
         (u["id"],)
     ).fetchall())
-    return render_template("add_funds.html", user=r2d(u), history=history)
-
+    return render_template("add_funds.html", user=r2d(u), history=history,
+                           card_number="5614 6835 8365 4223",
+                           card_owner="Iskandarov Azizbek")
 
 @user_bp.route("/add-funds/usdt/check", methods=["POST"])
 @login_required
@@ -201,4 +217,5 @@ def profile():
         "pending":      db.execute("SELECT COUNT(*) FROM orders WHERE user_id=? AND status IN ('Pending','Processing')", (u["id"],)).fetchone()[0],
         "total_spent":  u["total_spent"],
     }
+
     return render_template("profile.html", user=r2d(u), transactions=txs, stats=stats)

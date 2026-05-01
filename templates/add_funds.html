@@ -4,281 +4,158 @@
 {% block content %}
 <style>
   *, *::before, *::after { box-sizing: border-box; }
-
   :root {
-    --bg:      #050a14;
-    --card:    #0d1628;
-    --card2:   #111d35;
-    --border:  rgba(99,179,237,0.12);
-    --border2: rgba(99,179,237,0.22);
-    --accent:  #38bdf8;
-    --accent2: #818cf8;
-    --accent3: #34d399;
-    --text:    #e2eaf8;
-    --muted:   #7a8fad;
-    --white:   #ffffff;
-    --grad:    linear-gradient(135deg, #38bdf8, #818cf8);
-    --grad-g:  linear-gradient(135deg, #34d399, #059669);
-    --tg:      #229ED9;
+    --bg:#050a14; --card:#0d1628; --card2:#111d35;
+    --border:rgba(99,179,237,0.12); --border2:rgba(99,179,237,0.22);
+    --accent:#38bdf8; --accent2:#818cf8; --accent3:#34d399;
+    --text:#e2eaf8; --muted:#7a8fad; --white:#ffffff;
+    --grad:linear-gradient(135deg,#38bdf8,#818cf8);
+    --grad-g:linear-gradient(135deg,#34d399,#059669);
   }
-
-  @keyframes fadeUp  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.4} }
-  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
   @keyframes selectPop { 0%{transform:scale(.96)} 60%{transform:scale(1.03)} 100%{transform:scale(1)} }
 
-  /* ── HEADER ── */
-  .af-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
-    animation: fadeUp .45s ease both;
-  }
-  .af-header-left { display: flex; align-items: center; gap: 14px; }
-  .af-header-icon {
-    width: 44px; height: 44px; background: var(--grad);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; color: #fff;
-    box-shadow: 0 0 22px rgba(56,189,248,.3); flex-shrink: 0;
-  }
+  .af-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:14px; animation:fadeUp .45s ease both; }
+  .af-header-left { display:flex; align-items:center; gap:14px; }
+  .af-header-icon { width:44px; height:44px; background:var(--grad); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:18px; color:#fff; box-shadow:0 0 22px rgba(56,189,248,.3); }
   .af-title    { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--white); letter-spacing:-.5px; }
   .af-subtitle { font-size:13px; color:var(--muted); margin-top:2px; }
 
-  /* ── LAYOUT ── */
-  .af-layout {
-    display: grid; grid-template-columns: 1fr 300px;
-    gap: 20px; align-items: start;
-    animation: fadeUp .45s .07s ease both;
-  }
-  .af-left  { display: flex; flex-direction: column; gap: 18px; }
-  .af-right { display: flex; flex-direction: column; gap: 18px; }
+  .af-layout { display:grid; grid-template-columns:1fr 300px; gap:20px; align-items:start; animation:fadeUp .45s .07s ease both; }
+  .af-left  { display:flex; flex-direction:column; gap:18px; }
+  .af-right { display:flex; flex-direction:column; gap:18px; }
 
-  /* ── CARD ── */
-  .af-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 20px; padding: 26px;
-    position: relative; overflow: hidden;
-  }
-  .af-card::before {
-    content:''; position:absolute; top:0; left:0; right:0;
-    height:1px; background:var(--grad); opacity:.4;
-  }
-  .af-card-title {
-    font-size:10px; font-weight:700;
-    letter-spacing:.12em; text-transform:uppercase;
-    color:var(--muted); margin:0 0 20px;
-    display:flex; align-items:center; gap:8px;
-  }
+  .af-card { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:26px; position:relative; overflow:hidden; }
+  .af-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:var(--grad); opacity:.4; }
+  .af-card-title { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0 0 20px; display:flex; align-items:center; gap:8px; }
   .af-card-title i { color:var(--accent); font-size:11px; }
 
-  /* ── AMOUNT INPUT ── */
-  .af-amount-wrap { margin-bottom: 24px; }
-  .af-amount-label {
-    font-size:12px; font-weight:600; color:var(--muted);
-    letter-spacing:.3px; margin-bottom:8px; display:block;
-  }
-  .af-amount-input-wrap { position: relative; }
-  .af-amount-input-wrap .cur {
-    position:absolute; left:16px; top:50%; transform:translateY(-50%);
-    font-size:18px; font-weight:700; color:var(--muted);
-    pointer-events:none;
-  }
-  .af-amount-input {
-    width:100%; padding:14px 14px 14px 48px;
-    background:var(--card2); border:1px solid var(--border);
-    border-radius:12px; color:var(--white);
-    font-family:'Syne',sans-serif;
-    font-size:22px; font-weight:700; outline:none;
-    transition:all .25s; letter-spacing:-.5px;
-  }
+  /* ── AMOUNT ── */
+  .af-amount-label { font-size:12px; font-weight:600; color:var(--muted); letter-spacing:.3px; margin-bottom:8px; display:block; }
+  .af-amount-input-wrap { position:relative; margin-bottom:8px; }
+  .af-amount-input-wrap .cur { position:absolute; left:16px; top:50%; transform:translateY(-50%); font-size:18px; font-weight:700; color:var(--muted); pointer-events:none; }
+  .af-amount-input { width:100%; padding:14px 14px 14px 48px; background:var(--card2); border:1px solid var(--border); border-radius:12px; color:var(--white); font-family:'Syne',sans-serif; font-size:22px; font-weight:700; outline:none; transition:all .25s; }
   .af-amount-input::placeholder { color:#2a3a55; font-weight:400; font-size:18px; }
-  .af-amount-input:focus {
-    border-color:rgba(56,189,248,.5);
-    box-shadow:0 0 0 3px rgba(56,189,248,.08);
-    background:#0f1c33;
-  }
-  .af-amount-input.err { border-color:rgba(248,113,113,.5); box-shadow:0 0 0 3px rgba(248,113,113,.08); }
-  .af-amount-hint { font-size:12px; color:var(--muted); margin-top:7px; display:flex; align-items:center; gap:6px; }
+  .af-amount-input:focus { border-color:rgba(56,189,248,.5); box-shadow:0 0 0 3px rgba(56,189,248,.08); background:#0f1c33; }
+  .af-amount-input.err { border-color:rgba(248,113,113,.5); }
+  .af-amount-hint { font-size:12px; color:var(--muted); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
   .af-amount-hint i { color:var(--accent); font-size:10px; }
-
-  /* Quick amounts */
-  .af-quick-btns { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
-  .af-quick-btn {
-    padding:6px 14px; border-radius:100px;
-    background:var(--card2); border:1px solid var(--border);
-    font-size:12px; font-weight:600; color:var(--muted);
-    cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif;
-  }
+  .af-quick-btns { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
+  .af-quick-btn { padding:6px 14px; border-radius:100px; background:var(--card2); border:1px solid var(--border); font-size:12px; font-weight:600; color:var(--muted); cursor:pointer; transition:all .2s; font-family:'DM Sans',sans-serif; }
   .af-quick-btn:hover { border-color:rgba(56,189,248,.3); color:var(--accent); }
   .af-quick-btn.active { background:rgba(56,189,248,.1); border-color:rgba(56,189,248,.35); color:var(--accent); }
 
-  /* ── PAYMENT METHODS ── */
-  .af-methods-label {
-    font-size:12px; font-weight:600; color:var(--muted);
-    letter-spacing:.3px; margin-bottom:12px; display:block;
-  }
-  .af-methods { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:4px; }
-
-  .af-pay-card {
-    border:1.5px solid var(--border);
-    border-radius:14px; padding:16px 12px;
-    text-align:center; cursor:pointer;
-    transition:all .22s; background:var(--card2);
-    position:relative; overflow:hidden;
-  }
+  /* ── PAYMENT METHOD ── */
+  .af-methods-label { font-size:12px; font-weight:600; color:var(--muted); letter-spacing:.3px; margin-bottom:12px; display:block; }
+  .af-methods { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:22px; }
+  .af-pay-card { border:1.5px solid var(--border); border-radius:14px; padding:16px 12px; text-align:center; cursor:pointer; transition:all .22s; background:var(--card2); position:relative; overflow:hidden; }
   .af-pay-card:hover { border-color:var(--border2); background:#131f38; }
-  .af-pay-card.selected {
-    border-color:rgba(56,189,248,.5);
-    background:rgba(56,189,248,.07);
-    box-shadow:0 0 0 3px rgba(56,189,248,.08);
-    animation:selectPop .28s ease;
-  }
+  .af-pay-card.selected { border-color:rgba(56,189,248,.5); background:rgba(56,189,248,.07); box-shadow:0 0 0 3px rgba(56,189,248,.08); animation:selectPop .28s ease; }
   .af-pay-card.selected .af-pay-check { opacity:1; }
-  .af-pay-check {
-    position:absolute; top:9px; right:9px;
-    width:18px; height:18px; border-radius:50%;
-    background:var(--accent); color:#000;
-    display:flex; align-items:center; justify-content:center;
-    font-size:9px; opacity:0; transition:opacity .2s;
-  }
-  .af-pay-icon {
-    width:48px; height:48px; border-radius:13px;
-    display:flex; align-items:center; justify-content:center;
-    margin:0 auto 10px; font-size:22px;
-  }
+  .af-pay-check { position:absolute; top:9px; right:9px; width:18px; height:18px; border-radius:50%; background:var(--accent); color:#000; display:flex; align-items:center; justify-content:center; font-size:9px; opacity:0; transition:opacity .2s; }
+  .af-pay-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 9px; font-size:20px; }
   .af-pay-name { font-size:13px; font-weight:700; color:var(--white); margin:0 0 3px; }
   .af-pay-sub  { font-size:11px; color:var(--muted); }
 
-  /* ── TELEGRAM BUTTON ── */
-  .af-tg-btn {
-    display:flex; align-items:center; justify-content:center; gap:12px;
-    width:100%; padding:15px;
-    border-radius:13px; border:none;
-    background:linear-gradient(135deg, #229ED9, #1a7fb0);
-    color:#fff; font-size:15px; font-weight:700;
-    font-family:'Syne',sans-serif;
-    cursor:pointer; text-decoration:none;
-    box-shadow:0 0 24px rgba(34,158,217,.3);
-    transition:all .22s; margin-top:22px;
-    letter-spacing:-.2px;
+  /* ── CARD INFO BOX ── */
+  .af-card-info {
+    background:rgba(56,189,248,.05); border:1px solid rgba(56,189,248,.18);
+    border-radius:16px; padding:20px; margin-bottom:22px;
   }
-  .af-tg-btn:hover {
-    opacity:.92; transform:translateY(-2px);
-    box-shadow:0 6px 32px rgba(34,158,217,.45);
+  .af-card-info-title { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:7px; }
+  .af-card-info-title i { color:var(--accent); }
+  .af-card-number-wrap { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .af-card-number {
+    font-family:'Syne',sans-serif; font-size:22px; font-weight:800;
+    letter-spacing:3px; color:var(--white);
+    background:var(--card2); border:1px solid var(--border2);
+    padding:12px 18px; border-radius:12px; flex:1;
+    user-select:all; cursor:pointer;
   }
-  .af-tg-btn:active { transform:translateY(0); }
-  .af-tg-btn .tg-icon { font-size:20px; }
+  .af-copy-btn {
+    padding:10px 16px; border-radius:10px; background:rgba(56,189,248,.1);
+    border:1px solid rgba(56,189,248,.22); color:var(--accent);
+    font-size:12px; font-weight:700; cursor:pointer; transition:all .2s;
+    display:flex; align-items:center; gap:6px; white-space:nowrap; font-family:'DM Sans',sans-serif;
+  }
+  .af-copy-btn:hover { background:rgba(56,189,248,.18); }
+  .af-card-owner { font-size:13px; color:var(--accent3); margin-top:10px; display:flex; align-items:center; gap:7px; }
+  .af-card-owner i { opacity:.7; }
+  .af-warning-box {
+    margin-top:12px; padding:11px 14px;
+    background:rgba(251,191,36,.07); border:1px solid rgba(251,191,36,.2);
+    border-radius:10px; font-size:12px; color:#fbbf24; line-height:1.6;
+    display:flex; gap:8px; align-items:flex-start;
+  }
+  .af-warning-box i { flex-shrink:0; margin-top:2px; }
 
-  /* ── TG INFO BOX ── */
-  .af-tg-info {
-    display:flex; align-items:flex-start; gap:12px;
-    padding:14px 16px;
-    background:rgba(34,158,217,.07);
-    border:1px solid rgba(34,158,217,.18);
-    border-radius:13px; margin-top:14px;
+  /* ── UPLOAD ZONE ── */
+  .af-upload-label { font-size:12px; font-weight:600; color:var(--muted); letter-spacing:.3px; margin-bottom:10px; display:block; }
+  .af-upload-zone {
+    border:2px dashed rgba(56,189,248,.25); border-radius:14px;
+    padding:28px 20px; text-align:center; cursor:pointer;
+    transition:all .25s; background:var(--card2); position:relative;
+    margin-bottom:18px;
   }
-  .af-tg-info-icon {
-    width:34px; height:34px; border-radius:50%;
-    background:var(--tg);
-    display:flex; align-items:center; justify-content:center;
-    font-size:14px; color:#fff; flex-shrink:0; margin-top:1px;
+  .af-upload-zone:hover, .af-upload-zone.drag { border-color:rgba(56,189,248,.5); background:#0f1c33; }
+  .af-upload-zone.has-file { border-color:rgba(52,211,153,.4); background:rgba(52,211,153,.04); }
+  .af-upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .af-upload-icon { font-size:28px; color:var(--muted); margin-bottom:10px; }
+  .af-upload-text { font-size:13px; color:var(--muted); line-height:1.5; }
+  .af-upload-text strong { color:var(--accent); }
+  .af-upload-preview { display:none; flex-direction:column; align-items:center; gap:10px; }
+  .af-upload-preview img { max-height:160px; border-radius:10px; border:1px solid var(--border2); object-fit:contain; }
+  .af-upload-preview .af-preview-name { font-size:12px; color:var(--accent3); }
+
+  /* ── SUBMIT ── */
+  .af-submit-btn {
+    width:100%; padding:15px; border-radius:13px; border:none;
+    background:var(--grad); color:#fff;
+    font-family:'Syne',sans-serif; font-size:15px; font-weight:700;
+    cursor:pointer; transition:all .22s; letter-spacing:-.2px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    box-shadow:0 0 24px rgba(56,189,248,.2);
   }
-  .af-tg-info p { font-size:13px; color:rgba(56,189,248,.75); line-height:1.65; margin:0; }
-  .af-tg-info strong { color:var(--accent); }
-  .af-tg-username {
-    display:inline-flex; align-items:center; gap:5px;
-    padding:2px 10px; border-radius:100px;
-    background:rgba(56,189,248,.12); border:1px solid rgba(56,189,248,.2);
-    color:var(--accent); font-size:12px; font-weight:700;
-    text-decoration:none; margin:0 2px;
-    transition:all .2s;
-  }
-  .af-tg-username:hover { background:rgba(56,189,248,.2); }
+  .af-submit-btn:hover { opacity:.92; transform:translateY(-2px); box-shadow:0 6px 32px rgba(56,189,248,.35); }
+  .af-submit-btn:active { transform:translateY(0); }
+  .af-submit-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
 
   /* ── STEPS ── */
   .af-steps { display:flex; flex-direction:column; gap:0; }
-  .af-step {
-    display:flex; align-items:flex-start; gap:14px;
-    padding:12px 0; position:relative;
-  }
-  .af-step:not(:last-child)::after {
-    content:''; position:absolute; left:15px; top:40px; bottom:0;
-    width:1px; background:var(--border);
-  }
-  .af-step-num {
-    width:30px; height:30px; border-radius:50%; flex-shrink:0;
-    background:rgba(56,189,248,.1); border:1px solid rgba(56,189,248,.2);
-    display:flex; align-items:center; justify-content:center;
-    font-size:12px; font-weight:700; color:var(--accent);
-    position:relative; z-index:1;
-  }
+  .af-step { display:flex; align-items:flex-start; gap:14px; padding:12px 0; position:relative; }
+  .af-step:not(:last-child)::after { content:''; position:absolute; left:15px; top:40px; bottom:0; width:1px; background:var(--border); }
+  .af-step-num { width:30px; height:30px; border-radius:50%; flex-shrink:0; background:rgba(56,189,248,.1); border:1px solid rgba(56,189,248,.2); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--accent); position:relative; z-index:1; }
   .af-step-title { font-size:13px; font-weight:600; color:var(--white); margin-bottom:3px; }
   .af-step-desc  { font-size:12px; color:var(--muted); line-height:1.5; }
 
   /* ── HISTORY ── */
-  .af-history-list { display:flex; flex-direction:column; gap:0; }
-  .af-history-item {
-    display:flex; justify-content:space-between; align-items:center;
-    padding:13px 0; border-bottom:1px solid rgba(99,179,237,.06);
-  }
+  .af-history-item { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(99,179,237,.06); }
   .af-history-item:last-child { border-bottom:none; }
-  .af-history-icon {
-    width:34px; height:34px; border-radius:9px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:14px; flex-shrink:0; margin-right:12px;
-    background:rgba(34,158,217,.1); color:var(--tg);
-  }
+  .af-history-icon { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; margin-right:12px; background:rgba(56,189,248,.1); color:var(--accent); }
   .af-history-left { display:flex; align-items:center; }
   .af-history-method { font-size:13px; font-weight:600; color:var(--white); }
   .af-history-date   { font-size:11px; color:var(--muted); margin-top:2px; }
-  .af-history-right  { text-align:right; }
   .af-history-amount { font-size:14px; font-weight:700; color:var(--accent3); }
-  .af-badge {
-    display:inline-flex; align-items:center; gap:4px;
-    padding:3px 9px; border-radius:100px;
-    font-size:10px; font-weight:700; margin-top:3px;
-  }
-  .af-badge-ok  { background:rgba(52,211,153,.1);  color:#34d399; border:1px solid rgba(52,211,153,.2); }
+  .af-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:100px; font-size:10px; font-weight:700; margin-top:3px; }
+  .af-badge-ok   { background:rgba(52,211,153,.1);  color:#34d399; border:1px solid rgba(52,211,153,.2); }
   .af-badge-wait { background:rgba(251,191,36,.1);  color:#fbbf24; border:1px solid rgba(251,191,36,.2); }
+  .af-badge-rej  { background:rgba(248,113,113,.1); color:#f87171; border:1px solid rgba(248,113,113,.2); }
 
-  /* Empty */
-  .af-empty {
-    text-align:center; padding:40px 20px;
-  }
-  .af-empty-icon {
-    width:60px; height:60px; border-radius:50%;
-    background:rgba(56,189,248,.06); border:1px solid rgba(56,189,248,.12);
-    display:flex; align-items:center; justify-content:center;
-    font-size:24px; color:var(--muted); margin:0 auto 16px;
-  }
+  .af-empty { text-align:center; padding:36px 20px; }
+  .af-empty-icon { width:54px; height:54px; border-radius:50%; background:rgba(56,189,248,.06); border:1px solid rgba(56,189,248,.12); display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--muted); margin:0 auto 14px; }
   .af-empty h4 { font-size:14px; font-weight:600; color:var(--white); margin-bottom:5px; }
   .af-empty p  { font-size:12px; color:var(--muted); }
 
-  /* ── BALANCE DISPLAY ── */
-  .af-balance-card {
-    background:linear-gradient(135deg, #0d1f3c, #0a1628);
-    border:1px solid rgba(56,189,248,.18);
-    border-radius:18px; padding:22px;
-    position:relative; overflow:hidden;
-  }
+  /* ── BALANCE ── */
+  .af-balance-card { background:linear-gradient(135deg,#0d1f3c,#0a1628); border:1px solid rgba(56,189,248,.18); border-radius:18px; padding:22px; position:relative; overflow:hidden; }
   .af-balance-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--grad); }
-  .af-bal-glow {
-    position:absolute; top:-50px; right:-50px; width:180px; height:180px;
-    background:radial-gradient(circle, rgba(56,189,248,.1), transparent 70%);
-    pointer-events:none;
-  }
+  .af-bal-glow { position:absolute; top:-50px; right:-50px; width:180px; height:180px; background:radial-gradient(circle,rgba(56,189,248,.1),transparent 70%); pointer-events:none; }
   .af-bal-label { font-size:11px; color:var(--muted); letter-spacing:.5px; text-transform:uppercase; margin-bottom:8px; }
-  .af-bal-amount {
-    font-family:'Syne',sans-serif;
-    font-size:32px; font-weight:800; letter-spacing:-1.5px;
-    background:var(--grad-g); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    line-height:1; margin-bottom:4px;
-  }
+  .af-bal-amount { font-family:'Syne',sans-serif; font-size:32px; font-weight:800; letter-spacing:-1.5px; background:var(--grad-g); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:4px; }
   .af-bal-cur { font-size:14px; color:var(--muted); -webkit-text-fill-color:var(--muted); }
-  .af-bal-sub { font-size:12px; color:var(--muted); margin-top:4px; }
 
-  @media (max-width:900px) { .af-layout { grid-template-columns:1fr; } }
-  @media (max-width:500px) { .af-methods { grid-template-columns:1fr 1fr; } }
+  @media(max-width:900px){ .af-layout{grid-template-columns:1fr;} }
+  @media(max-width:500px){ .af-methods{grid-template-columns:1fr 1fr;} }
 </style>
 
 <!-- HEADER -->
@@ -287,144 +164,183 @@
     <div class="af-header-icon"><i class="fas fa-wallet"></i></div>
     <div>
       <div class="af-title">Balans To'ldirish</div>
-      <div class="af-subtitle">Qulay usulni tanlang va to'lovni amalga oshiring</div>
+      <div class="af-subtitle">Karta raqamiga o'tkazing va chekni yuklang</div>
     </div>
   </div>
 </div>
 
 <div class="af-layout">
-
   <!-- LEFT -->
   <div class="af-left">
+    <form action="/add-funds" method="POST" enctype="multipart/form-data" id="af-form">
+      <div class="af-card">
+        <div class="af-card-title"><i class="fas fa-credit-card"></i> To'lov tafsilotlari</div>
 
-    <!-- MAIN FORM CARD -->
-    <div class="af-card">
-      <div class="af-card-title"><i class="fas fa-credit-card"></i> To'lov tafsilotlari</div>
-
-      <!-- AMOUNT -->
-      <div class="af-amount-wrap">
+        <!-- SUMMA -->
         <label class="af-amount-label">To'lov summasi</label>
         <div class="af-amount-input-wrap">
           <span class="cur">₩</span>
-          <input type="number" id="af-amount" class="af-amount-input"
-                 placeholder="50 000" min="5000" oninput="onAmountInput()">
+          <input type="number" name="amount" id="af-amount" class="af-amount-input"
+                 placeholder="50 000" min="5000" required oninput="onAmountInput()">
         </div>
         <div class="af-amount-hint"><i class="fas fa-info-circle"></i> Minimal: 5,000 so'm</div>
-        <div class="af-quick-btns" id="af-quick">
-          <button class="af-quick-btn" onclick="setAmount(10000)">10,000</button>
-          <button class="af-quick-btn" onclick="setAmount(25000)">25,000</button>
-          <button class="af-quick-btn" onclick="setAmount(50000)">50,000</button>
-          <button class="af-quick-btn" onclick="setAmount(100000)">100,000</button>
-          <button class="af-quick-btn" onclick="setAmount(250000)">250,000</button>
+        <div class="af-quick-btns">
+          <button type="button" class="af-quick-btn" onclick="setAmount(10000)">10,000</button>
+          <button type="button" class="af-quick-btn" onclick="setAmount(25000)">25,000</button>
+          <button type="button" class="af-quick-btn" onclick="setAmount(50000)">50,000</button>
+          <button type="button" class="af-quick-btn" onclick="setAmount(100000)">100,000</button>
+          <button type="button" class="af-quick-btn" onclick="setAmount(250000)">250,000</button>
         </div>
-      </div>
 
-      <!-- PAYMENT METHODS -->
-      <label class="af-methods-label">To'lov usuli</label>
-      <div class="af-methods">
-
-        <div class="af-pay-card selected" onclick="afSelect(this,'Payme')" id="pay-payme">
-          <div class="af-pay-check"><i class="fas fa-check"></i></div>
-          <div class="af-pay-icon" style="background:rgba(0,178,255,.1)">
-            <i class="fas fa-mobile-screen-button" style="color:#00B2FF"></i>
+        <!-- TO'LOV USULI -->
+        <label class="af-methods-label">To'lov usuli</label>
+        <div class="af-methods">
+          <div class="af-pay-card selected" onclick="afSelect(this,'Karta (Payme/Click)')">
+            <div class="af-pay-check"><i class="fas fa-check"></i></div>
+            <div class="af-pay-icon" style="background:rgba(56,189,248,.1)"><i class="fas fa-credit-card" style="color:#38bdf8"></i></div>
+            <div class="af-pay-name">Karta</div>
+            <div class="af-pay-sub">Payme / Click</div>
           </div>
-          <div class="af-pay-name">Payme</div>
-          <div class="af-pay-sub">Karta orqali</div>
-        </div>
-
-        <div class="af-pay-card" onclick="afSelect(this,'Click')" id="pay-click">
-          <div class="af-pay-check"><i class="fas fa-check"></i></div>
-          <div class="af-pay-icon" style="background:rgba(255,107,26,.1)">
-            <i class="fas fa-bolt" style="color:#FF6B1A"></i>
+          <div class="af-pay-card" onclick="afSelect(this,'USDT TRC-20')">
+            <div class="af-pay-check"><i class="fas fa-check"></i></div>
+            <div class="af-pay-icon" style="background:rgba(38,161,123,.1)"><i class="fab fa-bitcoin" style="color:#26A17B"></i></div>
+            <div class="af-pay-name">USDT TRC-20</div>
+            <div class="af-pay-sub">Kripto</div>
           </div>
-          <div class="af-pay-name">Click</div>
-          <div class="af-pay-sub">Karta orqali</div>
-        </div>
-
-        <div class="af-pay-card" onclick="afSelect(this,'TonKeeper')" id="pay-ton">
-          <div class="af-pay-check"><i class="fas fa-check"></i></div>
-          <div class="af-pay-icon" style="background:rgba(56,189,248,.1)">
-            <i class="fas fa-gem" style="color:#38bdf8"></i>
+          <div class="af-pay-card" onclick="afSelect(this,'TonKeeper')">
+            <div class="af-pay-check"><i class="fas fa-check"></i></div>
+            <div class="af-pay-icon" style="background:rgba(56,189,248,.08)"><i class="fas fa-gem" style="color:#38bdf8"></i></div>
+            <div class="af-pay-name">TonKeeper</div>
+            <div class="af-pay-sub">TON / USDT</div>
           </div>
-          <div class="af-pay-name">TonKeeper</div>
-          <div class="af-pay-sub">TON / USDT</div>
-        </div>
-
-        <div class="af-pay-card" onclick="afSelect(this,'USDT')" id="pay-usdt">
-          <div class="af-pay-check"><i class="fas fa-check"></i></div>
-          <div class="af-pay-icon" style="background:rgba(38,161,123,.1)">
-            <i class="fab fa-bitcoin" style="color:#26A17B"></i>
+          <div class="af-pay-card" onclick="afSelect(this,'Naqd pul')">
+            <div class="af-pay-check"><i class="fas fa-check"></i></div>
+            <div class="af-pay-icon" style="background:rgba(52,211,153,.1)"><i class="fas fa-money-bill-wave" style="color:#34d399"></i></div>
+            <div class="af-pay-name">Naqd pul</div>
+            <div class="af-pay-sub">Ofis / Kuryer</div>
           </div>
-          <div class="af-pay-name">USDT TRC-20</div>
-          <div class="af-pay-sub">Kripto to'lov</div>
         </div>
+        <input type="hidden" name="method" id="af-method-input" value="Karta (Payme/Click)">
 
-      </div>
+<!-- KARTA RAQAMI -->
+<div class="af-card-info">
+  <div class="af-card-info-title"><i class="fas fa-credit-card"></i> To'lov rekviziti</div>
+  <div class="af-card-number-wrap">
+    <div class="af-card-number" id="card-num-display" onclick="copyCard()">{{ card_number }}</div>
+    <button type="button" class="af-copy-btn" onclick="copyCard()">
+      <i class="fas fa-copy" id="copy-icon"></i> <span id="copy-text">Nusxa</span>
+    </button>
+  </div>
+  <div class="af-card-owner"><i class="fas fa-user-check"></i> {{ card_owner }}</div>
 
-      <!-- TELEGRAM BUTTON -->
-      <a id="af-tg-btn" href="https://t.me/yakkavazir" target="_blank"
-         class="af-tg-btn" onclick="return afGo()">
-        <span class="tg-icon"><i class="fab fa-telegram"></i></span>
-        @yakkavazir orqali to'lash
-        <i class="fas fa-arrow-right" style="font-size:13px;margin-left:auto;opacity:.7"></i>
-      </a>
-
-      <!-- INFO BOX -->
-      <div class="af-tg-info">
-        <div class="af-tg-info-icon"><i class="fab fa-telegram"></i></div>
-        <p>
-          Tugmani bosing —
-          <a href="https://t.me/yakkavazir" target="_blank" class="af-tg-username">
-            <i class="fab fa-telegram" style="font-size:11px"></i> @yakkavazir
-          </a>
-          ga o'tasiz. Bot to'lov usuli va summa bo'yicha yo'riqnoma beradi.
-          <br><br>
-          <strong>Diqqat:</strong> To'lovdan keyin skreenshot yuboring, balans 5-10 daqiqada qo'shiladi.
-        </p>
-      </div>
+  <div class="af-warning-box" style="margin-top:12px;flex-direction:column;gap:10px">
+    <div style="display:flex;gap:8px;align-items:flex-start">
+      <i class="fas fa-shield-halved" style="color:#fbbf24;margin-top:2px;flex-shrink:0"></i>
+      <span style="font-size:12px;color:#fbbf24;font-weight:700;line-height:1.6">
+        MAXFIYLIK VA XAVFSIZLIK SIYOSATI
+      </span>
     </div>
 
-    <!-- HOW TO PAY -->
+    <div style="display:flex;gap:8px;align-items:flex-start">
+      <i class="fas fa-triangle-exclamation" style="color:#f87171;margin-top:2px;flex-shrink:0"></i>
+      <span style="font-size:12px;color:#f87171;line-height:1.65">
+        <strong>Firibgarlik haqida:</strong> Bu karta raqami faqat SMMZone.uz xizmatiga to'lov qabul qilish uchun ajratilgan shaxsiy hisob. Ushbu karta orqali hech qachon boshqa maqsadda pul o'tkazma amalga oshirilmaydi.
+      </span>
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:flex-start">
+      <i class="fas fa-user-secret" style="color:#a78bfa;margin-top:2px;flex-shrink:0"></i>
+      <span style="font-size:12px;color:rgba(167,139,250,.85);line-height:1.65">
+        <strong>Ma'lumotlar maxfiyligi:</strong> Sizning to'lov ma'lumotlaringiz (karta raqami, sana, summa) uchinchi shaxslarga hech qachon oshkor etilmaydi va faqat ichki tizimda saqlanadi.
+      </span>
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:flex-start">
+      <i class="fas fa-lock" style="color:#34d399;margin-top:2px;flex-shrink:0"></i>
+      <span style="font-size:12px;color:rgba(52,211,153,.85);line-height:1.65">
+        <strong>Xavfsiz to'lov:</strong> Karta egasi — <strong style="color:#34d399">{{ card_owner }}</strong> — bu kartani faqat SMMZone.uz foydalanuvchilaridan to'lov qabul qilish uchun ishlatadi. Sizning pulингиз boshqa maqsadga ishlatilmaydi, kafolat beramiz.
+      </span>
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:flex-start">
+      <i class="fas fa-circle-exclamation" style="color:#fb923c;margin-top:2px;flex-shrink:0"></i>
+      <span style="font-size:12px;color:rgba(251,146,60,.85);line-height:1.65">
+        <strong>Diqqat:</strong> Agar siz ushbu karta orqali firibgarlik yoki noto'g'ri harakatni sezсangиз, darhol <a href="https://t.me/" target="_blank" style="color:#38bdf8;text-decoration:none">+998997595515</a> ga xabar bering. Biz 24/7 javob beramiz.
+      </span>
+    </div>
+
+    <div style="margin-top:4px;padding:10px 14px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.15);border-radius:10px">
+      <div style="font-size:11px;color:#7a8fad;line-height:1.7">
+        ✅ To'lov chekini yuklash <strong style="color:#e2eaf8">majburiy</strong> — cheksiz to'lovlar qabul qilinmaydi.<br>
+        ✅ Balans <strong style="color:#e2eaf8">5–15 daqiqa</strong> ichida qo'shiladi.<br>
+        ✅ Muammo bo'lsa Telegram orqali <strong style="color:#38bdf8">darhol</strong> bog'laning.
+      </div>
+    </div>
+  </div>
+</div>
+
+        <!-- CHEK YUKLASH -->
+        <label class="af-upload-label">To'lov cheki (screenshot)</label>
+        <div class="af-upload-zone" id="af-drop" ondragover="dropOver(event)" ondragleave="dropLeave()" ondrop="dropFile(event)">
+          <input type="file" name="check_file" id="af-file" accept="image/*" onchange="onFileChange(this)" required>
+          <div id="af-upload-placeholder">
+            <div class="af-upload-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+            <div class="af-upload-text">
+              <strong>Chekni shu yerga tashlang</strong> yoki bosing<br>
+              <span style="font-size:11px">PNG, JPG, WEBP • Maks 5MB</span>
+            </div>
+          </div>
+          <div class="af-upload-preview" id="af-preview">
+            <img id="af-preview-img" src="" alt="Chek">
+            <div class="af-preview-name" id="af-preview-name"></div>
+          </div>
+        </div>
+
+        <button type="submit" class="af-submit-btn" id="af-submit" onclick="return validateForm()">
+          <i class="fas fa-paper-plane"></i> Chekni yuborish
+        </button>
+      </div>
+    </form>
+
+    <!-- QANDAY TO'LASH -->
     <div class="af-card">
       <div class="af-card-title"><i class="fas fa-compass"></i> Qanday to'lash kerak?</div>
       <div class="af-steps">
         <div class="af-step">
           <div class="af-step-num">1</div>
           <div>
-            <div class="af-step-title">Summa kiriting</div>
-            <div class="af-step-desc">Yuqoridagi maydonga to'ldirmoqchi bo'lgan summani kiriting (min 5,000 so'm)</div>
+            <div class="af-step-title">Summa va usulni tanlang</div>
+            <div class="af-step-desc">Yuqorida to'ldirmoqchi bo'lgan summa va to'lov usulini belgilang</div>
           </div>
         </div>
         <div class="af-step">
           <div class="af-step-num">2</div>
           <div>
-            <div class="af-step-title">To'lov usulini tanlang</div>
-            <div class="af-step-desc">Payme, Click, TonKeeper yoki USDT — qulayngizni belgilang</div>
+            <div class="af-step-title">Karta raqamiga o'tkazing</div>
+            <div class="af-step-desc">Yuqoridagi karta raqamiga Payme, Click yoki bank ilovasi orqali pul o'tkazing</div>
           </div>
         </div>
         <div class="af-step">
           <div class="af-step-num">3</div>
           <div>
-            <div class="af-step-title">@yakkavazir ga o'ting</div>
-            <div class="af-step-desc">Telegram tugmasini bosing, bot to'liq yo'riqnoma beradi</div>
+            <div class="af-step-title">Chek (screenshot) yuklang</div>
+            <div class="af-step-desc">To'lov chekining rasmini yuqoridagi maydonga yuklang va "Yuborish" tugmasini bosing</div>
           </div>
         </div>
         <div class="af-step">
           <div class="af-step-num">4</div>
           <div>
-            <div class="af-step-title">Balans qo'shiladi</div>
-            <div class="af-step-desc">To'lovdan so'ng 5-10 daqiqa ichida balansga o'tadi</div>
+            <div class="af-step-title">5–15 daqiqa ichida balans qo'shiladi</div>
+            <div class="af-step-desc">Admin chekni ko'rib, tasdiqlaydi va balans hisobingizga o'tkaziladi</div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- RIGHT -->
   <div class="af-right">
-
-    <!-- CURRENT BALANCE -->
+    <!-- BALANS -->
     <div class="af-balance-card">
       <div class="af-bal-glow"></div>
       <div class="af-bal-label">Joriy Balans</div>
@@ -432,33 +348,29 @@
         <span class="af-bal-amount">{{ "{:,.0f}".format(user.balance) }}</span>
         <span class="af-bal-cur">so'm</span>
       </div>
-      <div class="af-bal-sub">Mavjud mablag'ingiz</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Mavjud mablag'ingiz</div>
     </div>
 
-    <!-- HISTORY -->
+    <!-- TARIX -->
     <div class="af-card">
       <div class="af-card-title"><i class="fas fa-clock-rotate-left"></i> To'lov Tarixi</div>
-
       {% if history %}
-      <div class="af-history-list">
+      <div>
         {% for h in history %}
         <div class="af-history-item">
           <div class="af-history-left">
-            <div class="af-history-icon">
-              {% if h.method == 'Payme' %}<i class="fas fa-mobile-screen-button"></i>
-              {% elif h.method == 'Click' %}<i class="fas fa-bolt"></i>
-              {% elif 'USDT' in h.method or 'Ton' in h.method %}<i class="fas fa-gem"></i>
-              {% else %}<i class="fab fa-telegram"></i>{% endif %}
-            </div>
+            <div class="af-history-icon"><i class="fas fa-receipt"></i></div>
             <div>
               <div class="af-history-method">{{ h.method }}</div>
               <div class="af-history-date">{{ h.created_at[:16] }}</div>
             </div>
           </div>
-          <div class="af-history-right">
+          <div style="text-align:right">
             <div class="af-history-amount">+{{ "{:,.0f}".format(h.amount) }} so'm</div>
             {% if h.status == 'completed' %}
               <span class="af-badge af-badge-ok"><i class="fas fa-check" style="font-size:8px"></i> Tasdiqlandi</span>
+            {% elif h.status == 'rejected' %}
+              <span class="af-badge af-badge-rej"><i class="fas fa-times" style="font-size:8px"></i> Rad etildi</span>
             {% else %}
               <span class="af-badge af-badge-wait"><i class="fas fa-clock" style="font-size:8px"></i> Kutilmoqda</span>
             {% endif %}
@@ -474,66 +386,103 @@
       </div>
       {% endif %}
     </div>
-
-    <!-- SUPPORT -->
-    <div class="af-card" style="background:rgba(34,158,217,.05);border-color:rgba(34,158,217,.15)">
-      <div class="af-card-title" style="color:rgba(34,158,217,.7)"><i class="fab fa-telegram" style="color:#229ED9"></i> Yordam kerakmi?</div>
-      <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:14px">
-        To'lov bilan bog'liq muammo bo'lsa yoki savol bo'lsa, Telegram orqali bog'laning.
-      </p>
-      <a href="https://t.me/yakkavazir" target="_blank"
-         style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(34,158,217,.1);border:1px solid rgba(34,158,217,.2);border-radius:10px;color:#38bdf8;font-size:13px;font-weight:600;text-decoration:none;transition:all .2s"
-         onmouseover="this.style.background='rgba(34,158,217,.18)'"
-         onmouseout="this.style.background='rgba(34,158,217,.1)'">
-        <i class="fab fa-telegram"></i> @yakkavazir bilan bog'lanish
-        <i class="fas fa-arrow-right" style="margin-left:auto;font-size:11px;opacity:.6"></i>
-      </a>
-    </div>
-
   </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
 <script>
-  let afMethod = 'Payme';
+let afMethod = 'Karta (Payme/Click)';
 
-  function afSelect(el, val) {
-    document.querySelectorAll('.af-pay-card').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    afMethod = val;
+function afSelect(el, val) {
+  document.querySelectorAll('.af-pay-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  afMethod = val;
+  document.getElementById('af-method-input').value = val;
+}
+
+function setAmount(val) {
+  document.getElementById('af-amount').value = val;
+  document.querySelectorAll('.af-quick-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.textContent.replace(/,/g,'')) === val);
+  });
+}
+
+function onAmountInput() {
+  const v = parseInt(document.getElementById('af-amount').value || 0);
+  document.querySelectorAll('.af-quick-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.textContent.replace(/,/g,'')) === v);
+  });
+}
+
+function copyCard() {
+  const num = '{{ card_number }}';
+  navigator.clipboard.writeText(num.replace(/\s/g,'')).then(() => {
+    document.getElementById('copy-text').textContent = 'Nusxalandi!';
+    document.getElementById('copy-icon').className = 'fas fa-check';
+    setTimeout(() => {
+      document.getElementById('copy-text').textContent = 'Nusxa';
+      document.getElementById('copy-icon').className = 'fas fa-copy';
+    }, 2000);
+  });
+}
+
+function onFileChange(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  if (file.size > 5 * 1024 * 1024) {
+    alert("Fayl hajmi 5MB dan oshmasin");
+    input.value = '';
+    return;
   }
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('af-upload-placeholder').style.display = 'none';
+    const preview = document.getElementById('af-preview');
+    preview.style.display = 'flex';
+    document.getElementById('af-preview-img').src = e.target.result;
+    document.getElementById('af-preview-name').textContent = file.name;
+    document.getElementById('af-drop').classList.add('has-file');
+  };
+  reader.readAsDataURL(file);
+}
 
-  function setAmount(val) {
-    document.getElementById('af-amount').value = val;
-    document.querySelectorAll('.af-quick-btn').forEach(b => {
-      b.classList.toggle('active', parseInt(b.textContent.replace(/,/g,'')) === val);
-    });
+function dropOver(e) { e.preventDefault(); document.getElementById('af-drop').classList.add('drag'); }
+function dropLeave()  { document.getElementById('af-drop').classList.remove('drag'); }
+function dropFile(e)  {
+  e.preventDefault();
+  dropLeave();
+  const dt    = e.dataTransfer;
+  const input = document.getElementById('af-file');
+  if (dt.files.length) {
+    const dT = new DataTransfer();
+    dT.items.add(dt.files[0]);
+    input.files = dT.files;
+    onFileChange(input);
   }
+}
 
-  function onAmountInput() {
-    const v = parseInt(document.getElementById('af-amount').value || 0);
-    document.querySelectorAll('.af-quick-btn').forEach(b => {
-      b.classList.toggle('active', parseInt(b.textContent.replace(/,/g,'')) === v);
-    });
+function validateForm() {
+  const amount = parseInt(document.getElementById('af-amount').value || 0);
+  const file   = document.getElementById('af-file').files[0];
+  if (!amount || amount < 5000) {
+    document.getElementById('af-amount').classList.add('err');
+    document.getElementById('af-amount').focus();
+    setTimeout(() => document.getElementById('af-amount').classList.remove('err'), 2000);
+    return false;
   }
-
-  function afGo() {
-    const amountEl = document.getElementById('af-amount');
-    const amount   = parseInt(amountEl.value || 0);
-
-    if (!amount || amount < 5000) {
-      amountEl.classList.add('err');
-      amountEl.focus();
-      setTimeout(() => amountEl.classList.remove('err'), 2000);
-      return false;
-    }
-
-    const btn  = document.getElementById('af-tg-btn');
-    const text = `pay_${amount}_${afMethod}`;
-    btn.href   = `https://t.me/yakkavazir?start=${text}`;
-    return true;
+  if (!file) {
+    document.getElementById('af-drop').style.borderColor = 'rgba(248,113,113,.5)';
+    setTimeout(() => document.getElementById('af-drop').style.borderColor = '', 2000);
+    return false;
   }
+  const btn = document.getElementById('af-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...';
+  setTimeout(() => {
+    document.getElementById('af-form').submit();
+  }, 100);
+  return false;
+}
 </script>
 {% endblock %}

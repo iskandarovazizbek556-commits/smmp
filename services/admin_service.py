@@ -337,23 +337,28 @@ def sync_orders():
     return redirect(url_for("admin.orders"))
 
 
-# ── TO'LOVLAR ─────────────────────────────────────────────────────────────────
 @admin_bp.route("/payments")
 @admin_required
 def payments():
-    db   = get_db()
+    db    = get_db()
     page  = max(1, int(request.args.get("page", 1)))
     limit = 50
     rows = r2l(db.execute(
-        "SELECT d.id, d.amount, d.method, d.status, d.created_at, d.confirmed_at, u.username "
+        "SELECT d.id, d.amount, d.method, d.status, d.tx_hash as check_url, "
+        "d.created_at, d.confirmed_at, u.username "
         "FROM deposits d "
         "JOIN users u ON d.user_id=u.id "
         "ORDER BY d.created_at DESC LIMIT ? OFFSET ?",
         (limit, (page-1)*limit)
     ).fetchall())
-    total = db.execute("SELECT COUNT(*) FROM deposits").fetchone()[0]
-    return render_template("admin/payments.html", payments=rows, page=page, total=total, limit=limit)
-
+    total         = db.execute("SELECT COUNT(*) FROM deposits").fetchone()[0]
+    pending_count = db.execute("SELECT COUNT(*) FROM deposits WHERE status='pending'").fetchone()[0]
+    return render_template("admin/payments.html",
+                           payments=rows,
+                           page=page,
+                           total=total,
+                           limit=limit,
+                           pending_count=pending_count)
 
 @admin_bp.route("/payments/<int:did>/confirm", methods=["POST"])
 @admin_required

@@ -1,239 +1,109 @@
 {% extends "base.html" %}
-{% block title %}Admin To'lovlar{% endblock %}
+{% block title %}Admin — To'lovlar{% endblock %}
 
 {% block content %}
 <style>
-  .ap-wrap *, .ap-wrap *::before, .ap-wrap *::after { box-sizing: border-box; }
-
+  .ap-wrap *, .ap-wrap *::before, .ap-wrap *::after { box-sizing:border-box; }
   .ap-wrap {
-    --p1: #6366f1;
-    --p1l: #eef2ff;
-    --p1h: #4f46e5;
-    --green: #10b981;
-    --greenl: #d1fae5;
-    --yellow: #f59e0b;
-    --yellowl: #fef3c7;
-    --red: #ef4444;
-    --redl: #fef2f2;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-    --bg: #f3f4f6;
-    --card: #ffffff;
-    --text: #111827;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    color: var(--text);
+    --green:#10b981; --greenl:rgba(16,185,129,.1); --greenbr:rgba(16,185,129,.25);
+    --yellow:#f59e0b; --yellowl:rgba(245,158,11,.1); --yellowbr:rgba(245,158,11,.25);
+    --red:#ef4444;   --redl:rgba(239,68,68,.1);     --redbr:rgba(239,68,68,.25);
+    --accent:#38bdf8;
+    font-family:'DM Sans',sans-serif;
   }
 
   /* HEADER */
-  .ap-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .ap-header-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: var(--greenl);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--green);
-    font-size: 18px;
-  }
-
-  .ap-header h1 {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0;
-    color: var(--text);
-  }
-
-  .ap-header-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .ap-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:12px; }
+  .ap-header-left { display:flex; align-items:center; gap:14px; }
+  .ap-header-icon { width:42px; height:42px; border-radius:12px; background:var(--greenl); border:1px solid var(--greenbr); display:flex; align-items:center; justify-content:center; color:var(--green); font-size:18px; }
+  .ap-header h1  { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:#fff; margin:0; }
+  .ap-header-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+  .ap-pending-pill { padding:6px 14px; border-radius:100px; background:var(--yellowl); border:1px solid var(--yellowbr); font-size:12px; font-weight:700; color:#fbbf24; display:flex; align-items:center; gap:6px; }
 
   /* CARD */
-  .ap-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-  }
-
-  .ap-card-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
-  }
-
-  .ap-card-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .ap-pending-count {
-    font-size: 11px;
-    font-weight: 700;
-    background: var(--yellowl);
-    color: #92400e;
-    padding: 3px 10px;
-    border-radius: 20px;
-  }
+  .ap-card { background:#0d1628; border:1px solid rgba(99,179,237,.12); border-radius:18px; overflow:hidden; }
+  .ap-card-head { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid rgba(99,179,237,.1); background:rgba(255,255,255,.02); }
+  .ap-card-title { font-size:13px; font-weight:700; color:#e2eaf8; }
 
   /* TABLE */
-  .ap-table-wrap { overflow-x: auto; }
+  .ap-table-wrap { overflow-x:auto; }
+  .ap-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .ap-table th { padding:10px 16px; text-align:left; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#7a8fad; border-bottom:1px solid rgba(99,179,237,.1); white-space:nowrap; }
+  .ap-table td { padding:14px 16px; border-bottom:1px solid rgba(99,179,237,.06); vertical-align:middle; }
+  .ap-table tbody tr:last-child td { border-bottom:none; }
+  .ap-table tbody tr:hover { background:rgba(255,255,255,.02); }
 
-  .ap-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
+  .ap-id { font-weight:700; color:var(--accent); font-size:12px; }
+  .ap-user { font-weight:600; color:#e2eaf8; }
+  .ap-amount { font-weight:800; color:var(--green); font-size:15px; }
+  .ap-amount span { font-size:11px; font-weight:500; color:#7a8fad; margin-left:2px; }
 
-  .ap-table thead tr { background: var(--bg); }
+  .ap-method { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:100px; font-size:11px; font-weight:600; background:rgba(255,255,255,.05); color:#7a8fad; border:1px solid rgba(99,179,237,.12); }
+  .ap-time { font-size:11px; color:#7a8fad; white-space:nowrap; }
 
-  .ap-table th {
-    padding: 10px 16px;
-    text-align: left;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    white-space: nowrap;
-    border-bottom: 1px solid var(--border);
-  }
+  .ap-badge { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:100px; font-size:11px; font-weight:700; }
+  .ap-badge.confirmed { background:var(--greenl);  color:#34d399; border:1px solid var(--greenbr); }
+  .ap-badge.pending   { background:var(--yellowl); color:#fbbf24; border:1px solid var(--yellowbr); }
+  .ap-badge.rejected  { background:var(--redl);    color:#f87171; border:1px solid var(--redbr); }
 
-  .ap-table td {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    vertical-align: middle;
-  }
-
-  .ap-table tbody tr:last-child td { border-bottom: none; }
-  .ap-table tbody tr:hover { background: #fafafa; }
-
-  .ap-id { font-weight: 700; color: var(--p1); font-size: 12px; }
-  .ap-user { font-weight: 600; }
-  .ap-amount { font-weight: 800; color: var(--green); font-size: 14px; }
-  .ap-amount span { font-size: 11px; font-weight: 500; color: var(--muted); margin-left: 2px; }
-
-  /* METHOD BADGE */
-  .ap-method {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    background: var(--bg);
-    color: var(--muted);
-    border: 1px solid var(--border);
-  }
-
-  /* STATUS BADGE */
-  .ap-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-  }
-
-  .ap-badge.confirmed {
-    background: var(--greenl);
-    color: #065f46;
-  }
-
-  .ap-badge.pending {
-    background: var(--yellowl);
-    color: #92400e;
-  }
-
-  .ap-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
-
-  /* CONFIRM BUTTON */
-  .ap-confirm-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 8px;
-    background: var(--greenl);
-    color: #065f46;
-    border: 1px solid rgba(16,185,129,0.3);
-    font-size: 12px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-
-  .ap-confirm-btn:hover {
-    background: #a7f3d0;
-    box-shadow: 0 2px 8px rgba(16,185,129,0.2);
-  }
-
-  .ap-confirm-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  /* ACTIONS */
+  .ap-actions { display:flex; gap:7px; flex-wrap:wrap; }
+  .ap-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:9px; font-size:12px; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all .18s; border:none; white-space:nowrap; }
+  .ap-btn-confirm { background:var(--greenl); color:#34d399; border:1px solid var(--greenbr); }
+  .ap-btn-confirm:hover { background:rgba(52,211,153,.2); }
+  .ap-btn-reject  { background:var(--redl);   color:#f87171; border:1px solid var(--redbr); }
+  .ap-btn-reject:hover  { background:rgba(248,113,113,.18); }
+  .ap-btn-view    { background:rgba(56,189,248,.08); color:var(--accent); border:1px solid rgba(56,189,248,.2); }
+  .ap-btn-view:hover    { background:rgba(56,189,248,.16); }
+  .ap-btn:disabled { opacity:.4; cursor:not-allowed; }
 
   /* EMPTY */
-  .ap-empty {
-    text-align: center;
-    padding: 48px 20px;
-    color: var(--muted);
-  }
+  .ap-empty { text-align:center; padding:52px 20px; }
+  .ap-empty-icon { font-size:36px; color:#7a8fad; margin-bottom:12px; }
+  .ap-empty p { font-size:14px; color:#7a8fad; }
 
-  .ap-empty-icon { font-size: 36px; margin-bottom: 10px; }
-  .ap-empty p { font-size: 14px; margin: 0; }
+  /* MODAL */
+  .ap-modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(6px); z-index:900; align-items:center; justify-content:center; padding:20px; }
+  .ap-modal-bg.show { display:flex; }
+  .ap-modal { background:#0d1628; border:1px solid rgba(99,179,237,.2); border-radius:20px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; position:relative; }
+  .ap-modal-head { display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid rgba(99,179,237,.1); }
+  .ap-modal-title { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color:#fff; }
+  .ap-modal-close { width:32px; height:32px; border-radius:9px; background:rgba(255,255,255,.06); border:none; color:#7a8fad; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .18s; }
+  .ap-modal-close:hover { background:rgba(248,113,113,.15); color:#f87171; }
+  .ap-modal-body { padding:22px; }
+  .ap-modal-img { width:100%; border-radius:12px; border:1px solid rgba(99,179,237,.15); object-fit:contain; max-height:420px; display:block; }
+  .ap-modal-info { margin-top:16px; display:flex; flex-direction:column; gap:10px; }
+  .ap-modal-row { display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:rgba(255,255,255,.03); border-radius:10px; border:1px solid rgba(99,179,237,.08); }
+  .ap-modal-row-label { font-size:12px; color:#7a8fad; }
+  .ap-modal-row-val   { font-size:13px; font-weight:600; color:#e2eaf8; }
+  .ap-modal-btns { display:flex; gap:10px; margin-top:18px; }
+  .ap-modal-btns .ap-btn { flex:1; justify-content:center; padding:12px; font-size:13px; }
 
   /* TOAST */
-  .ap-toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    opacity: 0;
-    transition: opacity 0.25s;
-    z-index: 999;
-    pointer-events: none;
-  }
-
-  .ap-toast.success { background: #111827; color: #fff; }
-  .ap-toast.error   { background: var(--red); color: #fff; }
-  .ap-toast.show    { opacity: 1; }
+  .ap-toast { position:fixed; bottom:24px; right:24px; padding:11px 20px; border-radius:12px; font-size:13px; font-weight:600; opacity:0; transition:opacity .25s; z-index:999; pointer-events:none; }
+  .ap-toast.s { background:#0d1628; border:1px solid var(--greenbr); color:#34d399; }
+  .ap-toast.e { background:#0d1628; border:1px solid var(--redbr);   color:#f87171; }
+  .ap-toast.on { opacity:1; }
 </style>
 
 <div class="ap-wrap">
-
   <div class="ap-header">
-    <div class="ap-header-icon"><i class="fas fa-wallet"></i></div>
-    <div>
-      <h1>To'lovlar</h1>
-      <div class="ap-header-sub">Barcha depozit so'rovlari</div>
+    <div class="ap-header-left">
+      <div class="ap-header-icon"><i class="fas fa-receipt"></i></div>
+      <div>
+        <h1>To'lovlar</h1>
+        <div class="ap-header-sub">Foydalanuvchilar yuborgan cheklar</div>
+      </div>
     </div>
+    {% if pending_count > 0 %}
+    <span class="ap-pending-pill"><i class="fas fa-clock"></i> {{ pending_count }} ta kutilmoqda</span>
+    {% endif %}
   </div>
 
   <div class="ap-card">
     <div class="ap-card-head">
-      <div class="ap-card-title">To'lovlar tarixi</div>
-      {% set pending_count = payments | selectattr('status', 'equalto', 'pending') | list | length %}
-      {% if pending_count > 0 %}
-      <span class="ap-pending-count">⏳ {{ pending_count }} ta kutilmoqda</span>
-      {% endif %}
+      <div class="ap-card-title">Barcha to'lovlar</div>
+      <span style="font-size:12px;color:#7a8fad">Jami: {{ payments|length }}</span>
     </div>
 
     <div class="ap-table-wrap">
@@ -246,99 +116,212 @@
             <th>Usul</th>
             <th>Status</th>
             <th>Sana</th>
-            <th>Amal</th>
+            <th>Amallar</th>
           </tr>
         </thead>
         <tbody>
         {% for p in payments %}
-        <tr id="pay-row-{{ p.id }}">
+        <tr id="row-{{ p.id }}">
           <td><span class="ap-id">#{{ p.id }}</span></td>
           <td><span class="ap-user">{{ p.username }}</span></td>
-          <td>
-            <span class="ap-amount">
-              {{ "{:,.0f}".format(p.amount) }}<span>so'm</span>
-            </span>
-          </td>
+          <td><span class="ap-amount">{{ "{:,.0f}".format(p.amount) }}<span>so'm</span></span></td>
           <td>
             <span class="ap-method">
-              {% if p.method == 'Payme' %}<i class="fas fa-mobile-alt" style="color:#00B2FF"></i>
-              {% elif p.method == 'Click' %}<i class="fas fa-bolt" style="color:#FF6B1A"></i>
-              {% elif p.method == 'USDT' %}<i class="fab fa-bitcoin" style="color:#26A17B"></i>
-              {% elif p.method == 'TonKeeper' %}💎
-              {% else %}<i class="fas fa-money-bill"></i>
-              {% endif %}
+              {% if 'Karta' in p.method or 'Payme' in p.method %}<i class="fas fa-credit-card" style="color:#38bdf8"></i>
+              {% elif 'Click' in p.method %}<i class="fas fa-bolt" style="color:#FF6B1A"></i>
+              {% elif 'USDT' in p.method %}<i class="fab fa-bitcoin" style="color:#26A17B"></i>
+              {% elif 'Ton' in p.method %}<i class="fas fa-gem" style="color:#38bdf8"></i>
+              {% else %}<i class="fas fa-money-bill"></i>{% endif %}
               {{ p.method }}
             </span>
           </td>
-          <td id="pay-status-{{ p.id }}">
+          <td id="status-{{ p.id }}">
             {% if p.status == 'completed' %}
-            <span class="ap-badge confirmed"><i class="fas fa-check-circle"></i> Tasdiqlandi</span>
+              <span class="ap-badge confirmed"><i class="fas fa-check-circle"></i> Tasdiqlandi</span>
+            {% elif p.status == 'rejected' %}
+              <span class="ap-badge rejected"><i class="fas fa-times-circle"></i> Rad etildi</span>
             {% else %}
-            <span class="ap-badge pending"><i class="fas fa-clock"></i> Kutilmoqda</span>
+              <span class="ap-badge pending"><i class="fas fa-clock"></i> Kutilmoqda</span>
             {% endif %}
           </td>
           <td><span class="ap-time">{{ p.created_at[:16] }}</span></td>
           <td>
-            {% if p.status == 'pending' %}
-            <button class="ap-confirm-btn" id="pay-btn-{{ p.id }}"
-                    onclick="confirmDep({{ p.id }}, this)">
-              <i class="fas fa-check"></i> Tasdiqlash
-            </button>
-            {% endif %}
-          </td>
-        </tr>
-        {% else %}
-        <tr>
-          <td colspan="7">
-            <div class="ap-empty">
-              <div class="ap-empty-icon">💳</div>
-              <p>Hech qanday to'lov topilmadi</p>
+            <div class="ap-actions">
+              {% if p.check_url %}
+              <button class="ap-btn ap-btn-view"
+                      onclick="openModal({{ p.id }}, '{{ p.check_url }}', '{{ p.username }}', {{ p.amount }}, '{{ p.method }}', '{{ p.created_at[:16] }}', '{{ p.status }}')">
+                <i class="fas fa-eye"></i> Chek
+              </button>
+              {% endif %}
+              {% if p.status == 'pending' %}
+              <button class="ap-btn ap-btn-confirm" id="cbtn-{{ p.id }}" onclick="confirmDep({{ p.id }})">
+                <i class="fas fa-check"></i> Tasdiqlash
+              </button>
+              <button class="ap-btn ap-btn-reject"  id="rbtn-{{ p.id }}" onclick="rejectDep({{ p.id }})">
+                <i class="fas fa-times"></i>
+              </button>
+              {% endif %}
             </div>
           </td>
         </tr>
+        {% else %}
+        <tr><td colspan="7">
+          <div class="ap-empty">
+            <div class="ap-empty-icon"><i class="fas fa-inbox"></i></div>
+            <p>Hali to'lovlar yo'q</p>
+          </div>
+        </td></tr>
         {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
-
 </div>
 
-<div class="ap-toast" id="ap-toast"></div>
+<!-- CHECK MODAL -->
+<div class="ap-modal-bg" id="ap-modal">
+  <div class="ap-modal">
+    <div class="ap-modal-head">
+      <div class="ap-modal-title">To'lov cheki</div>
+      <button class="ap-modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="ap-modal-body">
+      <img id="modal-img" src="" alt="Chek" class="ap-modal-img">
+      <div class="ap-modal-info">
+        <div class="ap-modal-row">
+          <span class="ap-modal-row-label">Foydalanuvchi</span>
+          <span class="ap-modal-row-val" id="modal-user"></span>
+        </div>
+        <div class="ap-modal-row">
+          <span class="ap-modal-row-label">Summa</span>
+          <span class="ap-modal-row-val" id="modal-amount" style="color:#34d399"></span>
+        </div>
+        <div class="ap-modal-row">
+          <span class="ap-modal-row-label">Usul</span>
+          <span class="ap-modal-row-val" id="modal-method"></span>
+        </div>
+        <div class="ap-modal-row">
+          <span class="ap-modal-row-label">Sana</span>
+          <span class="ap-modal-row-val" id="modal-date"></span>
+        </div>
+      </div>
+      <div class="ap-modal-btns" id="modal-btns"></div>
+    </div>
+  </div>
+</div>
 
+<div class="ap-toast" id="toast"></div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('ap-toast');
-  t.textContent = msg;
-  t.className = 'ap-toast ' + type + ' show';
-  setTimeout(() => t.classList.remove('show'), 2500);
+let currentDepId = null;
+
+function openModal(id, checkUrl, username, amount, method, date, status) {
+  currentDepId = id;
+  document.getElementById('modal-img').src    = checkUrl;
+  document.getElementById('modal-user').textContent   = username;
+  document.getElementById('modal-amount').textContent = new Intl.NumberFormat('uz').format(amount) + ' so\'m';
+  document.getElementById('modal-method').textContent = method;
+  document.getElementById('modal-date').textContent   = date;
+
+  const btns = document.getElementById('modal-btns');
+  btns.innerHTML = '';
+  if (status === 'pending') {
+    btns.innerHTML = `
+      <button class="ap-btn ap-btn-confirm" style="flex:1;justify-content:center;padding:13px" onclick="confirmDep(${id},true)">
+        <i class="fas fa-check"></i> Tasdiqlash
+      </button>
+      <button class="ap-btn ap-btn-reject" style="flex:1;justify-content:center;padding:13px" onclick="rejectDep(${id},true)">
+        <i class="fas fa-times"></i> Rad etish
+      </button>`;
+  }
+  document.getElementById('ap-modal').classList.add('show');
 }
 
-async function confirmDep(id, btn) {
-  if (!confirm("To'lovni tasdiqlansinmi?")) return;
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Tekshirilmoqda...';
+function closeModal() {
+  document.getElementById('ap-modal').classList.remove('show');
+}
 
-  try {
-    const r = await fetch(`/admin/payments/${id}/confirm`, { method: "POST" }).then(r => r.json());
-    if (r.ok) {
-      document.getElementById('pay-status-' + id).innerHTML =
-        '<span class="ap-badge confirmed"><i class="fas fa-check-circle"></i> Tasdiqlandi</span>';
-      btn.remove();
-      showToast('✓ To\'lov tasdiqlandi!', 'success');
-    } else {
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-check"></i> Tasdiqlash';
-      showToast('❌ ' + (r.message || 'Xatolik yuz berdi'), 'error');
-    }
-  } catch {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-check"></i> Tasdiqlash';
-    showToast('❌ Server bilan bog\'lanib bo\'lmadi', 'error');
+document.getElementById('ap-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function showToast(msg, type='s') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'ap-toast ' + type + ' on';
+  setTimeout(() => t.classList.remove('on'), 3000);
+}
+
+async function confirmDep(id, fromModal=false) {
+  if (!confirm("To'lovni tasdiqlash va balansni qo'shish?")) return;
+  disableBtns(id);
+
+  const r = await fetch(`/admin/payments/${id}/confirm`, {method:'POST'}).then(r=>r.json()).catch(()=>({ok:false}));
+  if (r.ok) {
+    setStatus(id, 'confirmed', '<i class="fas fa-check-circle"></i> Tasdiqlandi');
+    removeBtns(id);
+    showToast('✓ To\'lov tasdiqlandi!', 's');
+    if (fromModal) closeModal();
+    updatePendingCount(-1);
+  } else {
+    enableBtns(id);
+    showToast('❌ ' + (r.message || 'Xatolik'), 'e');
   }
+}
+
+async function rejectDep(id, fromModal=false) {
+  if (!confirm("To'lovni rad etasizmi?")) return;
+  disableBtns(id);
+
+  const r = await fetch(`/admin/payments/${id}/reject`, {method:'POST'}).then(r=>r.json()).catch(()=>({ok:false}));
+  if (r.ok) {
+    setStatus(id, 'rejected', '<i class="fas fa-times-circle"></i> Rad etildi');
+    removeBtns(id);
+    showToast('To\'lov rad etildi', 's');
+    if (fromModal) closeModal();
+    updatePendingCount(-1);
+  } else {
+    enableBtns(id);
+    showToast('❌ Xatolik yuz berdi', 'e');
+  }
+}
+
+function setStatus(id, cls, html) {
+  const el = document.getElementById('status-'+id);
+  if (el) el.innerHTML = `<span class="ap-badge ${cls}">${html}</span>`;
+}
+
+function removeBtns(id) {
+  ['cbtn-'+id, 'rbtn-'+id].forEach(bid => {
+    const b = document.getElementById(bid);
+    if (b) b.remove();
+  });
+}
+
+function disableBtns(id) {
+  ['cbtn-'+id, 'rbtn-'+id].forEach(bid => {
+    const b = document.getElementById(bid);
+    if (b) { b.disabled = true; b.style.opacity='.5'; }
+  });
+}
+
+function enableBtns(id) {
+  ['cbtn-'+id, 'rbtn-'+id].forEach(bid => {
+    const b = document.getElementById(bid);
+    if (b) { b.disabled = false; b.style.opacity=''; }
+  });
+}
+
+function updatePendingCount(delta) {
+  const pill = document.querySelector('.ap-pending-pill');
+  if (!pill) return;
+  const match = pill.textContent.match(/\d+/);
+  if (!match) return;
+  const newVal = parseInt(match[0]) + delta;
+  if (newVal <= 0) pill.remove();
+  else pill.innerHTML = `<i class="fas fa-clock"></i> ${newVal} ta kutilmoqda`;
 }
 </script>
 {% endblock %}

@@ -6,7 +6,7 @@ from config import Config
 from database.db import get_db, close_db
 from database.migrate import init_db
 from utils.logger import log
-
+from services.balance_service import balance_bp
 # ─── App ──────────────────────────────────────
 app = Flask(__name__,
             template_folder="templates",
@@ -34,7 +34,7 @@ app.register_blueprint(user_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(api_bp)
 app.register_blueprint(support_bp)
-
+app.register_blueprint(balance_bp)
 # ─── Payment webhooks ─────────────────────────
 from flask import request, jsonify, render_template
 

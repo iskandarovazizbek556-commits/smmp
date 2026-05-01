@@ -14,8 +14,8 @@ class Config:
 
     PORT         = int(env("PORT", "8000"))
 
-    ADMIN_USER   = env("ADMIN_USER", "admin")
-    ADMIN_PASS   = env("ADMIN_PASS", "admin123")
+    ADMIN_USER   = env("ADMIN_USER", "admin_azizbek_iskandarov_2010")
+    ADMIN_PASS   = env("ADMIN_PASS", "admin20102010")
     ADMIN_EMAIL  = env("ADMIN_EMAIL", "admin@smmpanel.uz")
 
     # Provider API
